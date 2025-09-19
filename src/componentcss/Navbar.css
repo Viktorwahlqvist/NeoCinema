@@ -1,0 +1,20 @@
+/* SIDEBAR desktop */
+.sidebar {
+  width: 8rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;        
+  background-color: #e7f4fe; 
+}
+
+/* BOTTOM NAV ipad/mobil */
+.bottom-nav {
+  background-color: #e7f4fe;     
+}
+
+/* Exempel på textfärger i navbaren (valfritt) */
+.custom-navbar .nav-link,
+.custom-navbar .navbar-brand {
+  color: #111 !important;
+}

@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.4"
+  },
+  "dependencies": {
+    "mysql2": "^3.15.1"
+  }
+}

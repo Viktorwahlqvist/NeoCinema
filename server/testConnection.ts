@@ -1,4 +1,3 @@
-// server/testConnection.ts
 import { db } from "./db.js";
 
 

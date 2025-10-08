@@ -24,22 +24,46 @@ export const getMovieById = async (req: Request, res: Response) => {
   }
 };
 
-// POST new movie
+// POST new 
 export const createMovie = async (req: Request, res: Response) => {
-  const { title, duration, genre, release_date } = req.body;
+  const { title, info, genres } = req.body;
+
+  if (!title || !info || !Array.isArray(genres)) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  const connection = await db.getConnection();
+  await connection.beginTransaction();
+
   try {
-    const [result]: any = await db.query(
-      "INSERT INTO movies (title, duration, genre, release_date) VALUES (?, ?, ?, ?)",
-      [title, duration, genre, release_date]
+    // 1️⃣ Lägg till filmen
+    const [movieResult]: any = await connection.query(
+      "INSERT INTO movies (title, info) VALUES (?, ?)",
+      [title, JSON.stringify(info)]
     );
-    res.status(201).json({ id: result.insertId, title, duration, genre, release_date });
+
+    const movieId = movieResult.insertId;
+
+    // 2️⃣ Koppla till genres i moviesXgenres
+    for (const genreId of genres) {
+      await connection.query(
+        "INSERT INTO moviesXgenres (movieId, genreId) VALUES (?, ?)",
+        [movieId, genreId]
+      );
+    }
+
+    await connection.commit();
+    res.status(201).json({ message: "Movie created successfully", movieId });
   } catch (err) {
-    console.error(err);  // <-- Lägg till denna för detaljerad fel-logg
+    await connection.rollback();
+    console.error("❌ Error creating movie:", err);
     res.status(500).json({ error: "Failed to create movie" });
+  } finally {
+    connection.release();
   }
 };
 
-// PUT update movie
+// PUT update 
 export const updateMovie = async (req: Request, res: Response) => {
   const { title, duration, genre, release_date } = req.body;
   try {
@@ -53,12 +77,16 @@ export const updateMovie = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE movie
+// DELETE 
 export const deleteMovie = async (req: Request, res: Response) => {
   try {
-    await db.query("DELETE FROM movies WHERE movie_id = ?", [req.params.id]);
+    await db.query("DELETE FROM movies WHERE id = ?", [req.params.id]);
     res.json({ message: "Movie deleted" });
   } catch (err) {
     res.status(500).json({ error: "Failed to delete movie" });
   }
 };
+
+
+
+

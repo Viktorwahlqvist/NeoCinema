@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test:db": "tsx --tsconfig tsconfig.node.json testConnection.ts"
+    "start": "tsx index.ts"
   },
   "dependencies": {
     "cors": "^2.8.5",

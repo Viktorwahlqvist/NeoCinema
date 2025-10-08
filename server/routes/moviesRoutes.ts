@@ -8,6 +8,7 @@ import {
   deleteMovie,
 } from "../controllers/moviesControllers.js";
 
+
 const router = Router();
 
 router.get("/", getMovies);

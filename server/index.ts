@@ -1,9 +1,9 @@
-
 import express from "express";
 import dotenv from "dotenv";
 import { db } from "./db.js";
 import movieRoutes from "./routes/moviesRoutes.js";
 import genresRoutes from "./routes/genresRoutes.js";
+import dynamiskRoute from "./routes/dynamiskRoute.js";
 
 dotenv.config({ path: "../.env" });
 
@@ -14,6 +14,7 @@ app.use(express.json());
 // Routes
 app.use("/api/movies", movieRoutes);
 app.use("/api/genres", genresRoutes);
+app.use("/api", dynamiskRoute);
 
 const PORT = process.env.PORT || 5000;
 

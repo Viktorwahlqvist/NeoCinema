@@ -12,8 +12,6 @@ const app = express();
 app.use(express.json());
 
 // Routes
-app.use("/api/movies", movieRoutes);
-app.use("/api/genres", genresRoutes);
 app.use("/api", dynamiskRoute);
 
 const PORT = process.env.PORT || 5000;

@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "start": "tsx server/index.ts"
+  },
   "devDependencies": {
     "@vitejs/plugin-react": "^5.0.4"
   },

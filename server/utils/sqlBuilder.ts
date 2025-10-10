@@ -3,13 +3,14 @@ import filterBuilder from "./filterBuilder";
 export default function sqlBuilder(
   table: String,
   filter: object,
-  sort: string
+  sort: string,
+  limit: string,
+  offset: string
 ) {
   let sql: string = `SELECT * FROM ${table}`;
+  let paginaton: string[] = [];
 
   const { params, values } = filterBuilder(filter);
-
-  console.log(values);
 
   if (params.length > 0) {
     sql += " WHERE " + params.join(" AND ");
@@ -21,6 +22,10 @@ export default function sqlBuilder(
     const column = sort.replace(/^-/, "");
     sql += ` ORDER BY ${column} ${direction}`;
   }
+  // Limit & Offset
+  if (limit) paginaton.push(` LIMIT ${limit}`);
+  if (offset) paginaton.push(`OFFSET ${offset}`);
+  sql += paginaton.join(" ");
 
   return { sql, values };
 }

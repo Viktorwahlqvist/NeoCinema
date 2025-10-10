@@ -27,13 +27,21 @@ router.get("/", async (req, res) => {
 // Get all tables, include filtering and sorting
 router.get("/:table", async (req, res) => {
   const { table } = req.params;
-  const { sort, ...filter } = req.query;
+  const { sort, limit, offset, ...filter } = req.query;
 
   // Validate that the requested table exists in the database
   if (!tables.find((t) => t.TABLE_NAME === table)) {
     return res.status(500).json({ error: "Not valid table" });
   }
-  const { sql, values } = sqlBuilder(table, filter, sort as string);
+
+  const { sql, values } = sqlBuilder(
+    table,
+    filter,
+    sort as string,
+    limit as string,
+    offset as string
+  );
+
   try {
     console.log("SQL = ", sql);
     const [rows] = await db.query(sql, values);

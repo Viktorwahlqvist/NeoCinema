@@ -1,20 +1,21 @@
-// src/routes/seatsAuditorium.ts
+// src/routes/seatsauditoriums.ts
 import { Router } from "express";
 import { db } from "../db.js";          // your existing pool
-import type { Seat, AuditoriumShape, SeatPutBody } from "./types.js";
+import type { Seat, auditoriumsShape, SeatPutBody } from "./types.js";
 import type { RowDataPacket } from 'mysql2/promise';
 
 export const router = Router();
 
-/* ----------  GET /auditoriums  ---------- */
+/* ----------  GET /auditoriumss  ---------- */
 router.get("/auditoriums", async (_req, res, next) => {
   try {
     const [rows] = await db.execute(
-      "SELECT id, name, seat_shape AS seatShape FROM auditorium"
+      "SELECT id, name, seat_shape AS seatShape FROM auditoriums"
     );
-    res.json(rows as AuditoriumShape[]);
+    res.json(rows as auditoriumsShape[]);
   } catch (e) { next(e); }
 });
+
 
 /* ----------  GET /auditoriums/:id/seats  ---------- */
 router.get("/auditoriums/:id/seats", async (req, res, next) => {
@@ -35,10 +36,10 @@ router.get("/auditoriums/:id/seats", async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-/* ----------  PUT /auditoriums/:id/seats  ---------- */
+/* ----------  PUT /auditoriumss/:id/seats  ---------- */
 router.put("/auditoriums/:id/seats", async (req, res, next) => {
   try {
-    const auditoriumId = Number(req.params.id);
+    const auditoriumsId = Number(req.params.id);
     const { row, seat, action }: SeatPutBody = req.body;
 
     if (!row || !seat || !["reserve", "release"].includes(action))
@@ -47,15 +48,15 @@ router.put("/auditoriums/:id/seats", async (req, res, next) => {
     const status = action === "reserve" ? "taken" : "available";
 
     await db.execute(
-      `INSERT INTO seat (auditorium_id, row_num, seat_num, status)
-       VALUES (:aud, :row, :seat, :status)
-       ON DUPLICATE KEY UPDATE
-           status     = :status,
-           updated_at = CURRENT_TIMESTAMP`,
-      { aud: auditoriumId, row, seat, status }
-    );
+  `INSERT INTO seat (auditorium_id, row_num, seat_num, status)
+   VALUES (:aud, :row, :seat, :status)
+   ON DUPLICATE KEY UPDATE
+       status     = :status,
+       updated_at = CURRENT_TIMESTAMP`,
+  { aud: auditoriumsId, row, seat, status }
+);
 
-   const [rows] = await db.execute<RowDataPacket[]>(
+const [rows] = await db.execute<RowDataPacket[]>(
   `SELECT auditorium_id   AS auditoriumId,
           auditorium_name AS auditoriumName,
           row_num         AS rowNum,
@@ -66,12 +67,11 @@ router.put("/auditoriums/:id/seats", async (req, res, next) => {
    WHERE  auditorium_id = :aud
      AND  row_num  = :row
      AND  seat_num = :seat`,
-  { aud: auditoriumId, row, seat }
+  { aud: auditoriumsId, row, seat }
 );
 
 const updated = rows[0] as Seat;
-res.json(updated);
+return res.json(updated);
 
-    res.json(updated as Seat);
   } catch (e) { next(e); }
 });

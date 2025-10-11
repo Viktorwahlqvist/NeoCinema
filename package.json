@@ -1,12 +1,12 @@
 {
+  "scripts": {
+    "start": "tsx server/index.ts"
+  },
   "devDependencies": {
     "@vitejs/plugin-react": "^5.0.4",
     "tsx": "^4.20.6"
   },
   "dependencies": {
     "mysql2": "^3.15.1"
-  },
-  "scripts": {
-    "start": "tsx server/index.ts"
   }
 }

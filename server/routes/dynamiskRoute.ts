@@ -1,13 +1,16 @@
 import express from "express";
 import { db } from "../db.js";
-import { log, table } from "console";
+import sqlBuilder from "../utils/sqlBuilder.js";
 
 const router = express.Router();
 
 interface TableRow {
   TABLE_NAME: string;
+  TABLE_TYPE: string;
 }
 let tables: TableRow[] = [];
+
+// Get all tables dynamic
 router.get("/", async (req, res) => {
   try {
     const [rows] = await db.query(
@@ -20,15 +23,20 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch tables." });
   }
 });
+
+// Get all tables, include filtering and sorting
 router.get("/:table", async (req, res) => {
   const { table } = req.params;
+  const { sort, ...filter } = req.query;
 
+  // Validate that the requested table exists in the database
   if (!tables.find((t) => t.TABLE_NAME === table)) {
     return res.status(500).json({ error: "Not valid table" });
   }
-
+  const { sql, values } = sqlBuilder(table, filter, sort as string);
   try {
-    const [rows] = await db.query(`SELECT * FROM ${table}`);
+    console.log("SQL = ", sql);
+    const [rows] = await db.query(sql, values);
     res.status(200).json(rows);
   } catch (err) {
     res.status(500).json({ error: `Failed to fetch ${table}` });

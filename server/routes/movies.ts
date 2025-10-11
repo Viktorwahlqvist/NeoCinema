@@ -1,14 +1,13 @@
-// src/routes/movies.ts
 import { Router } from 'express';
 import { db } from '../db.js';
 import type { RowDataPacket } from 'mysql2/promise';
 
 export const moviesRouter = Router();
 
-/* ----------  GET /movies  (lista alla, optional genre-filter)  ---------- */
+/* ----------  GET /movies  ---------- */
 moviesRouter.get('/', async (req, res, next) => {
   try {
-    const { genre } = req.query;              // ?genre=Action
+    const { genre } = req.query;            
     let sql = `
       SELECT m.id,
              m.title,
@@ -31,7 +30,7 @@ moviesRouter.get('/', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-/* ----------  GET /movies/:id  (enskild film)  ---------- */
+/* ----------  GET /movies/:id---------- */
 moviesRouter.get('/:id', async (req, res, next) => {
   try {
     const [rows] = await db.execute<RowDataPacket[]>(

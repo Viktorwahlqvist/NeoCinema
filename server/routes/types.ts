@@ -6,16 +6,16 @@ export interface Seat {
   rowNum:       number;
   seatNum:      number;
   status:       SeatStatus;
-  updatedAt:    string;          // ISO-8601
+  updatedAt:    string;         
 }
 
 export interface auditoriumsShape {
   id:        number;
   name:      string;
-  seatShape: number[];           // [8,9,10 …]
+  seatShape: number[];           
 }
 
-/* PUT /auditoriumss/:id/seats  body */
+/* PUT /auditoriumss/:id/seats  Vad som ska in i body*/
 export interface SeatPutBody {
   row:    number;
   seat:   number;

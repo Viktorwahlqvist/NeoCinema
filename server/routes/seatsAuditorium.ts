@@ -1,6 +1,6 @@
-// src/routes/seatsauditoriums.ts
+
 import { Router } from "express";
-import { db } from "../db.js";          // your existing pool
+import { db } from "../db.js";          
 import type { Seat, auditoriumsShape, SeatPutBody } from "./types.js";
 import type { RowDataPacket } from 'mysql2/promise';
 

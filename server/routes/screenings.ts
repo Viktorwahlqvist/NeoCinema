@@ -4,7 +4,7 @@ import type { RowDataPacket } from 'mysql2/promise';
 
 export const screeningsRouter = Router();
 
-/* ----------  GET /api/screenings  (lista alla kommande)  ---------- */
+/* ----------  GET /api/screenings   ---------- */
 screeningsRouter.get('/', async (_req, res, next) => {
   try {
     const [rows] = await db.execute<RowDataPacket[]>(
@@ -14,7 +14,7 @@ screeningsRouter.get('/', async (_req, res, next) => {
   } catch (e) { next(e); }
 });
 
-/* ----------  GET /api/screenings/:id  (enskild visning)  ---------- */
+/* ----------  GET /api/screenings/:id ---------- */
 screeningsRouter.get('/:id', async (req, res, next) => {
   try {
     const [rows] = await db.execute<RowDataPacket[]>(

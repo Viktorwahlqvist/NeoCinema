@@ -16,6 +16,6 @@ export interface PriceTotals extends RowDataPacket {
 export interface PriceByType extends RowDataPacket {
   bookingId: number;
   ticket_type: TicketType;
-  qty: number;           // eller "antal" om du döpte kolumnen så i vyn
+  qty: number;           
   subtotal_kr: number;
 }

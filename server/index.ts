@@ -14,7 +14,6 @@ const app = express();
 
 app.use(express.json());
 
-// --- Sessionskonfiguration ---
 const MySQLStore = connectMySQL(session);
 const sessionStore = new MySQLStore({}, db);
 
@@ -26,10 +25,10 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: (Number(process.env.SESSION_TTL_MIN) || 60) * 60 * 1000, // TTL i millisekunder
+      maxAge: (Number(process.env.SESSION_TTL_MIN) || 60) * 60 * 1000,
       httpOnly: true,
       sameSite: "lax",
-      secure: false, // ändra till true om du kör HTTPS
+      secure: false,
     },
   })
 );

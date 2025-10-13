@@ -13,7 +13,7 @@ const app = express();
 app.use(express.json());
 
 // Routes
-app.use('/api/movies', moviesRouter); 
+app.use('/api/movies' , moviesRouter); 
 app.use('/api/screenings', screeningsRouter);
 app.use("/api", seatsRouter);
 app.use("/api", dynamiskRoute);

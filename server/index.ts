@@ -5,8 +5,7 @@ import dynamiskRoute from "./routes/dynamiskRoute.js";
 import { router as seatsRouter } from "./routes/seatsAuditorium.js";
 import { moviesRouter } from './routes/movies.js';
 import { screeningsRouter } from './routes/screenings.js';
-import { prices } from './routes/prices';
-
+import pricesRouter from './routes/prices.js';
 
 
 dotenv.config({ path: "../.env" });
@@ -17,17 +16,16 @@ app.get('/health', (_req, res) => res.json({ ok: true }));
 
 app.use(express.json());
 
-app.use(prices); 
 
 // Routes
 app.use('/api/movies', moviesRouter); 
 app.use('/api/screenings', screeningsRouter);
 app.use("/api", seatsRouter);
 app.use("/api", dynamiskRoute);
-
+app.use('/api/bookings', pricesRouter)
 
 const PORT = process.env.PORT || 5050;
-app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

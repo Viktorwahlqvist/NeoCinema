@@ -1,9 +1,14 @@
 {
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/express-session": "^1.18.2",
     "@vitejs/plugin-react": "^5.0.4",
     "tsx": "^4.20.6"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "express-mysql-session": "^3.0.3",
+    "express-session": "^1.18.2",
     "mysql2": "^3.15.1"
   },
   "scripts": {

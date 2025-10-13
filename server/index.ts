@@ -24,7 +24,7 @@ app.use("/api", seatsRouter);
 app.use("/api", dynamiskRoute);
 app.use('/api/bookings', pricesRouter)
 
-const PORT = process.env.PORT || 5050;
+const PORT = process.env.PORT || 5000;
 
 
 app.listen(PORT, () => {

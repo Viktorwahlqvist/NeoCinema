@@ -1,7 +1,7 @@
 // server/routes/prices.ts
 import { Router } from 'express';
 import { db } from '../db';
-import type { PriceLine, PriceTotals, PriceByType } from '../types/prices';
+import type { PriceLine, PriceTotals, PriceByType } from "./types";
 
 const pricesRouter = Router();
 

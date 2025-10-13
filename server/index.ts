@@ -1,12 +1,12 @@
 
 import express from "express";
 import dotenv from "dotenv";
-import session from "express-session";
-import connectMySQL from "express-mysql-session";
 import { db } from "./db.js";
 import movieRoutes from "./routes/moviesRoutes.js";
 import genresRoutes from "./routes/genresRoutes.js";
 import usersRoutes from "./routes/usersRoutes.js";
+import session from "express-session";
+import connectMySQL from "express-mysql-session";
 
 dotenv.config({ path: "../.env" });
 
@@ -15,7 +15,7 @@ const app = express();
 app.use(express.json());
 
 const MySQLStore = connectMySQL(session);
-const sessionStore = new MySQLStore({}, db);
+const sessionStore = new MySQLStore({}, db as any);
 
 app.use(
   session({

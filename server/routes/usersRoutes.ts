@@ -13,8 +13,8 @@ const isString = (value: unknown) : value is string =>
   typeof value === "string" && value.trim().length > 0;
 
 // Skaoa konto och logga in (inte klart än)
-router.post("/register", async (requestAnimationFrame, res) => {
-  const {fistName, lastName, email, password } = requestAnimationFrame.body ?? {};
+router.post("/register", async (req, res) => {
+  const {firstName, lastName, email, password } = req.body ?? {};
   if (!isString(email) || !isValidEmail(email)) {
     return res.status(400).json({error: "ogiltig e-postadress"});
   }
@@ -36,25 +36,29 @@ router.post("/register", async (requestAnimationFrame, res) => {
     }
 
     //Hasha lösenordet innan det sparar
-    const hashedPassord = await bcrypt.hash(password, 12);
+    const hashedPassword = await bcrypt.hash(password, 12);
 
-    const [result] = await db.query(
-      `INSERT INTO users (firstName, LastName, email, passord) Values (?, ?, ?, ?)`,
+   const [result] = await db.query(
+      `INSERT INTO users (firstName, lastName, email, password)
+       VALUES (?, ?, ?, ?)`,
       [firstName ?? null, lastName ?? null, email, hashedPassword]
     );
 
     const newUserId = (result as any).omsertId as number;
 
     //För att spara inloggningssessionen direkt
-    res.session.user = { id: newUserId, email };
+    req.session.user = { id: newUserId, email };
 
     return res.status(201).json({
       message: "Ditt konto har skapats",
-      user: { id: newUserId, firstName, lastName, email };
+      user: { id: newUserId, firstName, lastName, email },
       loggedIn: true,
     })
   } catch (error) {
     console.error("Registrerings problem:", error);
     return res.status(500).json({error: "Serverfel"});
   }
-});
+}
+)};
+
+export default router;

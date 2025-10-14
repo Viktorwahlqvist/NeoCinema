@@ -5,6 +5,15 @@ import bcrypt from "bcrypt";
 
 const router = Router();
 
+declare module "express-session" {
+  interface SessionData {
+    user?: {
+      id: number;
+      email: string;
+    };
+  }
+}
+
 // Kollar efter ifall epost är i rätt format exempel: namn@gmail.se
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);

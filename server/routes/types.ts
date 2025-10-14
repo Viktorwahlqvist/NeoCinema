@@ -31,20 +31,19 @@ export interface PriceLine extends RowDataPacket {
   bookingId: number;
   seatId: number;
   ticket_type: TicketType;
-  price_kr: number;             // funkar tack vare decimalNumbers: true
+  price_kr: number;           
 }
 
 export interface PriceTotals extends RowDataPacket {
   bookingId: number;
   tickets_count: number;
-  total_price_kr: number;       // funkar tack vare decimalNumbers: true
+  total_price_kr: number;       
 }
 
 export interface PriceByType extends RowDataPacket {
   bookingId: number;
   ticket_type: TicketType;
   qty: number;
-  subtotal_kr: number;          // funkar tack vare decimalNumbers: true
-}
-
+  subtotal_kr: number;       
+} 
 

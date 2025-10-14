@@ -3,7 +3,9 @@
     "start": "tsx server/index.ts"
   },
   "devDependencies": {
+    "@types/nodemailer": "^7.0.2",
     "@vitejs/plugin-react": "^5.0.4",
+    "nodemailer": "^7.0.9",
     "tsx": "^4.20.6"
   },
   "dependencies": {

@@ -1,11 +1,11 @@
 import express from "express";
 import dotenv from "dotenv";
-import { db } from "./db.js";
+import "./db";
 import dynamiskRoute from "./routes/dynamiskRoute.js";
 import { router as seatsRouter } from "./routes/seatsAuditorium.js";
 import { moviesRouter } from './routes/movies.js';
 import { screeningsRouter } from './routes/screenings.js';
-import pricesRouter from './routes/prices.js';
+import pricesRouter from "./routes/prices";
 
 
 dotenv.config({ path: "../.env" });

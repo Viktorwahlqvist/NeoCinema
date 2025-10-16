@@ -26,7 +26,7 @@ router.post("/bookings", async (req, res) => {
     // Get all seats with screening id
     const [seatsRow] = await db.query<Seat[]>(
       "SELECT * FROM seatStatusView WHERE screeningId = ?",
-      screeningId
+      [screeningId]
     );
 
     // Gets all available seats.
@@ -81,7 +81,7 @@ router.post("/bookings", async (req, res) => {
 router.delete("/bookings/:id", async (req, res) => {
   const id = req.params.id;
   try {
-    db.query("DELETE FROM bookings WHERE id = ?", id);
+    db.query("DELETE FROM bookings WHERE id = ?", [id]);
 
     res.status(204).send();
   } catch (err) {

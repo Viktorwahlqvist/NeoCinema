@@ -77,16 +77,23 @@ router.post("/bookings", async (req, res) => {
   }
 });
 
-// Delete booking with bookingId
 router.delete("/bookings/:id", async (req, res) => {
-  const id = req.params.id;
   try {
-    db.query("DELETE FROM bookings WHERE id = ?", [id]);
+    const id = Number(req.params.id);
 
-    res.status(204).send();
-  } catch (err) {
-    console.error("couldn't delete booking.", err);
-    res.status(500).json({ error: "couldn't delete booking." });
+    const [result] = await db.query<ResultSetHeader>(
+      "DELETE FROM bookings WHERE id = ? LIMIT 1",
+      [id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    res.status(200).json({ message: "Booking was removed successfully!" });
+  } catch (err: any) {
+    console.error("Delete booking error:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 

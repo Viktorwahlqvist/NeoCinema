@@ -1,13 +1,13 @@
-import { Router } from 'express';
-import { db } from '../db.js';
-import type { RowDataPacket } from 'mysql2/promise';
+import { Router } from "express";
+import { db } from "../db.js";
+import type { RowDataPacket } from "mysql2/promise";
 
 export const moviesRouter = Router();
 
 /* ----------  GET /movies  ---------- */
 // moviesRouter.get('/', async (req, res, next) => {
 //   try {
-//     const { genre } = req.query;            
+//     const { genre } = req.query;
 //     let sql = `
 //       SELECT m.id,
 //              m.title,
@@ -31,7 +31,7 @@ export const moviesRouter = Router();
 // });
 
 /* ----------  GET /movies/:id---------- */
-moviesRouter.get('/:id', async (req, res, next) => {
+moviesRouter.get("/:id", async (req, res, next) => {
   try {
     const [rows] = await db.execute<RowDataPacket[]>(
       `SELECT m.id,
@@ -45,7 +45,9 @@ moviesRouter.get('/:id', async (req, res, next) => {
        GROUP BY m.id`,
       [req.params.id]
     );
-    if (!rows.length) return res.status(404).json({ error: 'Film finns inte' });
+    if (!rows.length) return res.status(404).json({ error: "Film finns inte" });
     res.json(rows[0]);
-  } catch (e) { next(e); }
+  } catch (e) {
+    next(e);
+  }
 });

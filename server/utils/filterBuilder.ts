@@ -3,12 +3,21 @@ export default function filterBuilder(filter: object) {
   let values: string[] = [];
   // Add filters dynamically to query and values array
   Object.entries(filter).forEach(([key, value]) => {
-    value = value.replace(/[-_]/g, " ");
-    const endsWith = value.includes("%") ? " LIKE" : " =";
-    params.push(`${key} ${endsWith} ?`);
-    console.log(value);
+    if (key === "age") {
+      const num = Number(value);
+      const operator = num >= 0 ? "<=" : ">=";
+      const age = Math.abs(num);
 
-    values.push(value as string);
+      params.push(`Age ${operator} ?`);
+      values.push(age.toString());
+    } else {
+      value = value.replace(/[-_]/g, " ");
+      const endsWith = value.includes("%") ? " LIKE" : " =";
+      params.push(`${key} ${endsWith} ?`);
+      console.log(value);
+
+      values.push(value as string);
+    }
   });
 
   return { params, values };

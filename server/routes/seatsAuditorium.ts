@@ -27,7 +27,7 @@ router.get("/auditoriums/:id/seats", async (req, res, next) => {
               seat_num        AS seatNum,
               status,
               updated_at      AS updatedAt
-       FROM   v_seat_map
+       FROM   seatMap
        WHERE  auditorium_id = ?
        ORDER  BY row_num, seat_num`,
       [req.params.id]

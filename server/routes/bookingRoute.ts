@@ -81,12 +81,16 @@ router.post("/bookings", async (req, res) => {
 router.delete("/bookings/:id", async (req, res) => {
   const id = req.params.id;
   try {
-    db.query("DELETE FROM bookings WHERE id = ?", [id]);
+    db.query("DELETE FROM bookings WHERE id = ?", id);
 
-    res.status(204).send();
-  } catch (err) {
-    console.error("couldn't delete booking.", err);
-    res.status(500).json({ error: "couldn't delete booking." });
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    res.status(200).json({ message: "Booking was removed successfully!" });
+  } catch (err: any) {
+    console.error("Delete booking error:", err);
+    res.status(500).json({ error: err.message });
   }
 });
 

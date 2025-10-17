@@ -1,0 +1,26 @@
+// 1. import Bootstrap source
+@import "bootstrap/scss/bootstrap";
+
+// 2. your tiny overrides
+:root {
+  --bs-dark: #000;
+  --bs-primary: #e50914;
+}
+
+body {
+  background-color: var(--bs-dark);
+  color: #fff;
+}
+
+// movie card equal height
+.movie-card {
+  height: 100%;
+  border: none;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  display: flex;
+  align-items: end;
+}

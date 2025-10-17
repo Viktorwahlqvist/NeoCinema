@@ -1,0 +1,9 @@
+@import "variables";
+
+body {
+  background-color: $color-bg;
+  color: $color-text;
+  font-family: $font-family-heading;
+  margin: 0;
+  padding: 0;
+}

@@ -186,8 +186,4 @@ const [rows] = await db.query<RowDataPacket[]>(
   }
 });
 
-
-
-
-
 export default router;

@@ -17,3 +17,4 @@ export function getMovieImage(title: string) {
       return "/vite.svg"; // fallback om ingen bild hittas
   }
 }
+

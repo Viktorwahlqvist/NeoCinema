@@ -6,4 +6,4 @@ await sendEmail({
   subject: "Test från NEOCINEMA",
   html: "<p>Detta är ett testmejl via NodeMailer.</p>",
 });
-console.log("✅ Klar – kolla inkorgen!");
+console.log("yes!!! Klar – kolla inkorgen!");

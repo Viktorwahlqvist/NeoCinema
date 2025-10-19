@@ -45,4 +45,5 @@ router.get("/:table", async (req, res) => {
 
 
 
+
 export default router;

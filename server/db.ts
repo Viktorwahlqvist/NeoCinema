@@ -19,3 +19,4 @@ export const db = mysql.createPool({
   namedPlaceholders: true,
   port: Number(process.env.DB_PORT) || 3306,
 });
+

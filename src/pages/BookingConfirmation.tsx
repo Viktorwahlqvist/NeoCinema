@@ -22,7 +22,7 @@ export default function BookingConfirmation() {
   const handleDownloadPDF = () => {
     const doc = new jsPDF();
     doc.setFontSize(20);
-    doc.text("🎬 NeoCinema - Biobiljett", 20, 20);
+    doc.text("NeoCinema - Biobiljett", 20, 20);
 
     doc.setFontSize(12);
     doc.text(`Bokningsnummer: ${booking.rNumber}`, 20, 40);

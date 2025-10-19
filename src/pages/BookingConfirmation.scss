@@ -1,0 +1,108 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap");
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+background: linear-gradient(180deg, #0D0D0D 0%, #212133 100%);
+padding-top: 3.5rem;
+}
+
+.confirmation-title  {
+  color: #00F5FF;
+font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-family: "Orbitron", sans-serif;
+}
+.booking-confirmation {
+  min-height: 65vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+    max-width: 800px;
+  margin: 0 auto;                 
+  padding: 2rem;
+    box-shadow: 0 0 40px #9D4EDD;
+     border-radius: 30px;
+
+
+  
+
+.neon-border {
+  display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3rem;
+    max-width: 1000px;
+    width: 100%;
+    padding: 2rem;
+}
+
+
+.confirmation-info {
+  display: flex;               
+  align-items: center;        
+  justify-content: center;    
+  gap: 20rem;                   
+  font-family: "Orbitron", sans-serif;
+  color: white;                
+
+  .booking-text {
+    display: flex;
+    flex-direction: column;   
+    gap: 0.5rem;               
+    text-align: left;
+  }
+
+  strong {
+    color: white;              
+  }
+}
+
+
+
+
+}
+  .movie-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+
+    img {
+      max-width: 400px;
+      height: auto;
+      border-radius: 12px;
+        box-shadow: 0 0 15px #00f5ff;
+
+    }
+  }
+
+ .btn-glow {
+   display: flex;               
+  justify-content: center;     
+  gap: 0.5rem;                   
+  margin-top: 2rem;            
+  background-color: transparent;     
+  font-family: "Orbitron", sans-serif;
+    border: 1px solid #00f5ff;        
+  font-weight: 500;
+  font-size: 1rem;
+  border-radius: 10px;
+    padding: 0.75rem 2rem;
+    margin-right: 2.5rem;
+
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  box-shadow: 0 0 15px #00f5ff;
+
+  &:hover {
+    box-shadow: 0 0 25px #9D4EDD,;
+    transform: scale(1.05);
+      border: 1px solid #9D4EDD;         
+  }
+ }

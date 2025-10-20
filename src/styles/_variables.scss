@@ -1,0 +1,90 @@
+// ====================================
+// Fonts
+// ====================================
+
+$font-family-heading: 'Orbitron', sans-serif;
+
+// Text sizes
+$font-size-heading-lg: 32px;
+$font-size-heading-md: 24px;
+$font-size-body: 16px;
+
+
+// ====================================
+// Colors
+// ====================================
+
+$color-stroke: #00FFFF;      // Stroke color for box elements
+$color-button: #1A1B2E;      // Button / interaction elements
+$color-hover: #A349E8;       // Hover effect
+$color-bg: #1F1F1F;         // Background color
+$color-text: #FFFFFF;       // Default text color
+
+
+// ====================================
+// Shadows and glow effects
+// ====================================
+
+// Neon box shadows for different intensities
+$glow-color: $color-stroke;
+$glow-strong: 0 0 15px $glow-color;
+$glow-medium: 0 0 10px $glow-color;
+$glow-soft: 0 0 5px $glow-color;
+
+// Text glow for headings or highlighted text
+$text-glow: 0 0 8px $color-stroke;
+
+
+// ====================================
+// Gradients
+// ====================================
+
+// Background gradient used for sections, headers etc.
+$background-gradient: linear-gradient(180deg, #1A1B2E 0%, #0D0D14 100%);
+
+
+// ====================================
+// Spacing scale
+// ====================================
+
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 32px;
+$spacing-xl: 64px;
+
+
+// ====================================
+// Borders
+// ====================================
+
+$border-width: 2px;
+$border-style: solid;
+$border-color: $color-stroke;
+$border-radius: 8px;
+
+
+// ====================================
+// Breakpoints
+// ====================================
+
+$breakpoint-mobile: 480px;
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 1024px;
+
+
+// ====================================
+// Z-index levels
+// ====================================
+
+$z-background: 0;
+$z-content: 10;
+$z-overlay: 100;
+$z-modal: 1000;
+
+
+// ====================================
+// Miscellaneous
+// ====================================
+
+$transition-speed: 0.3s;

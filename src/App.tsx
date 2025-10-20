@@ -4,25 +4,28 @@ import type { Movie } from "./types/movie";
 import MoviesPage from "./pages/MoviesPage";
 import MovieCarousel from "./pages/MovieCarousel";
 import "./styles/base.scss";
+import AllMoviesPage from "./pages/AllMoviesPage";
 
 function App() {
-  const [movies, setMovies] = useState<Movie[]>([]);
+  return <AllMoviesPage />;
 
-  useEffect(() => {
-    const fetchMovies = async () => {
-      const res = await fetch("/api/movies");
-      const data = await res.json();
-      setMovies(data);
-    };
-    fetchMovies();
-  }, []);
+  // const [movies, setMovies] = useState<Movie[]>([]);
 
-  return (
-    <div>
-      <h2 style={{ textAlign: "center" }}>Nu på bio</h2>
-      <MovieCarousel movies={movies} />
-    </div>
-  );
+  // useEffect(() => {
+  //   const fetchMovies = async () => {
+  //     const res = await fetch("/api/movies");
+  //     const data = await res.json();
+  //     setMovies(data);
+  //   };
+  //   fetchMovies();
+  // }, []);
+
+  // return (
+  //   <div>
+  //     <h2 style={{ textAlign: "center" }}>Nu på bio</h2>
+  //     <MovieCarousel movies={movies} />
+  //   </div>
+  // );
 }
 
 export default App;

@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import type { Movie } from "./types/movie";
-import "./App.css";
 // import MoviesList from './components/MovieList'
 import MoviesPage from "./pages/MoviesPage";
 import MovieCarousel from "./pages/MovieCarousel";
+import "./styles/base.scss";
 
 function App() {
   const [movies, setMovies] = useState<Movie[]>([]);

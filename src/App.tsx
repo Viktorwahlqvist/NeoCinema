@@ -4,6 +4,7 @@ import './App.css'
 // import MoviesList from './components/MovieList'
 import MoviesPage from './pages/MoviesPage'
 import MovieCarousel from './pages/MovieCarousel'
+import NeoNavbar from './components/NeoNavbar'
 
 
 function App() {
@@ -21,10 +22,10 @@ function App() {
   }, []);
 
   return (
-    <div>
-      <h2 style={{ textAlign: "center" }}>Nu på bio</h2>
-      <MovieCarousel movies={movies} />
-    </div>
+<>
+
+  <NeoNavbar />
+    </>
   );
 };
 

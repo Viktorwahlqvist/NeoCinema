@@ -10,4 +10,5 @@ export interface Movie {
   id: number;
   title: string;
   info: MovieInfo;
+  genres: string[];
 }

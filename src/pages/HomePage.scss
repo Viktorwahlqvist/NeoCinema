@@ -16,9 +16,9 @@
   z-index: 10;
   background: rgba(#0b0f2e, 0.92);
   backdrop-filter: blur(6px);
-  padding: 1rem;
+  padding: 2rem;
   text-align: center;
-  border-bottom: 1px solid #00eaff;
+  
 }
 
 .genre-row {
@@ -26,7 +26,8 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.4rem;
-  margin: 0.5rem 0;
+ 
+  margin-top: 40px;
 }
 
 .genre-pill {
@@ -52,7 +53,7 @@
 
 .movie-scroll {
   display: flex;
-  gap: 1rem;
+  gap: 3rem;
   padding: 2rem 1rem;
   overflow-x: auto;
   scroll-snap-type: x mandatory;

@@ -1,5 +1,18 @@
-.neo-logo-img {
-  height: 10rem; /* ändra t.ex. till 40 eller 60 px om du vill */
-  width: auto;
-  border-radius: 8px; /* valfritt, för rundade hörn */
+/* src/components/NeoNavbar.scss */
+@import "../styles/variables";
+
+/* Navbar */
+.neo-navbar {
+  position: sticky; top: 0; z-index: $z-overlay;
+  background: #000; padding-block: $spacing-sm;
+
+  &::after {
+    content: ""; display: block; height: 2px; margin-top: $spacing-sm;
+    background: linear-gradient(90deg, $color-hover 0%, $color-stroke 50%, $color-hover 100%);
+    box-shadow: $glow-soft;
+  }
 }
+
+
+.neo-logo .neo-logo-img { height: clamp(48px, 6vw, 56px); width: auto; }
+

@@ -36,13 +36,11 @@ router.get("/:table", async (req, res) => {
   const { sql, values } = sqlBuilder(table, filter, sort as string);
   try {
     console.log("SQL = ", sql);
-    const [rows] = await db.query(sql, values);
+    const [rows] = await db.query(sql, [values]);
     res.status(200).json(rows);
   } catch (err) {
     res.status(500).json({ error: `Failed to fetch ${table}` });
   }
 });
-
-
 
 export default router;

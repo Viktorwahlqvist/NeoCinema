@@ -34,7 +34,6 @@ app.use(
 
 // Routes
 app.use("/api/movies", moviesRouter);
-app.use("/api/screenings", screeningsRouter);
 app.use("/api/users", usersRoutes);
 app.use("/api", bookingRoute);
 app.use("/api", seatsRouter);

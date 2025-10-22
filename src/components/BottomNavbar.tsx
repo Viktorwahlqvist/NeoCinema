@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import "./BottomNavbar.scss";
 
 export default function BottomNavbar() {
@@ -7,20 +8,20 @@ export default function BottomNavbar() {
   return (
     <>
       <nav className="navbar fixed-bottom bottom-navbar-custom d-flex justify-content-around align-items-center">
-        <a href="#" className="text-decoration-none text-center">
+        <Link to="/movies" className="text-decoration-none text-center">
           <i className="bi bi-film neon-icon"></i>
           <div className="nav-label">Filmer</div>
-        </a>
+        </Link>
 
-        <a href="#" className="text-decoration-none text-center">
+        <Link to="/" className="text-decoration-none text-center">
           <i className="bi bi-house-door neon-icon"></i>
           <div className="nav-label">Hem</div>
-        </a>
+        </Link>
 
-        <a href="#" className="text-decoration-none text-center">
+        <Link to="/profile" className="text-decoration-none text-center">
           <i className="bi bi-person neon-icon"></i>
           <div className="nav-label">Profil</div>
-        </a>
+        </Link>
 
         <button
           className="btn btn-link text-decoration-none text-center p-0"
@@ -37,8 +38,8 @@ export default function BottomNavbar() {
           <button className="close-btn" onClick={() => setMenuOpen(false)}>
             <i className="bi bi-x-lg"></i>
           </button>
-          <button className="menu-item">Om oss</button>
-          <button className="menu-item">Kiosk</button>
+          <Link to="/about" className="menu-item">Om oss</Link>
+          <Link to="/kiosk" className="menu-item">Kiosk</Link>
         </div>
       </div>
     </>

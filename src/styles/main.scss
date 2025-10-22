@@ -1,6 +1,6 @@
-
-
-
+@use "./variables";
+@use "./base.scss";
+@use "../pages/allmoviespages.scss";
 
 :root {
   --bs-dark: #000;
@@ -10,7 +10,4 @@
 body {
   background-color: var(--bs-dark);
 }
-
-
-
 

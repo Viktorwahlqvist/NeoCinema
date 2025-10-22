@@ -6,7 +6,7 @@ import type { RowDataPacket } from 'mysql2/promise';
 
 export const router = Router();
 
-/* ----------  GET /auditoriumss  ---------- */
+
 router.get("/auditoriums", async (_req, res, next) => {
   try {
     const [rows] = await db.execute(
@@ -17,7 +17,7 @@ router.get("/auditoriums", async (_req, res, next) => {
 });
 
 
-/* ----------  GET /auditoriums/:id/seats  ---------- */
+
 router.get("/auditoriums/:id/seats", async (req, res, next) => {
   try {
     const [rows] = await db.execute(
@@ -36,7 +36,6 @@ router.get("/auditoriums/:id/seats", async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-/* ----------  PUT /auditoriumss/:id/seats  ---------- */
 router.put("/auditoriums/:id/seats", async (req, res, next) => {
   try {
     const auditoriumsId = Number(req.params.id);

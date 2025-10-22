@@ -5,7 +5,6 @@ import "./allmovieslist.scss";
 import { Col, Row } from "react-bootstrap";
 
 export interface ScreeningsInfo extends Omit<Movie, "id"> {
-  genres: string[];
   auditoriumName: string;
   screeningId: number;
   startTime: string;

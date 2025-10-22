@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useState, useEffect } from "react";
 import type { Movie } from "./types/movie";
@@ -19,11 +20,18 @@ function App() {
     fetchMovies();
   }, []);
 
+=======
+import HomePage from "./pages/HomePage";
+import BottomNavbar from "./components/BottomNavbar";
+import './App.css';
+
+function App() {
+>>>>>>> origin/dev
   return (
-    <div>
-      <h2 style={{ textAlign: "center" }}>Nu på bio</h2>
-      <MovieCarousel movies={movies} />
-    </div>
+    <>
+      <HomePage />
+      <BottomNavbar />
+    </>
   );
 }
 

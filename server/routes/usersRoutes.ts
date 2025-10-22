@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db } from "../db.js";
 import bcrypt from "bcrypt";
-
+import "express-session";
 
 const router = Router();
 

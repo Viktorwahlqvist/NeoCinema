@@ -5,9 +5,9 @@ import AllMoviesPage from "./pages/AllMoviesPage";
 function App() {
   return (
     <>
-      <AllMoviesPage />
-      {/* <HomePage />
-      <BottomNavbar /> */}
+      {/* <AllMoviesPage /> */}
+      <HomePage />
+      <BottomNavbar />
     </>
   );
 }

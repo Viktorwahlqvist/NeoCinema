@@ -14,7 +14,14 @@
   justify-content: space-between;
 }
 
-.neo-logo img { height: clamp(56px, 6vw, 80px); width: auto; }
+.neo-logo-img {
+  width: auto;            
+  max-width: 150px;      
+  min-width: unset;     
+  height: 100px;           
+  object-fit: contain;   
+  display: block;
+}
 
 .neo-menu {
   flex: 1;
@@ -45,7 +52,6 @@
   .neo-text { font-size: 0.95rem; }
 }
 
-/* lite responsivitet */
 @media (max-width: $breakpoint-desktop) {
   .neo-menu { gap: $spacing-md; overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .neo-menu::-webkit-scrollbar { display: none; }

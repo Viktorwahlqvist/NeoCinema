@@ -1,0 +1,18 @@
+@use "../styles/variables" as *;
+img {
+  width: 100%;
+  max-width: 350px;
+  min-width: 250px;
+  height: auto;
+  display: block;
+}
+
+.hr-line {
+  width: 90%;
+  margin-inline: auto;
+  margin: 1rem auto;
+  height: 2px;
+  box-shadow: 0 0 10px $color-hover;
+  background-color: $color-hover;
+  color: $color-hover;
+}

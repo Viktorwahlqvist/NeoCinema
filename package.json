@@ -9,6 +9,7 @@
     "@types/react-bootstrap": "^1.0.1",
     "@types/react-dom": "^19.2.1",
     "@vitejs/plugin-react": "^5.0.4",
+    "sass": "^1.93.2",
     "tsx": "^4.20.6"
   },
   "dependencies": {
@@ -21,8 +22,8 @@
     "mysql2": "^3.15.1",
     "react": "^19.2.0",
     "react-bootstrap": "^2.10.10",
-    "react-bootstrap-icons": "^1.11.6",
     "react-dom": "^19.2.0",
+    "react-bootstrap-icons": "^1.11.6",
     "sass": "^1.93.2"
   },
   "optionalDependencies": {

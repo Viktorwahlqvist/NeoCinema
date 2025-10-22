@@ -7,7 +7,7 @@ import NavDesk from "./components/NavDesk";
 import { useIsMobile } from "./hooks/useIsMobile";
 
 function App() {
-  const isMobile = useIsMobile(768); 
+  const isMobile = useIsMobile(); 
 
   return (
     <>

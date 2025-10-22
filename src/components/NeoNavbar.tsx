@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 import "./NeoNavbar.scss";
 
 import { Film, CupHot, InfoCircle, House, Person } from "react-bootstrap-icons";
-import logga from "../assets/Logga.png";
+import logga from "../assets/NeoCinema.png";
 
 const NeoNavbar: React.FC = () => {
   return (

@@ -4,7 +4,6 @@ import { db } from "./db.js";
 import dynamiskRoute from "./routes/dynamiskRoute.js";
 import { router as seatsRouter } from "./routes/seatsAuditorium.js";
 import { moviesRouter } from "./routes/movies.js";
-import { screeningsRouter } from "./routes/screenings.js";
 import bookingRoute from "./routes/bookingRoute.js";
 import usersRoutes from "./routes/usersRoutes.js";
 import session from "express-session";
@@ -35,7 +34,6 @@ app.use(
 
 // Routes
 app.use("/api/movies", moviesRouter);
-app.use("/api/screenings", screeningsRouter);
 app.use("/api/users", usersRoutes);
 app.use("/api", bookingRoute);
 app.use("/api", seatsRouter);

@@ -14,6 +14,7 @@ export default function FilterBtn({ btnName, onClick, className }: BtnInput) {
         <button
           key={i}
           name={bName}
+          type="button"
           onClick={() => onClick(bName)}
           className={`overall-button ${className || ""}`}
         >

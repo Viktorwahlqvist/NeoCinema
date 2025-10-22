@@ -12,6 +12,7 @@ export default function useFetch<T>(url: string) {
     const signal = controller.signal;
     const fetchData = async () => {
       try {
+        await fetch("/api");
         const res = await fetch(url);
         if (!res.ok) {
           throw new Error("Fetch failed");
@@ -27,7 +28,7 @@ export default function useFetch<T>(url: string) {
     fetchData();
 
     return () => {
-      controller.abort;
+      controller.abort();
     };
   }, [url]);
 

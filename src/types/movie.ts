@@ -4,6 +4,8 @@ export interface MovieInfo {
   mobileImg: string;
   desktopImg: string;
   description: string;
+  trailer: string;
+  actors: string[];
 }
 
 export interface Movie {

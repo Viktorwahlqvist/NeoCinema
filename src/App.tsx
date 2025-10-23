@@ -19,7 +19,7 @@ function App() {
           <Route path="/booking/:screeningId" element={<BookingPage />} />
         </Routes>
 
-        {isMobile ? <BottomNavbar /> : <NavDesk />}
+        {/* {isMobile ? <BottomNavbar /> : <NavDesk />} */}
       </div>
     </Router>
   );

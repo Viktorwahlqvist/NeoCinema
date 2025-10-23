@@ -20,7 +20,7 @@ export default function BookingPage() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // Hämtar alla säten
+  // Hämtar alla säten - ändras till hook senare
   useEffect(() => {
     const fetchSeats = async () => {
       try {
@@ -45,16 +45,16 @@ export default function BookingPage() {
     );
   };
 
-  // POST-bokning
+  // POST-bokning- Vi hårdkodar userId och ticket type tills att det implementeras ordentligt
   const handleBooking = async () => {
     if (!selectedSeats.length) return alert("Välj minst en stol först!");
 
     const bookingData = {
       screeningId: Number(screeningId),
-      userId: 6, // tillfälligt hårdkodat
+      userId: 6, 
       seats: selectedSeats.map((id) => ({
         seatId: id,
-        ticketType: 1, // exempelvis vuxen-biljett
+        ticketType: 1, 
       })),
     };
 
@@ -71,12 +71,12 @@ export default function BookingPage() {
         throw new Error(data.message || "Bokningen misslyckades");
       }
 
-      // Visa bekräftelse
+      
       alert(
         `Bokningen lyckades! 🎬\nBokade platser: ${data.bookedSeats.join(", ")}`
       );
 
-      // Gå tillbaka till AllMoviesPage
+      // Gå tillbaka till AllMoviesPage - ska inte vara med, bara för demo
       navigate("/movies");
 
     } catch (err: any) {
@@ -103,7 +103,7 @@ export default function BookingPage() {
 
       <div className="screen"> DUKEN </div>
 
-      <div className="seating-area">
+      <section className="seating-area">
         {Object.keys(rows)
           .sort((a, b) => Number(a) - Number(b))
           .map((row) => (
@@ -118,12 +118,12 @@ export default function BookingPage() {
                       ${selectedSeats.includes(seat.seatId) ? "selected" : ""}`}
                     onClick={() => toggleSeat(seat.seatId, seat.seatStatus)}
                   >
-                    {seat.seat_num}
+                    {seat.seatId}
                   </button>
                 ))}
             </div>
           ))}
-      </div>
+      </section>
 
       {selectedSeats.length > 0 && (
         <button className="btn neon-btn mt-4" onClick={handleBooking}>

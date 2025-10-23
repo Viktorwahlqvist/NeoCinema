@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Carousel from "react-bootstrap/Carousel";
 import MovieCard from "../components/MovieCard";
 import { Movie } from "../types/movie";
+import useFetch from "../hook/useFetch";
 import "./HomePage.scss";
 
 function chunk<T>(arr: T[], size: number): T[][] {
@@ -13,27 +14,38 @@ function chunk<T>(arr: T[], size: number): T[][] {
 }
 
 export default function HomePage() {
-  const [movies, setMovies] = useState<Movie[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const { data, isLoading, error } = useFetch<Movie[]>("api/moviesWithGenres");
 
-  useEffect(() => {
-    fetch("/api/moviesWithGenres")
-      .then((r) => r.json())
-      .then((data) => {
-        const valid = Array.isArray(data) ? data.filter((m: Movie) => m && m.id && m.title) : [];
-        setMovies(valid);
-      })
-      .catch(() => {});
-  }, []);
+  const movies = Array.isArray(data)
+    ? data.filter((m: Movie) => m && m.id && m.title)
+    : [];
 
   const groups = chunk(movies, 1); // 1 card = 1 item
   const active = movies[activeIndex];
+  // felhantering och laddning
+  if (isLoading)
+    return (
+      <div className="text-center text-light mt-5">Laddar filmer...</div>
+    );
 
-  if (!movies.length) return <div className="text-center text-light mt-5">Laddar filmer...</div>;
+  if (error)
+    return (
+      <div className="text-center text-danger mt-5">
+        Något gick fel: {error}
+      </div>
+    );
+
+  if (!movies.length)
+    return (
+      <div className="text-center text-light mt-5">
+        Inga filmer tillgängliga just nu.
+      </div>
+    );
 
   return (
-    <div className="container-fluid home-page">
-      <div className="sticky-top header-box">
+    <main className="container-fluid home-page">
+      <section className="sticky-top header-box">
         <img src="/NeoCinema.png" alt="NeoCinema loga" className="site-logo" />
         <h2 className="neon-text">{active?.title ?? ""}</h2>
         <div className="genre-row">
@@ -42,7 +54,7 @@ export default function HomePage() {
           ))}
         </div>
         <button className="btn neon-btn mt-2" onClick={() => alert(`Köp biljetter för ${active?.title}`)}>Köp biljetter</button>
-      </div>
+      </section>
 
           <Carousel
             activeIndex={activeIndex}
@@ -60,6 +72,6 @@ export default function HomePage() {
               </Carousel.Item>
             ))}
     </Carousel>
-    </div>
+    </main>
   );
 }

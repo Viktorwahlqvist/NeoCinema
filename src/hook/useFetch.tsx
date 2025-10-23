@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
+// Hook to fetch data with an url, gets loading states and errors if fetch couldn't success.
+// AbortController used to cancel the fetch if the component unmounts
 export default function useFetch<T>(url: string) {
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -7,26 +9,27 @@ export default function useFetch<T>(url: string) {
 
   useEffect(() => {
     const controller = new AbortController();
-
+    const signal = controller.signal;
     const fetchData = async () => {
       try {
-        const res = await fetch(url, { signal: controller.signal });
-        if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-
+        await fetch("/api");
+        const res = await fetch(url);
+        if (!res.ok) {
+          throw new Error("Fetch failed");
+        }
         const result = await res.json();
         setData(result);
-      } catch (err: any) {
-        if (err.name !== "AbortError") {
-          setError(err.message || "Ett oväntat fel inträffade");
-        }
+      } catch (err) {
+        setError((err as Error).message);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchData();
 
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+    };
   }, [url]);
 
   return { data, isLoading, error };

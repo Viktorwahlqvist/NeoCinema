@@ -4,8 +4,11 @@ import AllMoviesPage from "./pages/AllMoviesPage";
 import MovieDetailPage from "./pages/MovieDetailPage";
 import BottomNavbar from "./components/BottomNavbar";
 import BookingPage from "./pages/BookingPage"
+import NavDesk from "./components/NavDesk";
+import { useIsMobile } from "./hooks/useIsMobile";
 
 function App() {
+  const isMobile = useIsMobile(); 
   return (
     <Router>
       <div className="app-container">
@@ -16,8 +19,8 @@ function App() {
           <Route path="/booking/:screeningId" element={<BookingPage />} />
         </Routes>
 
-        {/* BottomNavbar visas alltid, men vi döljer den på desktop */}
-        <BottomNavbar />
+        
+        {isMobile ? <BottomNavbar /> : <NavDesk />}
       </div>
     </Router>
   );

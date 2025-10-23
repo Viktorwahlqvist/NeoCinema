@@ -1,36 +1,76 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-// Hook to fetch data with an url, gets loading states and errors if fetch couldn't success.
-// AbortController used to cancel the fetch if the component unmounts
-export default function useFetch<T>(url: string) {
-  const [data, setData] = useState<T | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
+
+interface Options<TBody = unknown> {
+  method?: HttpMethod;
+  headers?: Record<string, string>;
+  body?: TBody;
+  skip?: boolean;
+}
+
+export default function useFetch<TResponse = unknown, TBody = unknown>(
+  url: string,
+  options: Options<TBody> = {}
+) {
+  const { method = "GET", headers = {}, body, skip = false } = options;
+
+  const [data, setData] = useState<TResponse | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(!skip);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (skip) return;
+
     const controller = new AbortController();
     const signal = controller.signal;
-    const fetchData = async () => {
+
+    const run = async () => {
+      setIsLoading(true);
+      setError("");
+
       try {
-        await fetch("/api");
-        const res = await fetch(url);
-        if (!res.ok) {
-          throw new Error("Fetch failed");
+        // warm-up only for GET and not the warm-up call itself
+        if (method === "GET" && !url.endsWith("/api")) {
+          await fetch("/api", { signal });
         }
-        const result = await res.json();
-        setData(result);
-      } catch (err) {
-        setError((err as Error).message);
+
+        const res = await fetch(url, {
+          method,
+          headers: method === "GET" ? headers : { "Content-Type": "application/json", ...headers },
+          body: body ? JSON.stringify(body) : undefined,
+          signal,
+        });
+
+        if (!res.ok) throw new Error(res.statusText || "Request failed");
+        const json = await res.json();
+        setData(json);
+      } catch (err: any) {
+        if (err.name !== "AbortError") setError(err.message || "Unknown error");
       } finally {
         setIsLoading(false);
       }
     };
-    fetchData();
 
-    return () => {
-      controller.abort();
-    };
-  }, [url]);
+    run();
+    return () => controller.abort();
+  }, [url, method, JSON.stringify(headers), JSON.stringify(body), skip]);
 
-  return { data, isLoading, error };
+
+  const doFetch = async (
+    body?: TBody,
+    customMethod: HttpMethod = "POST"
+  ) => {
+    const res = await fetch(url, {
+      method: customMethod,
+      headers: { "Content-Type": "application/json", ...headers },
+      body: customMethod === "GET" ? undefined : body ? JSON.stringify(body) : undefined,
+    });
+
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || res.statusText);
+    return json as TResponse;
+  };
+
+  return { data, isLoading, error, doFetch };
 }

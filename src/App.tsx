@@ -11,6 +11,7 @@ function App() {
   const isMobile = useIsMobile();
   return (
     <Router>
+      {!isMobile && <NavDesk />}
       <div className="app-container">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -18,8 +19,9 @@ function App() {
           <Route path="/movie/:id" element={<MovieDetailPage />} />
           <Route path="/booking/:screeningId" element={<BookingPage />} />
         </Routes>
-
-        {isMobile ? <BottomNavbar /> : <NavDesk />}
+        
+        {isMobile && <BottomNavbar />}
+        
       </div>
     </Router>
   );

@@ -5,7 +5,7 @@ import MovieDetailPage from "./pages/MovieDetailPage";
 import BottomNavbar from "./components/BottomNavbar";
 import BookingPage from "./pages/BookingPage"
 import NavDesk from "./components/NavDesk";
-import { useIsMobile } from "./hooks/useIsMobile";
+import { useIsMobile } from "./hook/useIsMobile";
 
 function App() {
   const isMobile = useIsMobile(); 

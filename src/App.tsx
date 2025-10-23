@@ -3,12 +3,12 @@ import HomePage from "./pages/HomePage";
 import AllMoviesPage from "./pages/AllMoviesPage";
 import MovieDetailPage from "./pages/MovieDetailPage";
 import BottomNavbar from "./components/BottomNavbar";
-import BookingPage from "./pages/BookingPage"
+import BookingPage from "./pages/BookingPage";
 import NavDesk from "./components/NavDesk";
 import { useIsMobile } from "./hook/useIsMobile";
 
 function App() {
-  const isMobile = useIsMobile(); 
+  const isMobile = useIsMobile();
   return (
     <Router>
       <div className="app-container">
@@ -19,8 +19,7 @@ function App() {
           <Route path="/booking/:screeningId" element={<BookingPage />} />
         </Routes>
 
-        
-        {isMobile ? <BottomNavbar /> : <NavDesk/>}
+        {isMobile ? <BottomNavbar /> : <NavDesk />}
       </div>
     </Router>
   );

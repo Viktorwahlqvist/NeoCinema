@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import MovieCard from "../components/MovieCard";
+import UpcomingMovies from "../components/UpcomingMovies";
 import { Movie } from "../types/movie";
 import "./HomePage.scss";
 
@@ -85,14 +86,14 @@ export default function HomePage() {
           }
 
           // vänta 300ms innan vi tillåter observern igen
-          setTimeout(() => ((window as any).isTeleporting = false), 300);
+          setTimeout(() => ((window as any).isTeleporting = false), 1000);
         });
       }
     };
 
     const onScroll = () => {
       clearTimeout(teleTimeout);
-      teleTimeout = window.setTimeout(onScrollEnd, 150);
+      teleTimeout = window.setTimeout(onScrollEnd, 1000);
     };
 
     el.addEventListener("scroll", onScroll);
@@ -110,8 +111,14 @@ export default function HomePage() {
 
   const active = movies[activeIndex];
 
+  // Show upcoming movies even if main movies fail to load
   if (!movies.length)
-    return <div className="text-center text-light mt-5">Laddar filmer...</div>;
+    return (
+      <div className="container-fluid home-page">
+        <div className="text-center text-light mt-5">Laddar filmer...</div>
+        <UpcomingMovies />
+      </div>
+    );
 
   return (
     <div className="container-fluid home-page">
@@ -142,6 +149,9 @@ export default function HomePage() {
           />
         ))}
       </div>
+
+      {/* ---- Upcoming Movies Section ---- */}
+      <UpcomingMovies />
     </div>
   );
 }

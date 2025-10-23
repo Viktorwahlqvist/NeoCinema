@@ -7,7 +7,8 @@ function App() {
   return (
     <>
       {/* <MovieDetailPage /> */}
-      <AllMoviesPage />
+      {/* <MovieDetailPage /> */}
+      {/* <AllMoviesPage /> */}
       {/* <HomePage />
       <BottomNavbar /> */}
     </>

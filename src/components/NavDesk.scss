@@ -3,7 +3,7 @@
 .neo-navbar {
   position: sticky;
   top: 0;
-  z-index: $z-overlay;
+  z-index: 2000;
   background: #000;          
   padding-block: $spacing-sm;
 }

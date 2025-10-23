@@ -3,16 +3,16 @@ import { Navbar, Container, Nav } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import { Film, CupHot, InfoCircle, House, Person } from "react-bootstrap-icons";
 import "./NavDesk.scss";
-import logga from "../assets/NeoCinema.png";
+// import logga from "/NeoCinema.png";
 
-const NavDesk: React.FC = () => {
+export default function NavDesk() {
   return (
     <Navbar className="neo-navbar" sticky="top">
       <Container fluid className="neo-shell">
         {/* Vänster: logga → hem */}
         <div className="neo-logo">
           <NavLink to="/" className="neo-logo-link">
-            <img src={logga} alt="NeoCinema" className="neo-logo-img" />
+            <img src="/NeoCinema.png" alt="NeoCinema" className="neo-logo-img" />
           </NavLink>
         </div>
 
@@ -52,4 +52,3 @@ const NavDesk: React.FC = () => {
   );
 };
 
-export default NavDesk;

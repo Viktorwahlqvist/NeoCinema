@@ -23,7 +23,7 @@ export default function AllMoviesPage() {
     age: false,
   });
   const { data, isLoading, error } =
-    useFetch<ScreeningsInfo[]>("api/screeningsInfo");
+    useFetch<ScreeningsInfo[]>("/api/screeningsInfo");
 
   // gets raw dates removes iso ater T
   const rawDates = data ? data.map((d) => d.startTime.split("T")[0]) : [];

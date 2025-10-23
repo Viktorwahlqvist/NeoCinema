@@ -20,7 +20,7 @@ function App() {
         </Routes>
 
         
-        {isMobile ? <BottomNavbar /> : <NavDesk />}
+        {isMobile ? <BottomNavbar /> : <NavDesk/>}
       </div>
     </Router>
   );

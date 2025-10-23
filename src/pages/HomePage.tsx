@@ -1,157 +1,77 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import Carousel from "react-bootstrap/Carousel";
 import MovieCard from "../components/MovieCard";
-import UpcomingMovies from "../components/UpcomingMovies";
 import { Movie } from "../types/movie";
+import useFetch from "../hook/useFetch";
 import "./HomePage.scss";
 
-const CLONES = 2; // how many duplicates at each end (≥ 2 recommended)
+function chunk<T>(arr: T[], size: number): T[][] {
+  const out: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) {
+    out.push(arr.slice(i, i + size));
+  }
+  return out;
+}
 
 export default function HomePage() {
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [activeIndex, setActiveIndex] = useState(CLONES);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const { data, isLoading, error } = useFetch<Movie[]>("api/moviesWithGenres");
 
-  useEffect(() => {
-    fetch("/api/movies")
-      .then((r) => r.json())
-      .then((data) => {
-        // filtrera bort null-rader om det finns några
-        const valid = data.filter((m: Movie) => m && m.id && m.title);
-        setMovies(valid);
-      })
-      .catch(() => {});
-  }, []);
-
-  const infinite = movies.length
-    ? [
-        ...movies.slice(-CLONES),
-        ...movies,
-        ...movies.slice(0, CLONES),
-      ]
+  const movies = Array.isArray(data)
+    ? data.filter((m: Movie) => m && m.id && m.title)
     : [];
 
-  
-    // --- IntersectionObserver ---
-  useEffect(() => {
-    if (!scrollRef.current || !movies.length) return;
-    const cards = scrollRef.current.querySelectorAll<HTMLElement>(".movie-card");
-
-    const obs = new IntersectionObserver(
-      (entries) => {
-        if ((window as any).isTeleporting) return; // 🚫 stoppa under teleport
-        for (const e of entries) {
-          if (e.isIntersecting && e.intersectionRatio >= 0.6) {
-            const idx = Array.from(cards).indexOf(e.target as HTMLElement);
-            const origIdx = (idx - CLONES + movies.length) % movies.length;
-            setActiveIndex(origIdx);
-            console.log("Active index:", origIdx, movies[origIdx]?.title);
-            break;
-          }
-        }
-      },
-      { root: scrollRef.current, threshold: 0.6 }
+  const groups = chunk(movies, 1); // 1 card = 1 item
+  const active = movies[activeIndex];
+  // felhantering och laddning
+  if (isLoading)
+    return (
+      <div className="text-center text-light mt-5">Laddar filmer...</div>
     );
 
-    cards.forEach((c) => obs.observe(c));
-    return () => obs.disconnect();
-  }, [movies]);
+  if (error)
+    return (
+      <div className="text-center text-danger mt-5">
+        Något gick fel: {error}
+      </div>
+    );
 
-  // --- teleport ---
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el || !movies.length) return;
-
-    let teleTimeout: number;
-    (window as any).isTeleporting = false;
-
-    const onScrollEnd = () => {
-      const scrollLeft = el.scrollLeft;
-      const maxScroll = el.scrollWidth - el.clientWidth;
-
-      const firstCard = el.querySelector<HTMLElement>(".movie-card");
-      const cardWidth = firstCard?.getBoundingClientRect().width ?? 0;
-
-      const totalWidth = cardWidth * movies.length;
-      const nearLeftEdge = scrollLeft < cardWidth * CLONES - cardWidth / 2;
-      const nearRightEdge = scrollLeft > maxScroll - cardWidth * CLONES + cardWidth / 2;
-
-      if (nearLeftEdge || nearRightEdge) {
-        (window as any).isTeleporting = true;
-
-        requestAnimationFrame(() => {
-          if (nearLeftEdge) {
-            el.scrollLeft = scrollLeft + totalWidth;
-          } else if (nearRightEdge) {
-            el.scrollLeft = scrollLeft - totalWidth;
-          }
-
-          // vänta 300ms innan vi tillåter observern igen
-          setTimeout(() => ((window as any).isTeleporting = false), 1000);
-        });
-      }
-    };
-
-    const onScroll = () => {
-      clearTimeout(teleTimeout);
-      teleTimeout = window.setTimeout(onScrollEnd, 1000);
-    };
-
-    el.addEventListener("scroll", onScroll);
-    return () => el.removeEventListener("scroll", onScroll);
-  }, [movies]);
-
-
-  /* ---- initial scroll to start ---- */
-  useEffect(() => {
-    if (scrollRef.current && movies.length) {
-      const cardWidth = scrollRef.current.querySelector<HTMLElement>(".movie-card")?.offsetWidth || 0;
-      scrollRef.current.scrollLeft = cardWidth * CLONES;
-    }
-  }, [movies]);
-
-  const active = movies[activeIndex];
-
-  // Show upcoming movies even if main movies fail to load
   if (!movies.length)
     return (
-      <div className="container-fluid home-page">
-        <div className="text-center text-light mt-5">Laddar filmer...</div>
-        <UpcomingMovies />
+      <div className="text-center text-light mt-5">
+        Inga filmer tillgängliga just nu.
       </div>
     );
 
   return (
-    <div className="container-fluid home-page">
-      <div className="sticky-top header-box">
+    <main className="container-fluid home-page">
+      <section className="sticky-top header-box">
+        <img src="/NeoCinema.png" alt="NeoCinema loga" className="site-logo" />
         <h2 className="neon-text">{active?.title ?? ""}</h2>
         <div className="genre-row">
           {active?.genres?.map((g) => (
-            <span key={g} className="genre-pill">
-              {g}
-            </span>
+            <span key={g} className="genre-pill">{g}</span>
           ))}
         </div>
-        <button
-          className="btn neon-btn mt-2"
-          onClick={() => alert(`Buy tickets for ${active?.title}`)}
-        >
-          Köp biljetter
-        </button>
-      </div>
+        <button className="btn neon-btn mt-2" onClick={() => alert(`Köp biljetter för ${active?.title}`)}>Köp biljetter</button>
+      </section>
 
-      {/* ---- infinite scroll row ---- */}
-      <div className="movie-scroll" ref={scrollRef}>
-        {infinite.map((movie, i) => (
-          <MovieCard
-            key={`${movie.id}-${i}`} // unikt för kloner
-            movie={movie}
-            isActive={(i - CLONES + movies.length) % movies.length === activeIndex}
-          />
-        ))}
-      </div>
-
-      {/* ---- Upcoming Movies Section ---- */}
-      <UpcomingMovies />
-    </div>
+          <Carousel
+            activeIndex={activeIndex}
+            onSelect={(idx) => setActiveIndex(idx)}
+            interval={null}
+            indicators={true}
+            controls={true}
+            wrap={true}
+          >
+            {groups.map((grp, idx) => (
+              <Carousel.Item key={grp[0].id}>
+                <div className="d-flex justify-content-center">
+                  <MovieCard movie={grp[0]} isActive={idx === activeIndex} />
+                </div>
+              </Carousel.Item>
+            ))}
+    </Carousel>
+    </main>
   );
 }

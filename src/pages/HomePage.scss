@@ -1,90 +1,93 @@
-@use "sass:color";
+@use "../styles/variables" as *;
+
+/* ===== HomePage Styling ===== */
 .home-page {
+  background-color: #050510;
+  color: #e0e0e0;
   min-height: 100vh;
-  background: #0b0f2e;
-  padding: 1rem 0;
+  padding-bottom: 4rem;
+  font-family: $font-family-heading;
+}
+
+/* ===== Header / Titel ===== */
+.header-box {
+  text-align: center;
+  padding: 2rem 0 1rem;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), transparent);
+  
+  .site-logo {
+  position: absolute;
+  top: -1rem;
+  left: -0.5rem;
+  width: 100px; /* ändra storlek efter behov */
+  height: auto;
+  z-index: 10
+}
 }
 
 .neon-text {
-  color: #fff;
-  text-shadow: 0 0 5px #00eaff, 0 0 10px #00eaff, 0 0 20px #00eaff;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #00eaff;
+  text-shadow: 0 0 6px #00eaff, 0 0 12px #00eaff, 0 0 24px rgba(0, 234, 255, 0.8);
+  letter-spacing: 1px;
+  margin-top: 40px;
 }
 
-/* ---- sticky header ---- */
-.header-box {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: rgba(#0b0f2e, 0.92);
-  backdrop-filter: blur(6px);
-  padding: 2rem;
-  text-align: center;
-  
-}
-
+/* ===== Genre-taggar ===== */
 .genre-row {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.4rem;
- 
-  margin-top: 40px;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
 }
 
 .genre-pill {
-  background: rgba(#00eaff, 0.15);
-  border: 1px solid #00eaff;
-  color: #00eaff;
-  font-size: 0.75rem;
-  padding: 0.3rem 0.7rem;
-  border-radius: 12px;
+  background: rgba(150, 0, 255, 0.2);
+  border: 1px solid #b000ff;
+  color: #e9b3ff;
+  padding: 0.35rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  text-shadow: 0 0 6px #b000ff;
+  transition: all 0.3s ease;
 }
 
+.genre-pill:hover {
+  background: rgba(176, 0, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ===== Neon-knapp ===== */
 .neon-btn {
-  background: #00eaff;
-  border: none;
-  color: #000;
+  color: $color-stroke;
+  border: 2px solid ;
+  background: transparent;
   font-weight: 600;
-  padding: 0.5rem 1.2rem;
-  border-radius: 6px;
-  transition: background 0.2s ease;
-  &:hover { background: color.scale(#00eaff, $lightness: 10%); }
+  padding: 0.6rem 1.5rem;
+  border-radius: 30px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 234, 255, 0.3);
 }
 
 
-.movie-scroll {
-  display: flex;
-  gap: 3rem;
-  padding: 2rem 1rem;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
+/* ===== Carousel ===== */
+.carousel {
+  margin-top: 1.5rem;
 }
 
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  filter: invert(1) brightness(1.5);
+}
 
-.movie-card {
-  flex: 0 0 auto;
-  width: 180px;
-  height: 270px;
-  border-radius: 14px;
-  overflow: hidden;
-  border: 2px solid #00eaff;
-  box-shadow: 0 4px 15px rgba(#00eaff, 0.35);
-  scroll-snap-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.carousel-indicators [data-bs-target] {
+  background-color: #00eaff;
+}
 
-  @media (min-width: 576px) { width: 220px; height: 330px; }
-  @media (min-width: 768px) { width: 250px; height: 375px; }
-
-  &.active {
-    box-shadow: 0 0 8px #00eaff, 0 0 16px #00eaff;
-  }
-
-  &:hover { transform: translateY(-4px); }
-
-  .card-poster {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+.carousel-indicators .active {
+  background-color: #b000ff;
 }

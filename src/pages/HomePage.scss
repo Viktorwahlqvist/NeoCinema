@@ -1,3 +1,4 @@
+@use "sass:color";
 .home-page {
   min-height: 100vh;
   background: #0b0f2e;
@@ -47,7 +48,7 @@
   padding: 0.5rem 1.2rem;
   border-radius: 6px;
   transition: background 0.2s ease;
-  &:hover { background: lighten(#00eaff, 10%); }
+  &:hover { background: color.scale(#00eaff, $lightness: 10%); }
 }
 
 

@@ -6,8 +6,8 @@ function App() {
   return (
     <>
       {/* <AllMoviesPage /> */}
+      {/* <BottomNavbar /> */}
       <HomePage />
-      <BottomNavbar />
     </>
   );
 }

@@ -1,73 +1,92 @@
-.bottom-navbar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+@use "../styles/variables" as *;
+
+.bottom-navbar-custom {
+  background-color: #0a0a1a;
   height: 100px;
-  background: rgba(15, 15, 30, 0.9);
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  border-top: 1px solid rgb(76, 141, 214);
-  backdrop-filter: blur(10px);
-  border-radius: 15px 15px 0 0;
-  z-index: 100;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  box-shadow: 0 -2px 20px rgba(0, 255, 255, 0.2);
+  border-top: 2px solid rgba(0, 255, 255, 0.4);
+  font-family: $font-family-heading;
 
+  a, button {
+    color: $color-stroke;
+    transition: all 0.2s ease;
 
-  .nav-btn {
-    background: none;
-    border: none;
-    color: #00eaff;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-size: 0.8rem;
-    text-decoration: none;
-    transition: 0.2s ease;
-
-
-    i {
-      font-size: 1.4rem;
-      margin-bottom: 3px;
+    &:hover {
+      transform: scale(1.1);
+      text-shadow: 0 0 5px #0ff, 0 0 10px #00f;
     }
+  }
 
+  .neon-icon {
+    font-size: 1.8rem;
+    color: #00eaff;
+    text-shadow: 0 0 8px #00eaff, 0 0 15px #0099ff;
+  }
+
+  .nav-label {
+    font-size: 0.8rem;
+    color: #b8dfff;
   }
 }
 
-/* Glidande meny */
-.slide-menu {
-  position: absolute;
-  bottom: 70px;
-  right: 10px;
-  background: rgba(20, 20, 40, 0.95);
-  border-radius: 10px;
-  padding: 10px;
-  width: 120px;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  opacity: 0;
-  transform: translateY(20px);
-  pointer-events: none;
-  transition: all 0.3s ease;
+
+.fullscreen-menu {
+  position: fixed;
+  bottom: -100%;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: rgba(10, 10, 26, 0.95);
+  border-top: 2px solid #00eaff;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  box-shadow: 0 -4px 25px rgba(0, 255, 255, 0.2);
+  transition: bottom 0.4s ease;
+  z-index: 1050;
+  font-family: $font-family-heading;
 
   &.open {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: all;
+    bottom: 0;
   }
 
-  .slide-item {
+  .menu-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-top: 2rem;
+    height: 100%;
+    position: relative;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 20px;
     background: none;
     border: none;
     color: #00eaff;
-    text-align: left;
-    padding: 8px 10px;
-    border-radius: 5px;
+    font-size: 1.6rem;
+    text-shadow: 0 0 10px #00eaff;
+  }
+
+  .menu-item {
+    background: transparent;
+    border: 1px solid #00eaff;
+    color: #00eaff;
+    padding: 0.8rem 2rem;
+    margin: 0.6rem 0;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    width: 70%;
+    text-shadow: 0 0 10px #00eaff;
+    transition: all 0.3s ease;
 
     &:hover {
       background: rgba(0, 255, 255, 0.1);
-      color: #fff;
+      transform: scale(1.05);
     }
   }
 }

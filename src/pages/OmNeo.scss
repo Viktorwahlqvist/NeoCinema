@@ -1,0 +1,205 @@
+/* src/pages/OmNeo.scss */
+@use '../styles/variables' as *;
+
+/* ===== Bas ===== */
+.omneo-root {
+  min-height: 100vh;
+  background: $background-gradient;
+  color: $color-text;
+  font-family: $font-family-heading;
+  /* lite rymd */
+  padding-bottom: $spacing-xl;
+}
+
+/* ===== HERO (mer lik din screenshot) ===== */
+.omneo-hero {
+  position: relative;
+  height: 260px; /* lite lägre än tidigare */
+  overflow: hidden;
+  isolation: isolate;
+
+  &__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(.44) saturate(1.05); /* mörkare så text glöder */
+    transform: translateZ(0); /* skarpare i chrome */
+  }
+
+  /* lila toning och subtil cyanlinje i botten */
+  &::after {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg,
+        rgba(163,73,232,.55) 0%,
+        rgba(163,73,232,.28) 35%,
+        rgba(0,0,0,0) 80%);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  &__overlay {
+    position: absolute; inset: 0;
+    z-index: 2;
+    display: grid; place-items: center;
+    text-align: center;
+    padding: $spacing-md;
+  }
+}
+
+/* Titel + undertitel – cyan + prickar ovan/under */
+.omneo-title {
+  margin: 0 0 $spacing-xs;
+  font-size: $font-size-heading-lg;
+  letter-spacing: .3px;
+  color: $color-stroke;
+  text-shadow: $text-glow;
+  position: relative;
+
+  &::before, &::after {
+    content: '•';
+    display: block;
+    color: $color-stroke;
+    opacity: .95;
+    line-height: 1;
+    margin: 0 auto $spacing-xs;
+  }
+  &::after { margin: $spacing-xs auto 0; }
+}
+
+.omneo-subtitle {
+  font-size: 14px;  /* tajtare som i bilden */
+  opacity: .9;
+  max-width: 700px;
+  margin-inline: auto;
+}
+
+/* ===== Panel (neon-ram + rundade hörn) ===== */
+.omneo-content {
+  max-width: 1120px;
+  margin: $spacing-xl auto;
+  padding: $spacing-lg;
+  background: $background-gradient;
+  border-radius: 24px;
+  border: $border-width $border-style rgba($color-stroke,.35);
+  /* yttre glow + tunn innerkant */
+  box-shadow: 0 0 22px rgba(0,255,255,.18),
+              inset 0 0 0 1px rgba(0,255,255,.10);
+}
+
+/* Grid: text vänster, ikonspalt höger */
+.omneo-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-xl;
+
+  @media (min-width: $breakpoint-desktop) {
+    grid-template-columns: 2.5fr 1fr;
+    align-items: start;
+  }
+}
+
+/* ===== Sektioner (vänsterkolumn) ===== */
+.omneo-section {
+  padding: $spacing-md 0;
+    text-align: left;            /* ← vänsterställ allt i sektionen */
+
+
+  &:last-child { border-bottom: 0; }
+
+  h2 {
+    margin: 0 0 $spacing-sm;
+    font-size: $font-size-heading-md;
+    color: $color-stroke;
+    text-shadow: $text-glow;
+  }
+
+  p {
+    margin: 0;
+    font-size: 13.5px; /* lite mindre brödtext som i bilden */
+    line-height: 1.55;
+    opacity: .95;
+    max-width: 62ch; /* smal spalt */
+  }
+}
+
+/* Kontaktpunkter */
+.omneo-contact {
+  list-style: none; margin: 0; padding: 0;
+
+  li {
+    display: flex; gap: $spacing-sm;
+    align-items: baseline;
+    margin-bottom: $spacing-sm;
+
+    strong {
+      color: $color-stroke;
+      min-width: 7ch;
+      display: inline-block;
+    }
+  }
+}
+
+/* ===== Ikonspalt (högerkolumn) ===== */
+.omneo-icons {
+  display: grid;
+  gap: 28px;
+  justify-items: center;
+  align-content: start;
+  padding-top: 6px; /* liten optisk justering */
+}
+
+.omneo-iconBox {
+  width: 56px; height: 56px;
+  border-radius: 14px;
+  display: grid; place-items: center;
+  background: linear-gradient(180deg, rgba(0,255,255,.12), rgba(0,255,255,.04));
+  border: $border-width $border-style rgba($color-stroke,.35);
+  box-shadow: 0 0 14px rgba(0,255,255,.18),
+              inset 0 0 0 1px rgba(163,73,232,.10);
+  color: $color-stroke;
+
+  svg {
+    width: 26px; height: 26px;
+    stroke: currentColor; fill: none; stroke-width: 1.8;
+  }
+}
+
+/* ===== Responsiva justeringar ===== */
+@media (max-width: $breakpoint-tablet) {
+  .omneo-content { margin: $spacing-lg $spacing-md; padding: $spacing-lg $spacing-md; }
+  .omneo-title { font-size: 28px; }
+  .omneo-subtitle { font-size: 13px; }
+}
+/* högerkolumnens layout behålls */
+.omneo-icons {
+  display: grid;
+  gap: 100px;
+  justify-items: center;
+  align-content: start;
+}
+
+/* variant utan box – samma look som din screenshot */
+.omneo-icons--bare .omneo-icon {
+  width: 30px;
+  height: 30px;
+  color: $color-stroke;     /* cyan */
+  stroke-width: 1.8;        /* lite tjockare linje */
+}
+
+/* om Bootstrap råkar påverka, lås storlek och färg */
+.omneo-icons--bare .omneo-icon svg {
+  width: 30px;
+  height: 30px;
+}
+/* Extra nudge: bara den första ikonen får toppmarginal */
+.omneo-icons .omneo-icon:first-child {
+  margin-top: $spacing-xl;  /* +64px */
+}
+
+/* ta bort ev. tidigare box-stil */
+.omneo-iconBox { display: none; }
+.omneo-iconLink { display: inline-grid; }
+.omneo-iconLink .omneo-icon { cursor: pointer; }
+.omneo-iconLink:hover .omneo-icon { filter: drop-shadow(0 0 6px $color-stroke); }

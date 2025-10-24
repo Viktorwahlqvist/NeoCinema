@@ -5,6 +5,11 @@ import './App.css'
 import MoviesPage from './pages/MoviesPage'
 import MovieCarousel from './pages/MovieCarousel'
 import NeoNavbar from './components/NeoNavbar'
+import OmNeo from './pages/OmNeo';
+import { Route, Routes } from "react-router-dom";
+
+
+
 
 
 function App() {
@@ -25,6 +30,9 @@ function App() {
 <>
 
   <NeoNavbar />
+   <Routes>
+        <Route path="/om-oss" element={<OmNeo />} />
+   </Routes>
     </>
   );
 };

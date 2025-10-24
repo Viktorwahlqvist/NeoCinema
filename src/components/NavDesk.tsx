@@ -18,7 +18,7 @@ export default function NavDesk() {
 
         {/* Mitten: meny */}
         <Nav className="neo-menu">
-          <NavLink to="/filmer" className="neo-link">
+          <NavLink to="/Movies" className="neo-link">
             <Film className="neo-icon" />
             {/* Filmer */}
             <span className="neo-text">Filmer</span>

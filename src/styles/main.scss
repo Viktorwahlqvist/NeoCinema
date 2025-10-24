@@ -1,2 +1,13 @@
-@import 'variables';
-@import 'base';
+@use "./variables";
+@use "./base.scss";
+@use "../pages/allmoviespages.scss";
+
+:root {
+  --bs-dark: #000;
+  --bs-primary: #e50914;
+}
+
+body {
+  background-color: var(--bs-dark);
+}
+

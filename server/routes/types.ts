@@ -16,7 +16,6 @@ export interface auditoriumsShape {
   seatShape: number[];           
 }
 
-/* PUT /auditoriumss/:id/seats  Vad som ska in i body*/
 export interface SeatPutBody {
   row:    number;
   seat:   number;

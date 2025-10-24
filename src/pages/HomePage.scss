@@ -1,0 +1,93 @@
+@use "../styles/variables" as *;
+
+/* ===== HomePage Styling ===== */
+.home-page {
+  background-color: #050510;
+  color: #e0e0e0;
+  min-height: 100vh;
+  padding-bottom: 4rem;
+  font-family: $font-family-heading;
+}
+
+/* ===== Header / Titel ===== */
+.header-box {
+  text-align: center;
+  padding: 2rem 0 1rem;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), transparent);
+  
+  .site-logo {
+  position: absolute;
+  top: -1rem;
+  left: -0.5rem;
+  width: 100px; /* ändra storlek efter behov */
+  height: auto;
+  z-index: 10
+}
+}
+
+.neon-text {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #00eaff;
+  text-shadow: 0 0 6px #00eaff, 0 0 12px #00eaff, 0 0 24px rgba(0, 234, 255, 0.8);
+  letter-spacing: 1px;
+  margin-top: 40px;
+}
+
+/* ===== Genre-taggar ===== */
+.genre-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+}
+
+.genre-pill {
+  background: rgba(150, 0, 255, 0.2);
+  border: 1px solid #b000ff;
+  color: #e9b3ff;
+  padding: 0.35rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  text-shadow: 0 0 6px #b000ff;
+  transition: all 0.3s ease;
+}
+
+.genre-pill:hover {
+  background: rgba(176, 0, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ===== Neon-knapp ===== */
+.neon-btn {
+  color: $color-stroke;
+  border: 2px solid ;
+  background: transparent;
+  font-weight: 600;
+  padding: 0.6rem 1.5rem;
+  border-radius: 30px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 234, 255, 0.3);
+}
+
+
+/* ===== Carousel ===== */
+.carousel {
+  margin-top: 1.5rem;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  filter: invert(1) brightness(1.5);
+}
+
+.carousel-indicators [data-bs-target] {
+  background-color: #00eaff;
+}
+
+.carousel-indicators .active {
+  background-color: #b000ff;
+}

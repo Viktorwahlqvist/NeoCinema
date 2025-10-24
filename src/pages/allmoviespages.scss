@@ -1,0 +1,19 @@
+@use "../styles/variables" as *;
+.all-movies-container {
+  margin-top: 4rem;
+  background-color: $background-gradient;
+  box-shadow: 0 0 10px $color-hover;
+  border-radius: $border-radius;
+
+  .text-container {
+    margin-top: 2rem;
+    margin-left: 4rem;
+    .all-movies-header {
+      text-shadow: $text-glow;
+    }
+
+    .choose-text {
+      text-shadow: $text-glow;
+    }
+  }
+}

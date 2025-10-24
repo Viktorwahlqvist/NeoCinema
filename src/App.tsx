@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import AllMoviesPage from "./pages/AllMoviesPage";
 import MovieDetailPage from "./pages/MovieDetailPage";
+import OmNeo from "./pages/OmNeo";
 import BottomNavbar from "./components/BottomNavbar";
 import BookingPage from "./pages/BookingPage";
 import NavDesk from "./components/NavDesk";
@@ -18,9 +19,11 @@ function App() {
           <Route path="/movies" element={<AllMoviesPage />} />
           <Route path="/movie/:id" element={<MovieDetailPage />} />
           <Route path="/booking/:screeningId" element={<BookingPage />} />
+          <Route path="/om-oss" element={<OmNeo />} />
         </Routes>
-
+        
         {isMobile && <BottomNavbar />}
+        
       </div>
     </Router>
   );

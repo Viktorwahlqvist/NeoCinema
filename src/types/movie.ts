@@ -6,6 +6,7 @@ export interface MovieInfo {
   description: string;
   trailer: string;
   actors: string[];
+  director: string | string[];
 }
 
 export interface Movie {

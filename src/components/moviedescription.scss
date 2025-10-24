@@ -1,0 +1,17 @@
+@use "../styles/variables" as *;
+.movie-title {
+  text-shadow: 0 0 15px $color-hover;
+  margin-left: 20%;
+}
+
+.descsription-container {
+  font-size: 1rem;
+  margin-inline: auto;
+  background: $background-gradient;
+  width: 60%;
+
+  border: $border-width $border-style $border-color;
+  border-radius: $border-radius;
+  box-shadow: 0 0 15px $color-hover;
+  padding: 1rem;
+}

@@ -19,9 +19,8 @@ function App() {
           <Route path="/movie/:id" element={<MovieDetailPage />} />
           <Route path="/booking/:screeningId" element={<BookingPage />} />
         </Routes>
-        
+
         {isMobile && <BottomNavbar />}
-        
       </div>
     </Router>
   );

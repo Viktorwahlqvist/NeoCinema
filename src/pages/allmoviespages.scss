@@ -1,15 +1,23 @@
 @use "../styles/variables" as *;
 .all-movies-container {
-  margin-top: 4rem;
+  margin-top: 1rem;
   background-color: $background-gradient;
   box-shadow: 0 0 10px $color-hover;
   border-radius: $border-radius;
+
+  @media (max-width: 991px) {
+    font-size: 0.7rem;
+  }
 
   .text-container {
     margin-top: 2rem;
     margin-left: 4rem;
     .all-movies-header {
+      margin-top: 2rem;
       text-shadow: $text-glow;
+      @media (max-width: 991px) {
+        font-size: 1.5rem;
+      }
     }
 
     .choose-text {

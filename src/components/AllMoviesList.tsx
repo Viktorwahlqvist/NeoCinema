@@ -21,14 +21,22 @@ export default function AllMoviesList({ movies }: AllMoviesListPRops) {
   return (
     <>
       {movies.map((movie, index) => (
-        <Row key={index} className="align-items-center gap-3 my-5">
-          <Col className="d-flex justify-content-end col-1 mx-5">
+        <Row
+          key={index}
+          className="align-items-center gap-3 my-5 flex-column flex-md-row"
+        >
+          <Col
+            xs={2}
+            md={1}
+            lg={1}
+            className="d-flex justify-content-end ms-md-2"
+          >
             <p>{movie.startTime.slice(11, 16)}</p>
           </Col>
-          <Col>
-            <img className="img-movies" src={movie.info.desktopImg} alt="" />
+          <Col xs={11} md={3} lg={4}>
+            <img className="img-fluid" src={movie.info.desktopImg} alt="" />
           </Col>
-          <Col>
+          <Col xs={12} md={2} lg={2}>
             <Row className="d-flex justify-content-center text-center">
               <p>{movie.title}</p>
               <p>{movie.genres.join("/")}</p>
@@ -37,10 +45,10 @@ export default function AllMoviesList({ movies }: AllMoviesListPRops) {
               }m`}
             </Row>
           </Col>
-          <Col>
+          <Col xs={3} md={2} lg={2}>
             <p>Salong {movie.auditoriumName}</p>
           </Col>
-          <Col>
+          <Col xs={6} md={2} lg={2}>
             <FilterBtn
               btnName={["Köp biljetter"]}
               onClick={() => navigate(`/booking/${movie.screeningId}`)}

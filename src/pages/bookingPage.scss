@@ -1,0 +1,74 @@
+.booking-page {
+  padding: 2rem;
+  color: white;
+  text-align: center;
+}
+
+.screen {
+  background: linear-gradient(90deg, #00f0ff, #0077ff);
+  color: black;
+  font-weight: bold;
+  padding: 0.5rem;
+  margin-bottom: 2rem;
+  border-radius: 10px;
+}
+
+.seating-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.seat-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.seat {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background-color: transparent;
+  border: 2px solid #00f0ff;
+  color: #00f0ff;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: rgba(0, 240, 255, 0.2);
+  }
+
+  &.booked {
+    border-color: #ff4c4c;
+    color: #ff4c4c;
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  &.selected {
+    background-color: #00f0ff;
+    color: black;
+  }
+}
+
+.neon-text {
+  color: #00f0ff;
+  text-shadow: 0 0 8px #00f0ff;
+}
+
+.neon-btn {
+  background: none;
+  border: 2px solid #00f0ff;
+  color: #00f0ff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  font-weight: bold;
+  transition: 0.2s;
+
+  &:hover {
+    background: #00f0ff;
+    color: black;
+  }
+}

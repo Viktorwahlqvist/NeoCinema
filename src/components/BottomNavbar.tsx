@@ -8,14 +8,14 @@ export default function BottomNavbar() {
   return (
     <>
       <nav className="navbar fixed-bottom bottom-navbar-custom d-flex justify-content-around align-items-center">
-        <Link to="/movies" className="text-decoration-none text-center">
-          <i className="bi bi-film neon-icon"></i>
-          <div className="nav-label">Filmer</div>
-        </Link>
-
         <Link to="/" className="text-decoration-none text-center">
           <i className="bi bi-house-door neon-icon"></i>
           <div className="nav-label">Hem</div>
+        </Link>
+        
+        <Link to="/movies" className="text-decoration-none text-center">
+          <i className="bi bi-film neon-icon"></i>
+          <div className="nav-label">Filmer</div>
         </Link>
 
         <Link to="/profile" className="text-decoration-none text-center">
@@ -38,7 +38,7 @@ export default function BottomNavbar() {
           <button className="close-btn" onClick={() => setMenuOpen(false)}>
             <i className="bi bi-x-lg"></i>
           </button>
-          <Link to="/about" className="menu-item">Om oss</Link>
+          <Link to="/AboutUs" className="menu-item">Om oss</Link>
           <Link to="/kiosk" className="menu-item">Kiosk</Link>
         </div>
       </div>

@@ -9,9 +9,21 @@
     font-size: 0.7rem;
   }
 
+  @media (max-width: 460px) {
+    box-shadow: none;
+
+    .text-mobil {
+      font-size: 1rem;
+    }
+  }
+
   .text-container {
     margin-top: 2rem;
     margin-left: 4rem;
+    @media (max-width: 460px) {
+      margin-top: 1rem;
+      margin-left: 0.25rem;
+    }
     .all-movies-header {
       margin-top: 2rem;
       text-shadow: $text-glow;

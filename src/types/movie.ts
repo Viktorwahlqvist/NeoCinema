@@ -15,3 +15,9 @@ export interface Movie {
   info: MovieInfo;
   genres: string[];
 }
+
+export interface Review {
+  source: string;
+  text: string;
+  rating: number; 
+}

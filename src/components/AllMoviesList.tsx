@@ -32,7 +32,7 @@ export default function AllMoviesList({ movies }: AllMoviesListPRops) {
           <Col>
             <Row className="d-flex justify-content-center text-center">
               <p>{movie.title}</p>
-              <p>{movie.genres.join("/")}</p>
+              <p>{movie.genres.sort().join("/")}</p>
               {`${Math.floor(movie.info.duration / 60)}h ${
                 movie.info.duration % 60
               }m`}

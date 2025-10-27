@@ -1,0 +1,63 @@
+.ticket-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  text-align: left;
+}
+
+.ticket-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(163, 73, 232, 0.1);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  color: #fff;
+  font-family: "Orbitron", sans-serif;
+  font-size: 1rem;
+  box-shadow: 0 0 6px rgba(0, 255, 255, 0.3);
+
+}
+
+.ticket-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  button {
+    background: transparent;
+    color: #00ffff;
+    border: 2px solid #00ffff;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+  }
+
+  span {
+    min-width: 24px;
+    text-align: center;
+    color: #fff;
+    font-size: 1.1rem;
+  }
+}
+
+/* Subtle glow animation (optional, looks cool) */
+@keyframes neonGlow {
+  0%, 100% {
+    text-shadow: 0 0 6px #00ffff, 0 0 12px #a349e8;
+  }
+  50% {
+    text-shadow: 0 0 12px #a349e8, 0 0 18px #00ffff;
+  }
+}
+
+.ticket-row span {
+  animation: neonGlow 2s infinite alternate;
+}

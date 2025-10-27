@@ -22,8 +22,11 @@ export default function AllMoviesPage() {
     auditorium: null,
     age: false,
   });
-  const { data, isLoading, error } =
-    useFetch<ScreeningsInfo[]>("/api/screeningsInfo");
+  const { data, isLoading, error } = useFetch<ScreeningsInfo[]>(
+    "/api/screeningsInfo"
+  );
+
+  console.log(data);
 
   // gets raw dates removes iso ater T
   const rawDates = data ? data.map((d) => d.startTime.split("T")[0]) : [];

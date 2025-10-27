@@ -9,6 +9,7 @@ export interface ScreeningsInfo extends Omit<Movie, "id"> {
   auditoriumName: string;
   screeningId: number;
   startTime: string;
+  movieId: string;
 }
 
 interface AllMoviesListPRops {
@@ -41,6 +42,11 @@ export default function AllMoviesList({ movies }: AllMoviesListPRops) {
             <p>Salong {movie.auditoriumName}</p>
           </Col>
           <Col>
+            <FilterBtn
+              className="my-4"
+              btnName={["Mer info"]}
+              onClick={() => navigate(`/movie/${movie.movieId}`)}
+            />
             <FilterBtn
               btnName={["Köp biljetter"]}
               onClick={() => navigate(`/booking/${movie.screeningId}`)}

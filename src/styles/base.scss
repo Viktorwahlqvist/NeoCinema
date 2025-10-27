@@ -1,7 +1,8 @@
 @use "./variables" as *;
 
 body {
-  background-color: $color-bg;
+  background-color: #050510;
+  background: $background-gradient;
   color: $color-text;
   font-family: $font-family-heading;
   margin: 0;

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import useFetch from "../hook/useFetch";
+import "./TicketSelector.scss";
 
 interface Ticket {
   id: number;
@@ -16,26 +17,29 @@ export default function TicketSelector({ onTicketChange }: Props) {
   const [selected, setSelected] = useState<{ id: number; count: number }[]>([]);
 
   useEffect(() => {
-    if (tickets) {
-      // Förifyll två vuxenbiljetter 
-      setSelected([{ id: 3, count: 2 }]);
-    }
-  }, [tickets]);
+  if (tickets && selected.length === 0) {
+    // Förifyll två vuxenbiljetter bara första gången
+    setSelected([{ id: 3, count: 2 }]);
+  }
+}, [tickets]);
+
 
   useEffect(() => {
     onTicketChange(selected);
   }, [selected]);
 
-  const updateCount = (id: number, delta: number) => {
-    setSelected((prev) => {
-      const existing = prev.find((t) => t.id === id);
-      if (!existing) return [...prev, { id, count: Math.max(0, delta) }];
-      const newCount = Math.max(0, existing.count + delta);
-      return newCount > 0
-        ? prev.map((t) => (t.id === id ? { ...t, count: newCount } : t))
-        : prev.filter((t) => t.id !== id);
-    });
-  };
+const updateCount = (id: number, delta: number) => {
+  setSelected((prev) => {
+    const found = prev.find((t) => t.id === id);
+    if (!found) return delta > 0 ? [...prev, { id, count: delta }] : prev;
+
+    const newCount = Math.max(0, found.count + delta);
+    return newCount > 0
+      ? prev.map((t) => (t.id === id ? { ...t, count: newCount } : t))
+      : prev.filter((t) => t.id !== id);
+  });
+};
+
 
   if (isLoading) return <p>Laddar biljetter...</p>;
   if (error) return <p>Fel vid hämtning av biljetter: {error}</p>;

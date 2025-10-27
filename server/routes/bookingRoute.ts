@@ -20,6 +20,49 @@ type SeatInput = {
   ticketType: number;
 };
 
+
+router.get("/screeningInfo/:screeningId", async (req, res) => {
+  const [rows] = await db.query<RowDataPacket[]>(
+    "SELECT * FROM screeningsInfo WHERE screeningId = ?",
+    [req.params.screeningId]
+  );
+  res.json(rows[0] || null);
+});
+
+router.get("/priceTotals", async (req, res) => {
+  const { bookingId } = req.query;
+  if (!bookingId) return res.status(400).json({ message: "Missing bookingId" });
+
+  try {
+    // Hämta summering per biljettyp + totalpris
+    const [rows] = await db.query<RowDataPacket[]>(
+      `
+      SELECT 
+        pl.ticket_type AS ticketType,
+        COUNT(*) AS quantity,
+        SUM(pl.price_kr) AS subTotal,
+        totals.totalPrice
+      FROM priceLines pl
+      JOIN (
+        SELECT bookingId, SUM(price_kr) AS totalPrice
+        FROM priceLines
+        WHERE bookingId = ?
+        GROUP BY bookingId
+      ) totals ON totals.bookingId = pl.bookingId
+      WHERE pl.bookingId = ?
+      GROUP BY pl.ticket_type
+      `,
+      [bookingId, bookingId]
+    );
+
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching priceTotals:", err);
+    res.status(500).json({ message: "Serverfel vid hämtning av prisinfo" });
+  }
+});
+
+
 router.post("/bookings", async (req, res) => {
   const { screeningId, userId, seats } = req.body;
   try {

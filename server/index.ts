@@ -10,7 +10,6 @@ import session from "express-session";
 import connectMySQL from "express-mysql-session";
 // import { setupSSEEndpoint, broadcastSeatUpdate } from "./utils/sseManager.js";
 // import { getSeatsFromDB } from "./routes/seatsAuditorium.js"; 
-
 dotenv.config({ path: "../.env" });
 
 const app = express();

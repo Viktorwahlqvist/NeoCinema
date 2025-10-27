@@ -6,7 +6,7 @@ const address = 'Biogatan 1, 123 45 Småstad';
 const mapsUrl = `https://www.google.com/maps?q=${encodeURIComponent(address)}`;
 
 
-export default function OmNeo() {
+export default function AboutUs() {
   return (
     <div className="omneo-root">
       <header className="omneo-hero">

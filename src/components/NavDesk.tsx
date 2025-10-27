@@ -18,6 +18,7 @@ export default function NavDesk() {
 
         {/* Mitten: meny */}
         <Nav className="neo-menu">
+
              <NavLink to="/" end className="neo-link">
             <House className="neo-icon" />
             {/* Hem */}

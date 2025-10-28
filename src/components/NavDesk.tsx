@@ -2,7 +2,7 @@ import React from "react";
 import { Navbar, Container, Nav } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import { Film, CupHot, InfoCircle, House, Person } from "react-bootstrap-icons";
-import "./NavDesk.scss";
+import "./Style/NavDesk.scss";
 // import logga from "/NeoCinema.png";
 
 export default function NavDesk() {

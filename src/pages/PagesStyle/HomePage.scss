@@ -1,4 +1,4 @@
-@use "../styles/variables" as *;
+@use "../../styles/variables" as *;
 
 /* ===== HomePage Styling ===== */
 .home-page {
@@ -34,7 +34,7 @@
   margin-top: 40px;
 }
 
-/* ===== Genre-taggar ===== */
+/* ===== Genre-tag ===== */
 .genre-row {
   display: flex;
   flex-wrap: wrap;
@@ -59,7 +59,7 @@
   transform: translateY(-2px);
 }
 
-/* ===== Neon-knapp ===== */
+/* ===== Neon-button ===== */
 .neon-btn {
   color: $color-stroke;
   border: 2px solid ;

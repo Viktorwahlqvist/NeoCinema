@@ -1,7 +1,51 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import useFetch from "../hook/useFetch";
+import TicketSelector from "../components/TicketSelector";
 import "./BookingPage.scss";
 
+// helper : find N adjacent seats 
+function findAdjacentSeats(seats: Seat[], n: number, startSeatId?: number): number[] {
+  const rows = seats.reduce((acc: Record<number, Seat[]>, seat) => {
+    if (!acc[seat.row_num]) acc[seat.row_num] = [];
+    acc[seat.row_num].push(seat);
+    return acc;
+  }, {});
+
+  if (startSeatId) {
+    const clickedSeat = seats.find((s) => s.seatId === startSeatId);
+    if (!clickedSeat) return [];
+
+    const rowSeats = rows[clickedSeat.row_num]
+      .filter((s) => s.seatStatus === "available")
+      .sort((a, b) => a.seat_num - b.seat_num);
+
+    const index = rowSeats.findIndex((s) => s.seatId === clickedSeat.seatId);
+    const right = rowSeats.slice(index, index + n);
+    if (right.length === n) return right.map((s) => s.seatId);
+
+    const leftStart = Math.max(0, index - n + 1);
+    const left = rowSeats.slice(leftStart, leftStart + n);
+    if (left.length === n) return left.map((s) => s.seatId);
+  }
+
+  for (const row of Object.values(rows)) {
+    const available = row
+      .filter((s) => s.seatStatus === "available")
+      .sort((a, b) => a.seat_num - b.seat_num);
+
+    for (let i = 0; i <= available.length - n; i++) {
+      const segment = available.slice(i, i + n);
+      const contiguous = segment.every(
+        (s, j, arr) => j === 0 || s.seat_num === arr[j - 1].seat_num + 1
+      );
+      if (contiguous) return segment.map((s) => s.seatId);
+    }
+  }
+  return [];
+}
+
+/* ---------- types ---------- */
 interface Seat {
   seatId: number;
   row_num: number;
@@ -14,122 +58,188 @@ interface Seat {
 
 export default function BookingPage() {
   const { screeningId } = useParams<{ screeningId: string }>();
-  const [seats, setSeats] = useState<Seat[]>([]);
-  const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // Hämtar alla säten - ändras till hook senare
-  useEffect(() => {
-    const fetchSeats = async () => {
-      try {
-        const res = await fetch(`/api/seatStatusView?screeningId=${screeningId}`);
-        if (!res.ok) throw new Error("Fel vid hämtning av säten");
-        const data = await res.json();
-        setSeats(data);
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSeats();
-  }, [screeningId]);
+  const [tickets, setTickets] = useState<{ id: number; count: number }[]>([]);
+  const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
+  const totalTickets = tickets.reduce((sum, t) => sum + t.count, 0);
 
-  // Hanterar klick på stolar
-  const toggleSeat = (id: number, status: string) => {
-    if (status === "booked") return;
-    setSelectedSeats((prev) =>
-      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
-    );
+  const { data: seats, isLoading, error } = useFetch<Seat[]>(
+    `/api/seatStatusView?screeningId=${screeningId}`
+  );
+  const { doFetch: postBooking } = useFetch<{ bookedSeats: number[]; bookingId: number }>(
+    "/api/bookings"
+  );
+  const { doFetch: getPriceBreakdown } = useFetch<
+    { ticketType: string; quantity: number; subTotal: number; totalPrice: number }[]
+  >("/api/priceTotals", { skip: true });
+
+  // auto-pick adjacent seats 
+  useEffect(() => {
+    if (!seats || totalTickets === 0) {
+      setSelectedSeats([]);
+      return;
+    }
+    const best = findAdjacentSeats(seats, totalTickets);
+    setSelectedSeats(best);
+  }, [seats, totalTickets]);
+
+  // seat click 
+  const handleSeatClick = (seatId: number, status: string) => {
+    if (status === "booked" || !seats) return;
+    const best = findAdjacentSeats(seats, totalTickets, seatId);
+    if (best.length === totalTickets) setSelectedSeats(best);
   };
 
-  // POST-bokning- Vi hårdkodar userId och ticket type tills att det implementeras ordentligt
+  //booking + price summary 
   const handleBooking = async () => {
-    if (!selectedSeats.length) return alert("Välj minst en stol först!");
+    if (!totalTickets) return alert("Välj minst en biljett!");
+    if (selectedSeats.length < totalTickets)
+      return alert("Du har valt färre stolar än antal biljetter!");
+
+    // collapse duplicates & build seatList
+    const uniqueTickets = tickets.reduce((acc, curr) => {
+      const found = acc.find((t) => t.id === curr.id);
+      if (found) found.count += curr.count;
+      else acc.push({ ...curr });
+      return acc;
+    }, [] as { id: number; count: number }[]);
+
+    const seatList: { seatId: number; ticketType: number }[] = [];
+    const seatQueue = [...selectedSeats];
+    for (const t of uniqueTickets) {
+      for (let i = 0; i < t.count; i++) {
+        const seatId = seatQueue.shift();
+        if (seatId !== undefined) seatList.push({ seatId, ticketType: t.id });
+      }
+    }
 
     const bookingData = {
       screeningId: Number(screeningId),
-      userId: 6, 
-      seats: selectedSeats.map((id) => ({
-        seatId: id,
-        ticketType: 1, 
-      })),
+      userId: 6,
+      seats: seatList,
     };
 
     try {
-      const res = await fetch("/api/bookings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(bookingData),
-      });
+      const result = await postBooking(bookingData, "POST");
+      const bookingId = result.bookingId;
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Bokningen misslyckades");
-      }
-
-      
-      alert(
-        `Bokningen lyckades! 🎬\nBokade platser: ${data.bookedSeats.join(", ")}`
+      const breakdown = await getPriceBreakdown(
+        `/api/priceTotals?bookingId=${bookingId}`,
+        "GET"
       );
 
-      // Gå tillbaka till AllMoviesPage - ska inte vara med, bara för demo
-      navigate("/movies");
+      const lines = breakdown.map(
+        (row) => `${row.quantity} × ${row.ticketType}  ${row.subTotal} kr`
+      );
+      const total = breakdown[0]?.totalPrice ?? 0;
 
+      const msg = [
+        `Bokningen lyckades! 🎬`,
+        ``,
+        `Platser: ${result.bookedSeats.join(", ")}`,
+        ``,
+        ...lines,
+        ``,
+        `Total: ${total} kr`,
+      ].join("\n");
+
+      alert(msg);
+      navigate("/movies");
     } catch (err: any) {
-      console.error("Fel vid bokning:", err);
       alert(`Kunde inte boka platser: ${err.message}`);
     }
   };
+    
+   const { data: screening, isLoading: screeningLoading } = useFetch<
+  {
+    title: string;
+    info: { mobileImg: string };
+    startTime: string;
+    auditoriumName: string;
+  }[]
+>(`/api/screeningsInfo?screeningId=${screeningId}`, { skip: !screeningId });
 
-  // Gruppera stolar per rad
-  const rows = seats.reduce((acc: Record<number, Seat[]>, seat) => {
-    if (!acc[seat.row_num]) acc[seat.row_num] = [];
-    acc[seat.row_num].push(seat);
-    return acc;
-  }, {});
 
-  if (loading) return <p>Laddar stolar...</p>;
+    
+  
+  if (isLoading) return <p>Laddar stolar...</p>;
   if (error) return <p>Ett fel uppstod: {error}</p>;
-
+  if (!seats?.length) return <p>Inga stolar hittades.</p>;
+    
   return (
     <main className="booking-page text-center">
-      <h2 className="neon-text mb-4">
-        {seats[0]?.auditoriumName} – {new Date(seats[0]?.start_time).toLocaleString()}
-      </h2>
+      <div className="booking-layout">
+      
+        <aside className="booking-left">
+          {screening?.[0] && (
+            <>
+              <div className="movie-poster-box">
+                <img
+                  src={screening[0].info?.mobileImg || "/placeholder.jpg"}
+                  alt={screening[0].title}
+                  className="movie-poster"
+                />
+              </div>
+            </>
+          )}
 
-      <div className="screen"> DUKEN </div>
+          {/* Ticket selector */}
+  
+          <div className="ticket-section">
+            <h5 className="neon-text">Välj biljetter</h5>
+            <TicketSelector onTicketChange={setTickets} />
+          </div>
+        </aside>
 
-      <section className="seating-area">
-        {Object.keys(rows)
-          .sort((a, b) => Number(a) - Number(b))
-          .map((row) => (
-            <div key={row} className="seat-row">
-              {rows[Number(row)]
-                .sort((a, b) => a.seat_num - b.seat_num)
-                .map((seat) => (
-                  <button
-                    key={seat.seatId}
-                    className={`seat 
-                      ${seat.seatStatus === "booked" ? "booked" : ""} 
-                      ${selectedSeats.includes(seat.seatId) ? "selected" : ""}`}
-                    onClick={() => toggleSeat(seat.seatId, seat.seatStatus)}
-                  >
-                    {seat.seatId}
-                  </button>
-                ))}
+        {/* RIGHT : seats + button */}
+        
+        <section className="booking-right">
+          {screening?.[0] && (
+            <div className="heading-box">
+              <h2 className="neon-text">
+                {screening[0].auditoriumName} –{" "}
+                {new Date(screening[0].startTime).toLocaleString()}
+              </h2>
             </div>
-          ))}
-      </section>
+          )}
+          <div className="screen">DUKEN</div>
 
-      {selectedSeats.length > 0 && (
-        <button className="btn neon-btn mt-4" onClick={handleBooking}>
-          Boka {selectedSeats.length} plats(er)
-        </button>
-      )}
+          <div className="seating-area">
+            {Object.entries(
+              seats.reduce((acc: Record<number, Seat[]>, seat) => {
+                if (!acc[seat.row_num]) acc[seat.row_num] = [];
+                acc[seat.row_num].push(seat);
+                return acc;
+              }, {})
+            )
+              .sort((a, b) => Number(a[0]) - Number(b[0]))
+              .map(([row, rowSeats]) => (
+                <div key={row} className="seat-row">
+                  {rowSeats
+                    .sort((a, b) => a.seat_num - b.seat_num)
+                    .map((seat) => (
+                      <button
+                        key={seat.seatId}
+                        className={`seat ${seat.seatStatus === "booked" ? "booked" : ""} ${
+                          selectedSeats.includes(seat.seatId) ? "selected" : ""
+                        }`}
+                        onClick={() => handleSeatClick(seat.seatId, seat.seatStatus)}
+                      >
+                        {seat.seatId}
+                      </button>
+                    ))}
+                </div>
+              ))}
+          </div>
+
+          {totalTickets > 0 && (
+            <button className="btn neon-btn mt-4" onClick={handleBooking}>
+              Boka {totalTickets} biljett(er)
+            </button>
+          )}
+        </section>
+      </div>
     </main>
   );
 }

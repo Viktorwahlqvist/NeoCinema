@@ -59,7 +59,7 @@ export default function AllMoviesPage() {
           screening.startTime.split("T")[0] === filterOptions.date) &&
         (!filterOptions.auditorium ||
           screening.auditoriumName === filterOptions.auditorium) &&
-        (!filterOptions.age || Number(screening.info.ageLimit) < 18)
+        (!filterOptions.age || Number(screening.info.ageLimit) < 15)
       );
     });
 
@@ -98,7 +98,7 @@ export default function AllMoviesPage() {
           </Col>
           <Col xs="3" md="auto" className="d-flex align-items-end">
             <FilterBtn
-              btnName={filterOptions.age ? ["Över 18"] : ["Under 18"]}
+              btnName={filterOptions.age ? ["Över 15"] : ["Under 15"]}
               onClick={handleOnClickAge}
             />
           </Col>

@@ -45,6 +45,9 @@ router.get("/:table", async (req, res) => {
   try {
     console.log("SQL = ", sql);
     const [rows] = await db.query(sql, [values]);
+    /*Jag testade lite med flattening pågrund av SSE*/
+    // const flatValues = Array.isArray(values) ? values.flat() : values;
+    // const [rows] = await db.query(sql, flatValues);
     res.status(200).json(rows);
   } catch (err) {
     res.status(500).json({ error: `Failed to fetch ${table}` });

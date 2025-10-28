@@ -41,18 +41,14 @@ export default function AllMoviesList({ movies }: AllMoviesListPRops) {
               alt=""
             />
           </Col>
-
-          <Col
-            xs={6}
-            md={2}
-            lg={2}
-            className="text-mobil d-flex flex-column align-items-center align-items-md-center text-center"
-          >
-            <p>{movie.title}</p>
-            <p>{movie.genres.join("/")}</p>
-            {`${Math.floor(movie.info.duration / 60)}h ${
-              movie.info.duration % 60
-            }m`}
+          <Col>
+            <Row className="d-flex justify-content-center text-center">
+              <p>{movie.title}</p>
+              <p>{movie.genres.sort().join("/")}</p>
+              {`${Math.floor(movie.info.duration / 60)}h ${
+                movie.info.duration % 60
+              }m`}
+            </Row>
           </Col>
           <Col
             xs={6}

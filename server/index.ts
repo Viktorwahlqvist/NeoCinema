@@ -2,13 +2,15 @@ import express from "express";
 import dotenv from "dotenv";
 import { db } from "./db.js";
 import dynamiskRoute from "./routes/dynamiskRoute.js";
-import { router as seatsRouter } from "./routes/seatsAuditorium.js";
+// import { router as seatsRouter } from "./routes/seatsAuditorium.js";
 import { moviesRouter } from "./routes/movies.js";
 import bookingRoute from "./routes/bookingRoute.js";
 import usersRoutes from "./routes/usersRoutes.js";
 import session from "express-session";
 import {screeningsRouter} from "./routes/screeningsRouter.js"
 import connectMySQL from "express-mysql-session";
+// import { setupSSEEndpoint, broadcastSeatUpdate } from "./utils/sseManager.js";
+// import { getSeatsFromDB } from "./routes/seatsAuditorium.js"; 
 dotenv.config({ path: "../.env" });
 
 const app = express();
@@ -16,6 +18,9 @@ app.use(express.json());
 
 const MySQLStore = connectMySQL(session);
 const sessionStore = new MySQLStore({}, db as any);
+
+
+
 
 app.use(
   session({
@@ -33,11 +38,14 @@ app.use(
   })
 );
 
+// Setup SSE endpoint
+// setupSSEEndpoint(app, getSeatsFromDB);
+
 // Routes
 app.use("/api/movies", moviesRouter);
 app.use("/api/users", usersRoutes);
 app.use("/api", bookingRoute);
-app.use("/api", seatsRouter);
+// app.use("/api", getSeatsFromDB);
 app.use("/api", dynamiskRoute);
 app.use("/api/screenings", screeningsRouter);
 

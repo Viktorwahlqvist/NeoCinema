@@ -1,18 +1,26 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+// vite.config.ts
+import { defineConfig } from "vitest/config";   // ⬅️ ändrat
+import react from "@vitejs/plugin-react";
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+
   server: {
-    port: 3000,          
-    strictPort: true,    
+    port: 3000,
+    strictPort: true,
     proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
+      "/api": {
+        target: "http://localhost:5000",
         changeOrigin: true,
-        secure: false
-      }
-    }
-  }
+        secure: false,
+      },
+    },
+  },
+
+test: {
+  include: ["**/*.{test,spec}.?(c|m)[jt]s?(x)"],
+  environment: "jsdom",
+  globals: true,
+  setupFiles: "./src/setupTests.ts",
+},
 });

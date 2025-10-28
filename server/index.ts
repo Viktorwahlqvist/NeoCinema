@@ -7,6 +7,7 @@ import { moviesRouter } from "./routes/movies.js";
 import bookingRoute from "./routes/bookingRoute.js";
 import usersRoutes from "./routes/usersRoutes.js";
 import session from "express-session";
+import {screeningsRouter} from "./routes/screeningsRouter.js"
 import connectMySQL from "express-mysql-session";
 // import { setupSSEEndpoint, broadcastSeatUpdate } from "./utils/sseManager.js";
 // import { getSeatsFromDB } from "./routes/seatsAuditorium.js"; 
@@ -46,6 +47,8 @@ app.use("/api/users", usersRoutes);
 app.use("/api", bookingRoute);
 // app.use("/api", getSeatsFromDB);
 app.use("/api", dynamiskRoute);
+app.use("/api/screenings", screeningsRouter);
+
 
 const PORT = process.env.PORT || 5000;
 

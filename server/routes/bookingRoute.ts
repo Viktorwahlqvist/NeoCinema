@@ -2,6 +2,7 @@ import express from "express";
 import { db } from "../db.js";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import randomNumber from "../utils/randomNumber.js";
+import {sendEmail} from "./Mailer.js"
 
 const router = express.Router();
 
@@ -19,49 +20,6 @@ type SeatInput = {
   seatId: number;
   ticketType: number;
 };
-
-
-router.get("/screeningInfo/:screeningId", async (req, res) => {
-  const [rows] = await db.query<RowDataPacket[]>(
-    "SELECT * FROM screeningsInfo WHERE screeningId = ?",
-    [req.params.screeningId]
-  );
-  res.json(rows[0] || null);
-});
-
-router.get("/priceTotals", async (req, res) => {
-  const { bookingId } = req.query;
-  if (!bookingId) return res.status(400).json({ message: "Missing bookingId" });
-
-  try {
-    // Hämta summering per biljettyp + totalpris
-    const [rows] = await db.query<RowDataPacket[]>(
-      `
-      SELECT 
-        pl.ticket_type AS ticketType,
-        COUNT(*) AS quantity,
-        SUM(pl.price_kr) AS subTotal,
-        totals.totalPrice
-      FROM priceLines pl
-      JOIN (
-        SELECT bookingId, SUM(price_kr) AS totalPrice
-        FROM priceLines
-        WHERE bookingId = ?
-        GROUP BY bookingId
-      ) totals ON totals.bookingId = pl.bookingId
-      WHERE pl.bookingId = ?
-      GROUP BY pl.ticket_type
-      `,
-      [bookingId, bookingId]
-    );
-
-    res.json(rows);
-  } catch (err) {
-    console.error("Error fetching priceTotals:", err);
-    res.status(500).json({ message: "Serverfel vid hämtning av prisinfo" });
-  }
-});
-
 
 router.post("/bookings", async (req, res) => {
   const { screeningId, userId, seats } = req.body;
@@ -107,6 +65,54 @@ router.post("/bookings", async (req, res) => {
       [seatValues]
     );
 
+    const [userRows] = await db.query<RowDataPacket[]>(
+  "SELECT firstName, lastName, email FROM users WHERE id = ?",
+  [userId]
+);
+
+const user = userRows[0] as { firstName: string; lastName: string; email: string };
+
+
+ const [bookingInfoRows] = await db.query<RowDataPacket[]>(
+      `SELECT 
+          b.bookingNumber AS rNumber,
+          m.title AS movieTitle,
+          s.start_time AS screeningTime,
+          a.name AS auditoriumName,
+          SUM(t.price) AS totalPrice
+       FROM bookings b
+       JOIN screenings s ON s.id = b.screeningId
+       JOIN movies m ON m.id = s.movie_id
+       JOIN auditoriums a ON a.id = s.auditorium_id
+       JOIN bookingXSeats bx ON bx.bookingId = b.id
+       JOIN tickets t ON t.id = bx.ticketTypeId
+       WHERE b.id = ?
+       GROUP BY b.id;`,
+      [bookingId]
+    );
+
+    const bookingInfo = bookingInfoRows[0];
+// Skicka mejlet till den inloggade användaren
+try {
+  await sendEmail({
+    to: user.email,
+    subject: `🎬 Bekräftelse på din biobokning – ${bookingInfo.movieTitle}`,
+    html: `
+      <h2>Tack ${user.firstName} ${user.lastName}!</h2>
+      <p>Din bokning hos <b>Neocinema AB</b> är bekräftad.</p>
+      <p><b>Film:</b> ${bookingInfo.movieTitle}</p>
+      <p><b>Salong:</b> ${bookingInfo.auditoriumName}</p>
+      <p><b>Tid:</b> ${new Date(bookingInfo.screeningTime).toLocaleString("sv-SE")}</p>
+      <p><b>Totalt pris:</b> ${bookingInfo.totalPrice} kr</p>
+      <p><b>Bokningsnummer:</b> ${bookingInfo.rNumber}</p>
+    `
+  });
+} catch (error) {
+  console.error("Kunde inte skicka mejlet:", error);
+}
+
+
+
     res.status(201).json({
       message: "Booking created successfully",
       rNumber,
@@ -114,30 +120,70 @@ router.post("/bookings", async (req, res) => {
       bookedSeats: seats.map((seat: Seat) => seat.seatId),
       ticketTypes: seats.map((seat: Seat) => seat.ticketType),
     });
-  } catch (err) {
-    console.error("Booking could not be processed.", err);
-    res.status(500).json({ error: "Booking could not be processed." });
-  }
+} catch (err: any) {
+  console.error("❌ Booking could not be processed.", err);
+  res.status(500).json({ error: err.message });
+}
 });
 
-// Delete booking with bookingId
-router.delete("/bookings/:id", async (req, res) => {
+
+router.delete('/bookings/:id', async (req, res) => {
   try {
-    const id = Number(req.params.id);
+    const id = Number(req.params.id); 
 
     const [result] = await db.query<ResultSetHeader>(
-      "DELETE FROM bookings WHERE id = ? LIMIT 1",
+      'DELETE FROM bookings WHERE id = ? LIMIT 1',
       [id]
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Booking not found" });
+      return res.status(404).json({ message: 'Booking not found' });
     }
 
-    res.status(200).json({ message: "Booking was removed successfully!" });
+    res.status(200).json({ message: 'Booking was removed successfully!' });
   } catch (err: any) {
-    console.error("Delete booking error:", err);
+    console.error('Delete booking error:', err);
     res.status(500).json({ error: err.message });
   }
 });
+
+router.get("/bookings/:bookingId", async (req, res) => {
+  const { bookingId } = req.params;
+
+  try {
+const [rows] = await db.query<RowDataPacket[]>(
+  `SELECT 
+      b.id AS bookingId,
+      b.bookingNumber AS rNumber,
+      u.email,
+      m.title AS movieTitle,
+      s.start_time AS screeningTime,
+      a.name AS auditoriumName,
+      SUM(t.price) AS totalPrice
+   FROM bookings b
+   JOIN users u ON u.id = b.userId
+   JOIN screenings s ON s.id = b.screeningId
+   JOIN movies m ON m.id = s.movie_id
+   JOIN auditoriums a ON a.id = s.auditorium_id
+   JOIN bookingXSeats bx ON bx.bookingId = b.id
+   JOIN tickets t ON t.id = bx.ticketTypeId
+   WHERE b.id = ?
+   GROUP BY b.id;`,
+  [bookingId]
+);
+
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Ingen bokning hittades" });
+    }
+
+  
+
+    res.json(rows[0]);
+  } catch (err: any) {
+    console.error("❌ Fel vid hämtning av bokning:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;

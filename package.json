@@ -1,15 +1,22 @@
 {
   "scripts": {
     "start": "tsx server/index.ts",
-    "dev": "vite"
+    "dev": "vite",
+    "test": "vitest",
+    "test:ui": "vitest --ui"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/express-session": "^1.18.2",
     "@types/react": "^19.2.2",
     "@types/react-bootstrap": "^1.0.1",
     "@types/react-dom": "^19.2.1",
     "@vitejs/plugin-react": "^5.0.4",
-    "tsx": "^4.20.6"
+    "jsdom": "^27.0.1",
+    "tsx": "^4.20.6",
+    "vitest": "^4.0.3"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.2",

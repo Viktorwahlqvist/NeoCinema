@@ -5,6 +5,7 @@ import "./filter-dropdown.scss";
 interface SelectProps {
   label: string;
   options: string[];
+  className?: string;
   onClick: (value: string) => void;
 }
 
@@ -12,6 +13,7 @@ export default function FilterDropdown({
   label,
   options,
   onClick,
+  className,
 }: SelectProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -37,7 +39,7 @@ export default function FilterDropdown({
         <section className="option-container">
           <FilterBtn
             btnName={options}
-            className="options-dropdown"
+            className={`options-dropdown ${className}`}
             onClick={handleClickSelect}
           />
         </section>

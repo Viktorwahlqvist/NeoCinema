@@ -25,9 +25,18 @@ export default function AllMoviesPage() {
   const { data, isLoading, error } = useFetch<ScreeningsInfo[]>(
     "/api/screeningsInfo"
   );
+  // Filter out dates that have already passed
+  const now = new Date();
+  const filteredDates =
+    data?.filter((d) => {
+      const date = new Date(d.startTime);
+      return date >= now;
+    }) ?? [];
 
-  // gets raw dates removes iso ater T
-  const rawDates = data ? data.map((d) => d.startTime.split("T")[0]) : [];
+  // gets raw dates removes iso after T
+  const rawDates = filteredDates
+    ? filteredDates.map((d) => d.startTime.split("T")[0])
+    : [];
   // sets a limit of 7 days and sort them.
   const limitedDays = getLimitedSortedDates(rawDates);
   // formating dates so we get weekday before
@@ -53,7 +62,7 @@ export default function AllMoviesPage() {
   useEffect(() => {
     if (!data) return;
 
-    const filtered = data.filter((screening) => {
+    const filtered = filteredDates.filter((screening) => {
       return (
         (!filterOptions.date ||
           screening.startTime.split("T")[0] === filterOptions.date) &&
@@ -86,6 +95,7 @@ export default function AllMoviesPage() {
             <FilterDropdown
               label="Välj ett datum"
               onClick={(label) => handleOnClickDate(dateMap[label])}
+              className="day-filter"
               options={formattedDays}
             />
           </Col>

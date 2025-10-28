@@ -1,0 +1,31 @@
+@import 'variables';
+
+// Base styles for the whole site
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: $font-family-heading;
+  background: linear-gradient(180deg, #060913 0%, #0f172a 60%, #1a1f35 100%);
+  color: $color-text;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+
+a {
+  color: $color-text;
+  text-decoration: none;
+  transition: color $transition-speed;
+
+  &:hover {
+    color: $color-hover;
+  }
+}

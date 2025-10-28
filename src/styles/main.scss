@@ -1,2 +1,12 @@
+// Importera Bootstrap SCSS
+@import "../../node_modules/bootstrap/scss/bootstrap";
+
+// Import variables first so all files can use them
 @import 'variables';
-@import 'base';
+
+// Global base styles (typography, reset, body bg etc)
+@import 'global';
+
+// Components (buttons, cards, forms etc)
+@import 'components/buttons';
+@import 'components/movie-card';

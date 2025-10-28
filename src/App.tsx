@@ -1,7 +1,9 @@
+import "./styles/_global.scss";
 import { useState, useEffect } from "react";
 import type { Movie } from "./types/movie";
 import "./App.css";
 import { MovieCarousel } from "./components/MovieCarousel";
+import NeoNavbar from "./components/NeoNavbar";
 
 function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -22,6 +24,7 @@ function App() {
 
   return (
     <div className="App">
+      <NeoNavbar />
       <h2 className="section-title">Nu på bio</h2>
       <MovieCarousel movies={movies} />
     </div>

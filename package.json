@@ -22,7 +22,9 @@
     "mysql2": "^3.15.1",
     "react": "^19.2.0",
     "react-bootstrap": "^2.10.10",
-    "react-dom": "^19.2.0"
+    "react-bootstrap-icons": "^1.11.6",
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.4"
   },
   "optionalDependencies": {
     "@rollup/rollup-win32-x64-msvc": "^4.52.4"

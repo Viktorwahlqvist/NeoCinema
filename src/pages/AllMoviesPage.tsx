@@ -67,36 +67,36 @@ export default function AllMoviesPage() {
   }, [data, filterOptions]);
 
   return (
-    <Container>
+    <Container fluid className=" container-lg">
       <main className="all-movies-container">
-        <Row>
-          <section className="text-container">
-            <Col>
+        <Row className="text-container">
+          <Row>
+            <Col xs={12} md={4} lg={4}>
               <h1 className="all-movies-header">På bio just nu</h1>
             </Col>
-            <Col>
-              <p className="choose-text">
-                Välj mellan våra två biografer och se vilka filmer som går
-              </p>
-            </Col>
-          </section>
+          </Row>
+          <Col>
+            <p className="choose-text">
+              Välj mellan våra två biografer och se vilka filmer som går
+            </p>
+          </Col>
         </Row>
-        <Row className="mx-5">
-          <Col xs="auto">
+        <Row className="mx-sm-5">
+          <Col xs="4" md="auto">
             <FilterDropdown
               label="Välj ett datum"
               onClick={(label) => handleOnClickDate(dateMap[label])}
               options={formattedDays}
             />
           </Col>
-          <Col xs="auto">
+          <Col xs="4" md="auto">
             <FilterDropdown
               label="Välj en salong"
               onClick={handleOnClickAuditorium}
               options={["Neo Lilla", "Neo Stora"]}
             />
           </Col>
-          <Col xs="auto" className="d-flex align-items-end">
+          <Col xs="3" md="auto" className="d-flex align-items-end">
             <FilterBtn
               btnName={filterOptions.age ? ["Över 15"] : ["Under 15"]}
               onClick={handleOnClickAge}

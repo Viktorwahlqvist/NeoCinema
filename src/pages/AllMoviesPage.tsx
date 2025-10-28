@@ -26,8 +26,6 @@ export default function AllMoviesPage() {
     "/api/screeningsInfo"
   );
 
-  console.log(data);
-
   // gets raw dates removes iso ater T
   const rawDates = data ? data.map((d) => d.startTime.split("T")[0]) : [];
   // sets a limit of 7 days and sort them.
@@ -61,7 +59,7 @@ export default function AllMoviesPage() {
           screening.startTime.split("T")[0] === filterOptions.date) &&
         (!filterOptions.auditorium ||
           screening.auditoriumName === filterOptions.auditorium) &&
-        (!filterOptions.age || Number(screening.info.ageLimit) < 18)
+        (!filterOptions.age || Number(screening.info.ageLimit) < 15)
       );
     });
 
@@ -100,7 +98,7 @@ export default function AllMoviesPage() {
           </Col>
           <Col xs="auto" className="d-flex align-items-end">
             <FilterBtn
-              btnName={filterOptions.age ? ["Över 18"] : ["Under 18"]}
+              btnName={filterOptions.age ? ["Över 15"] : ["Under 15"]}
               onClick={handleOnClickAge}
             />
           </Col>

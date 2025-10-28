@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import "./BottomNavbar.scss";
+import "./Style/BottomNavbar.scss";
 
 export default function BottomNavbar() {
   const [menuOpen, setMenuOpen] = useState(false);

@@ -63,61 +63,101 @@ router.get("/priceTotals", async (req, res) => {
 });
 
 
+// router.post("/bookings", async (req, res) => {
+//   const { screeningId, userId, seats } = req.body;
+//   try {
+//     // Get all seats with screening id
+//     const [seatsRow] = await db.query<Seat[]>(
+//       "SELECT * FROM seatStatusView WHERE screeningId = ?",
+//       [screeningId]
+//     );
+
+//     // Gets all available seats.
+//     const availableSeats = seatsRow.filter((r) => r.seatStatus === "available");
+
+//     // checks if the choosen seat is available
+//     const isAllAvailable = seats.every((seats: SeatInput) =>
+//       availableSeats.some((s) => s.seatId === seats.seatId)
+//     );
+
+//     if (!isAllAvailable) {
+//       return res
+//         .status(400)
+//         .json({ message: "One or more seats are already booked" });
+//     }
+//     // Insert userid and screening id to bookings
+//     const [newBooking] = await db.query<ResultSetHeader>(
+//       "INSERT INTO bookings(bookingNumber, userId, screeningId, date) VALUES(?, ?, ?, ?)",
+//       [rNumber, userId, screeningId, bookingDate]
+//     );
+
+//     if (!newBooking || newBooking.affectedRows === 0) {
+//       return res.status(400).json({ message: "Booking could not be created" });
+//     }
+
+//     const bookingId = newBooking.insertId;
+//     // Incase its more then 1 tickets/seats.
+//     const seatValues = seats.map((seat: Seat) => [
+//       bookingId,
+//       seat.seatId,
+//       seat.ticketType,
+//     ]);
+//     await db.query(
+//       "INSERT INTO bookingXSeats (bookingId, seatId, ticketTypeId) VALUES ?",
+//       [seatValues]
+//     );
+
+//     res.status(201).json({
+//       message: "Booking created successfully",
+//       rNumber,
+//       bookingId,
+//       bookedSeats: seats.map((seat: Seat) => seat.seatId),
+//       ticketTypes: seats.map((seat: Seat) => seat.ticketType),
+//     });
+//   } catch (err) {
+//     console.error("Booking could not be processed.", err);
+//     res.status(500).json({ error: "Booking could not be processed." });
+//   }
+// });
+
+
 router.post("/bookings", async (req, res) => {
-  const { screeningId, userId, seats } = req.body;
-  try {
-    // Get all seats with screening id
-    const [seatsRow] = await db.query<Seat[]>(
-      "SELECT * FROM seatStatusView WHERE screeningId = ?",
-      [screeningId]
-    );
+  const { screeningId, userId, guestEmail, seats } = req.body;
 
-    // Gets all available seats.
-    const availableSeats = seatsRow.filter((r) => r.seatStatus === "available");
-
-    // checks if the choosen seat is available
-    const isAllAvailable = seats.every((seats: SeatInput) =>
-      availableSeats.some((s) => s.seatId === seats.seatId)
-    );
-
-    if (!isAllAvailable) {
-      return res
-        .status(400)
-        .json({ message: "One or more seats are already booked" });
-    }
-    // Insert userid and screening id to bookings
-    const [newBooking] = await db.query<ResultSetHeader>(
-      "INSERT INTO bookings(bookingNumber, userId, screeningId, date) VALUES(?, ?, ?, ?)",
-      [rNumber, userId, screeningId, bookingDate]
-    );
-
-    if (!newBooking || newBooking.affectedRows === 0) {
-      return res.status(400).json({ message: "Booking could not be created" });
-    }
-
-    const bookingId = newBooking.insertId;
-    // Incase its more then 1 tickets/seats.
-    const seatValues = seats.map((seat: Seat) => [
-      bookingId,
-      seat.seatId,
-      seat.ticketType,
-    ]);
-    await db.query(
-      "INSERT INTO bookingXSeats (bookingId, seatId, ticketTypeId) VALUES ?",
-      [seatValues]
-    );
-
-    res.status(201).json({
-      message: "Booking created successfully",
-      rNumber,
-      bookingId,
-      bookedSeats: seats.map((seat: Seat) => seat.seatId),
-      ticketTypes: seats.map((seat: Seat) => seat.ticketType),
-    });
-  } catch (err) {
-    console.error("Booking could not be processed.", err);
-    res.status(500).json({ error: "Booking could not be processed." });
+  // 1. basic validation
+  if (!screeningId || !seats?.length) {
+    return res.status(400).json({ message: "Missing screening or seats" });
   }
+
+  // 2. check seats are still free
+  const [seatsRow] = await db.query<Seat[]>(
+    "SELECT * FROM seatStatusView WHERE screeningId = ?",
+    [screeningId]
+  );
+  const availableSeats = seatsRow.filter((r) => r.seatStatus === "available");
+  const isAllAvailable = seats.every((s: any) =>
+    availableSeats.some((a) => a.seatId === s.seatId)
+  );
+  if (!isAllAvailable) {
+    return res.status(400).json({ message: "One or more seats are already booked" });
+  }
+
+  // 3. insert booking (user can be null)
+  const rNumber = "BIO" + Math.floor(100000 + Math.random() * 900000);
+  const [newBooking] = await db.query<ResultSetHeader>(
+    "INSERT INTO bookings(bookingNumber, userId, screeningId, date, guestEmail) VALUES(?, ?, ?, NOW(), ?)",
+    [rNumber, userId || null, screeningId, guestEmail || null]
+  );
+
+  // 4. store seats
+  const seatValues = seats.map((s: any) => [newBooking.insertId, s.seatId, s.ticketType]);
+  await db.query("INSERT INTO bookingXSeats (bookingId, seatId, ticketTypeId) VALUES ?", [seatValues]);
+
+  // 5. return booking number
+  res.status(201).json({
+    bookingId: newBooking.insertId,
+    bookedSeats: seats.map((s: any) => s.seatId),
+  });
 });
 
 // Delete booking with bookingId

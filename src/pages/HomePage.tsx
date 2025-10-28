@@ -3,7 +3,7 @@ import Carousel from "react-bootstrap/Carousel";
 import MovieCard from "../components/MovieCard";
 import { Movie } from "../types/movie";
 import useFetch from "../hook/useFetch";
-import "./HomePage.scss";
+import "./PagesStyle/HomePage.scss";
 
 function chunk<T>(arr: T[], size: number): T[][] {
   const out: T[][] = [];
@@ -23,7 +23,7 @@ export default function HomePage() {
 
   const groups = chunk(movies, 1); // 1 card = 1 item
   const active = movies[activeIndex];
-  // felhantering och laddning
+  // handling loading, error and empty states
   if (isLoading)
     return (
       <div className="text-center text-light mt-5">Laddar filmer...</div>

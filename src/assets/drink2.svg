@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+<svg width="800px" height="800px" viewBox="-13.05 0 95.506 95.506" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <linearGradient id="linear-gradient" x1="0.052" y1="0.472" x2="1.018" y2="0.523" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#f9a973"/>
+      <stop offset="1" stop-color="#e28b3d"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="0.237" y1="0.532" x2="1.252" y2="0.39" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#feecd2"/>
+      <stop offset="1" stop-color="#cdac82"/>
+    </linearGradient>
+  </defs>
+  <g id="drink_orange_juice" data-name="drink orange juice" transform="translate(-1071.056 -801.196)">
+    <g id="Group_87" data-name="Group 87">
+      <path id="Path_222" data-name="Path 222" d="M1130.793,827.788a3.008,3.008,0,0,1-2.995,3h-53.747a3,3,0,0,1-2.995-3h0a3,3,0,0,1,2.995-3H1127.8a3.008,3.008,0,0,1,2.995,3Z" fill="#a4d322"/>
+    </g>
+    <g id="Group_88" data-name="Group 88">
+      <path id="Path_223" data-name="Path 223" d="M1076.294,830.785l8.615,65.917h32.024l8.615-65.917Z" fill="url(#linear-gradient)"/>
+    </g>
+    <path id="Path_224" data-name="Path 224" d="M1120.142,872.169l3.107-23.782H1078.6l3.106,23.782Z" fill="url(#linear-gradient-2)"/>
+    <path id="Path_225" data-name="Path 225" d="M1076.614,833.219h48.615l.319-2.434h-49.255Z" fill="#c97027"/>
+    <path id="Path_226" data-name="Path 226" d="M1140.454,803.442a2.252,2.252,0,0,0-2.249-2.246,1.541,1.541,0,0,0-.279.06l-.01-.048c-.046.005-18.2,4.6-25.389,7.039-8.285,2.967-11.692,11.973-11.844,12.126l-.045.117-1.3,4.3h4.7l.858-2.821a22.279,22.279,0,0,1,2.314-3.96,14.657,14.657,0,0,1,6.768-5.507c6.793-2.313,24.449-6.76,24.465-6.765l.568-.211A2.232,2.232,0,0,0,1140.454,803.442Z" fill="#27b7ff"/>
+  </g>
+</svg>

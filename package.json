@@ -1,19 +1,26 @@
 {
-  "name": "neocinema",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
   "scripts": {
+    "start": "tsx server/index.ts",
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "start": "tsx index.ts"
+    "test": "vitest",
+    "test:ui": "vitest --ui"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/express-session": "^1.18.2",
+    "@types/react": "^19.2.2",
+    "@types/react-bootstrap": "^1.0.1",
+    "@types/react-dom": "^19.2.1",
+    "@vitejs/plugin-react": "^5.0.4",
+    "jsdom": "^27.0.1",
+    "tsx": "^4.20.6",
+    "vitest": "^4.0.3"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.2",
     "axios": "^1.12.2",
-    "bcrypt": "^6.0.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "express-mysql-session": "^3.0.3",
@@ -26,18 +33,7 @@
     "react-router-dom": "^7.9.4",
     "sass": "^1.93.2"
   },
-  "devDependencies": {
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.0",
-    "@testing-library/user-event": "^14.6.1",
-    "@types/express-session": "^1.18.2",
-    "@types/react": "^19.2.2",
-    "@types/react-bootstrap": "^1.0.1",
-    "@types/react-dom": "^19.2.1",
-    "@vitejs/plugin-react": "^5.0.4",
-    "sass-embedded": "^1.93.2",
-    "tsx": "^4.20.6",
-    "jsdom": "^27.0.1",
-    "vitest": "^4.0.3"
+  "optionalDependencies": {
+    "@rollup/rollup-win32-x64-msvc": "^4.52.4"
   }
 }

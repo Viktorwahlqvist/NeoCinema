@@ -10,52 +10,53 @@ import DateTimeSelector from "../components/DateTimeSelector";
 import "../styles/date-time-selector.scss";
 import MovieReviews from "../components/MovieReviews";
 
+import { useNavigate } from "react-router-dom";
+
 export default function MovieDetailPage() {
   const { id } = useParams();
-  const movieId = id;
+  const navigate = useNavigate(); // 👈 Lägg till
 
-  if (typeof id === "undefined") {
-    return <p>Loading movie...</p>;
+  interface Screening {
+    screening_id: number;
+    [key: string]: any;
   }
+
+  const handleSelect = (screening: Screening): void => {
+    console.log("Vald visning:", screening);
+    navigate(`/booking/${screening.screening_id}`); // 👈 Navigera till rätt sida
+  };
 
   const {
     data: movies,
     isLoading: movieLoading,
-    error: movieError /*Hårdkodad id för att fixa sidan ändra senare */,
+    error: movieError,
   } = useFetch<Movie[]>(`/api/moviesWithGenres?id=${id}`);
+
   const {
     data: screenings,
     isLoading: screeningLoading,
-    error: screeningError /*Hårdkodad id för att fixa sidan ändra senare */,
+    error: screeningError,
   } = useFetch(`/api/movieScreenings?movie_id=${id}&limit=10`);
 
   const movie = movies?.[0] ?? null;
-
-  console.log(movie, screenings);
 
   if (!movie) return <p>No movie found</p>;
 
   return (
     <div className="container py-3">
       <Stack gap={3}>
-        {movieError && <p>Error loading movie</p>}
-        {movieLoading && <p>Movie loading...</p>}
-        {movie && (
-          <>
-            <Trailer videoId={movie.info.trailer} title={movie.title} />
-            <MovieTags
-              actors={movie.info.actors}
-              ageLimit={movie.info.ageLimit}
-              duration={movie.info.duration}
-              genrer={movie.genres}
-            />
-            <MovieDescription
-              title={movie.title}
-              description={movie.info.description}
-              director={movie.info.director}
-            />
-          </>
-        )}
+        <Trailer videoId={movie.info.trailer} title={movie.title} />
+        <MovieTags
+          actors={movie.info.actors}
+          ageLimit={movie.info.ageLimit}
+          duration={movie.info.duration}
+          genrer={movie.genres}
+        />
+        <MovieDescription
+          title={movie.title}
+          description={movie.info.description}
+          director={movie.info.director}
+        />
       </Stack>
 
       <div className="container my-4">
@@ -64,7 +65,7 @@ export default function MovieDetailPage() {
             <DateTimeSelector
               movieId={Number(id)}
               limit={50}
-              onSelect={(screening) => console.log("Vald visning:", screening)}
+              onSelect={handleSelect} // 👈 Skicka callbacken
             />
           </div>
 

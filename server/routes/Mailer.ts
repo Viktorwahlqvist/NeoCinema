@@ -1,9 +1,14 @@
 import nodemailer from "nodemailer";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const secretPath = path.join(__dirname, "gmail-secret.json");
 
 // Läs in e-post och app-lösenord från gmail-secret.json
-const secretPath = path.join(process.cwd(), "gmail-secret.json");
 let emailInfo: { email: string; appPassword: string };
 
 try {

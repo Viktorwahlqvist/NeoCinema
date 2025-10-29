@@ -23,6 +23,7 @@ function App() {
           <Route path="/booking/:screeningId" element={<BookingPage />} />
           <Route path="/Bekräftelse/:bookingId" element={<BookingConfirmation />} />
           <Route path="/AboutUs" element={<AboutUs />} />
+          <Route path="/kiosk" element={<KioskPage />} />
         </Routes>
         
         {isMobile && <BottomNavbar />}

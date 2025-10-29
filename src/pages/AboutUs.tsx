@@ -1,5 +1,5 @@
 import React from "react";
-import "./OmNeo.scss";
+import "./PagesStyle/OmNeo.scss";
 import { Flag, GeoAlt, Map } from "react-bootstrap-icons";
 
 const address = 'Biogatan 1, 123 45 Småstad';

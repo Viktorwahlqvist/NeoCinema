@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import useFetch from "../hook/useFetch";
 import TicketSelector from "../components/TicketSelector";
 import { getMovieImage } from "../utils/getMovieImage";
-import "./BookingPage.scss";
+import "./PagesStyle/BookingPage.scss";
 
 // helper : find N adjacent seats 
 function findAdjacentSeats(seats: Seat[], n: number, startSeatId?: number): number[] {
@@ -46,7 +46,7 @@ function findAdjacentSeats(seats: Seat[], n: number, startSeatId?: number): numb
   return [];
 }
 
-/* ---------- types ---------- */
+//  types 
 interface Seat {
   seatId: number;
   row_num: number;
@@ -91,31 +91,34 @@ export default function BookingPage() {
     const best = findAdjacentSeats(seats, totalTickets, seatId);
     if (best.length === totalTickets) setSelectedSeats(best);
   };
-
+    const [isGuest, setIsGuest] = useState(false);
+    const [guestEmail, setGuestEmail] = useState("");
   //booking + price summary 
+ 
+ 
   const handleBooking = async () => {
-    if (!totalTickets) return alert("Välj minst en biljett!");
-    if (selectedSeats.length < totalTickets)
-      return alert("Du har valt färre stolar än antal biljetter!");
-
-    // collapse duplicates & build seatList
-    const uniqueTickets = tickets.reduce((acc, curr) => {
-      const found = acc.find((t) => t.id === curr.id);
-      if (found) found.count += curr.count;
-      else acc.push({ ...curr });
-      return acc;
-    }, [] as { id: number; count: number }[]);
-
-    const seatList: { seatId: number; ticketType: number }[] = [];
-    const seatQueue = [...selectedSeats];
-    for (const t of uniqueTickets) {
-      for (let i = 0; i < t.count; i++) {
-        const seatId = seatQueue.shift();
-        if (seatId !== undefined) seatList.push({ seatId, ticketType: t.id });
-      }
+  if (!totalTickets) return alert("Välj minst en biljett!");
+  if (selectedSeats.length < totalTickets)
+    return alert("Du har valt färre stolar än antal biljetter!");
+  
+  //collapse duplicates & build seatList 
+  const uniqueTickets = tickets.reduce((acc, curr) => {
+    const found = acc.find((t) => t.id === curr.id);
+    if (found) found.count += curr.count;
+    else acc.push({ ...curr });
+    return acc;
+  }, [] as { id: number; count: number }[]);
+  
+  const seatList: { seatId: number; ticketType: number }[] = [];
+  const seatQueue = [...selectedSeats];
+  for (const t of uniqueTickets) {
+    for (let i = 0; i < t.count; i++) {
+      const seatId = seatQueue.shift();
+      if (seatId !== undefined) seatList.push({ seatId, ticketType: t.id });
     }
+  }
 
-    const bookingData = {
+   const bookingData = {
       screeningId: Number(screeningId),
       userId: 6,
       seats: seatList,
@@ -140,14 +143,14 @@ export default function BookingPage() {
     }
   };
     
-   const { data: screening, isLoading: screeningLoading } = useFetch<
-  {
-    title: string;
-    info: { mobileImg: string };
-    startTime: string;
-    auditoriumName: string;
-  }[]
->(`/api/screeningsInfo?screeningId=${screeningId}`, { skip: !screeningId });
+    const { data: screening, isLoading: screeningLoading } = useFetch<
+    {
+      title: string;
+      info: { mobileImg: string };
+      startTime: string;
+      auditoriumName: string;
+    }[]
+  >(`/api/screeningsInfo?screeningId=${screeningId}`, { skip: !screeningId });
 
 
     
@@ -174,15 +177,13 @@ export default function BookingPage() {
           )}
 
           {/* Ticket selector */}
-  
           <div className="ticket-section">
             <h5 className="neon-text">Välj biljetter</h5>
             <TicketSelector onTicketChange={setTickets} />
           </div>
         </aside>
 
-        {/* RIGHT : seats + button */}
-        
+        {/* seats + button */}
         <section className="booking-right">
           {screening?.[0] && (
             <div className="heading-box">
@@ -193,7 +194,16 @@ export default function BookingPage() {
             </div>
           )}
           <div className="screen">DUKEN</div>
-
+          <div className="guest-toggle mb-3">
+    <label className="text-light">
+      <input
+        type="checkbox"
+        checked={isGuest}
+        onChange={(e) => setIsGuest(e.target.checked)}
+      />
+      Fortsätt som gäst
+    </label>
+  </div>
           <div className="seating-area">
             {Object.entries(
               seats.reduce((acc: Record<number, Seat[]>, seat) => {
@@ -223,10 +233,26 @@ export default function BookingPage() {
           </div>
 
           {totalTickets > 0 && (
-            <button className="btn neon-btn mt-4" onClick={handleBooking}>
-              Boka {totalTickets} biljett(er)
-            </button>
+           <>
+         
+          {isGuest && (
+            <div className="guest-email mb-3">
+              <label className="form-label text-light">E-post (valfritt)</label>
+              <input
+                type="email"
+                className="form-control"
+                placeholder="namn@exempel.se"
+                value={guestEmail}
+                onChange={(e) => setGuestEmail(e.target.value)}
+              />
+            </div>
           )}
+
+          <button className="btn neon-btn mt-4" onClick={handleBooking}>
+            Boka {totalTickets} biljett(er)
+          </button>
+        </>
+      )}
         </section>
       </div>
     </main>

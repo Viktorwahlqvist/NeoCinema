@@ -1,5 +1,5 @@
 import React from 'react';
-import './UpcomingMovies.scss';
+import './Style/UpcomingMovies.scss';
 
 interface UpcomingMovie {
   id: number;

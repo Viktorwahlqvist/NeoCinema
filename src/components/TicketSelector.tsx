@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useFetch from "../hook/useFetch";
-import "./TicketSelector.scss";
+import "./Style/TicketSelector.scss";
 
 interface Ticket {
   id: number;

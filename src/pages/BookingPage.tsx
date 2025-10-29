@@ -63,6 +63,8 @@ export default function BookingPage() {
   const [tickets, setTickets] = useState<{ id: number; count: number }[]>([]);
   const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
   const totalTickets = tickets.reduce((sum, t) => sum + t.count, 0);
+  const totalPrice = tickets.reduce((sum, t) => sum + t.count * (t as any).price, 0);
+
 
   const { data: seats, isLoading, error } = useFetch<Seat[]>(
     `/api/seatStatusView?screeningId=${screeningId}`
@@ -167,7 +169,7 @@ export default function BookingPage() {
             <>
               <div className="movie-poster-box">
                 
-<img src={screening[0].info?.mobileImg || "/placeholder.jpg"}
+          <img src={screening[0].info?.mobileImg || "/placeholder.jpg"}
  
                   alt={screening[0].title}
                   className="movie-poster"
@@ -181,6 +183,13 @@ export default function BookingPage() {
             <h5 className="neon-text">Välj biljetter</h5>
             <TicketSelector onTicketChange={setTickets} />
           </div>
+          {totalTickets > 0 && (
+          <div className="ticket-total-box mt-3">
+            <p className="text-light">Totalt pris</p>
+            <h4 className="neon-text">{totalPrice} kr</h4>
+          </div>
+        )}
+
         </aside>
 
         {/* seats + button */}

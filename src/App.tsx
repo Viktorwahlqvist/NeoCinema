@@ -1,32 +1,34 @@
-import "./styles/_global.scss";
-import { useState, useEffect } from "react";
-import type { Movie } from "./types/movie";
-import { MovieCarousel } from "./components/MovieCarousel";
-import NeoNavbar from "./components/NeoNavbar";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import AllMoviesPage from "./pages/AllMoviesPage";
+import MovieDetailPage from "./pages/MovieDetailPage";
+import AboutUs from "./pages/AboutUs";
+import KioskPage from "./pages/KioskPage";
+import BottomNavbar from "./components/BottomNavbar";
+import BookingPage from "./pages/BookingPage";
+import BookingConfirmation from "./pages/BookingConfirmation";
+import NavDesk from "./components/NavDesk";
+import { useIsMobile } from "./hook/useIsMobile";
 
 function App() {
-  const [movies, setMovies] = useState<Movie[]>([]);
-
-  useEffect(() => {
-    const fetchMovies = async () => {
-      try {
-        const res = await fetch("/api/movies");
-        if (!res.ok) throw new Error("Kunde inte hämta filmer");
-        const data = await res.json();
-        setMovies(data);
-      } catch (err) {
-        console.error("Fel vid hämtning av filmer:", err);
-      }
-    };
-    fetchMovies();
-  }, []);
-
+  const isMobile = useIsMobile();
   return (
-    <div className="App">
-      <NeoNavbar />
-      <h2 className="section-title">Nu på bio</h2>
-      <MovieCarousel movies={movies} />
-    </div>
+    <Router>
+      {!isMobile && <NavDesk />}
+      <div className="app-container">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/movies" element={<AllMoviesPage />} />
+          <Route path="/movie/:id" element={<MovieDetailPage />} />
+          <Route path="/booking/:screeningId" element={<BookingPage />} />
+          <Route path="/Bekräftelse/:bookingId" element={<BookingConfirmation />} />
+          <Route path="/AboutUs" element={<AboutUs />} />
+        </Routes>
+        
+        {isMobile && <BottomNavbar />}
+        
+      </div>
+    </Router>
   );
 }
 

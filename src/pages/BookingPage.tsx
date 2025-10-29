@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useFetch from "../hook/useFetch";
 import TicketSelector from "../components/TicketSelector";
-import { getMovieImage } from "../utils/getMovieImage";
 import "./PagesStyle/BookingPage.scss";
 
 // helper : find N adjacent seats 
@@ -167,11 +166,12 @@ export default function BookingPage() {
           {screening?.[0] && (
             <>
               <div className="movie-poster-box">
-                <img
-                src={getMovieImage(screening[0].title)}
+                
+<img src={screening[0].info?.mobileImg || "/placeholder.jpg"}
+ 
                   alt={screening[0].title}
                   className="movie-poster"
-                />
+            />
               </div>
             </>
           )}

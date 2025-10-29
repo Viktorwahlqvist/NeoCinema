@@ -1,0 +1,29 @@
+@import '../variables';
+
+.button {
+  display: inline-block;
+  padding: $spacing-sm $spacing-md;
+  background-color: $color-button;
+  color: $color-text;
+  border: $border-width $border-style $border-color;
+  border-radius: $border-radius;
+  font-family: $font-family-heading;
+  font-size: $font-size-body;
+  cursor: pointer;
+  box-shadow: $glow-soft;
+  transition: background-color $transition-speed, box-shadow $transition-speed;
+
+  &:hover {
+    background-color: $color-hover;
+    box-shadow: $glow-medium;
+  }
+
+  &:active {
+    box-shadow: $glow-strong;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    width: 100%;
+    text-align: center;
+  }
+}

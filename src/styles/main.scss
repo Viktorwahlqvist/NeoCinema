@@ -1,13 +1,14 @@
-@use "./variables";
-@use "./base.scss";
-@use "../pages/PagesStyle/allmoviespages.scss";
+@import "./styles/_global.scss";
 
-:root {
-  --bs-dark: #000;
-  --bs-primary: #e50914;
-}
+// Importera Bootstrap SCSS
+@import "../../node_modules/bootstrap/scss/bootstrap";
 
-body {
-  background-color: var(--bs-dark);
-}
+// Import variables first so all files can use them
+@import 'variables';
 
+// Global base styles (typography, reset, body bg etc)
+@import 'global';
+
+// Components (buttons, cards, forms etc)
+@import 'components/buttons';
+@import 'components/movie-card';

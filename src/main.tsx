@@ -1,16 +1,15 @@
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.tsx'
+import './styles/_global.scss'        // 🆕 använd din globala scss
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap-icons/font/bootstrap-icons.css' // 🆕 lägg till detta
+import { BrowserRouter } from 'react-router-dom'
 
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap-icons/font/bootstrap-icons.css";
-import "./styles/main.scss";
-
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App";
-
-ReactDOM.createRoot(document.getElementById("root")!).render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-
+    <BrowserRouter>
       <App />
-  </React.StrictMode>
-);
-
+    </BrowserRouter>
+  </React.StrictMode>,
+)

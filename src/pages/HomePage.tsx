@@ -4,6 +4,7 @@ import MovieCard from "../components/MovieCard";
 import { Movie } from "../types/movie";
 import useFetch from "../hook/useFetch";
 import "./PagesStyle/HomePage.scss";
+import UpcomingMovies from "../components/UpcomingMovies";
 
 function chunk<T>(arr: T[], size: number): T[][] {
   const out: T[][] = [];
@@ -72,6 +73,10 @@ export default function HomePage() {
               </Carousel.Item>
             ))}
     </Carousel>
+
+    <UpcomingMovies />
+
+
     </main>
   );
 }

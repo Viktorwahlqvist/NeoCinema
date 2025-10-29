@@ -3,7 +3,7 @@ import HomePage from "./pages/HomePage";
 import AllMoviesPage from "./pages/AllMoviesPage";
 import MovieDetailPage from "./pages/MovieDetailPage";
 import AboutUs from "./pages/AboutUs";
-import KioskPage from "./pages/KioskPage";
+import KioskPage from "./pages/KioskPage"
 import BottomNavbar from "./components/BottomNavbar";
 import BookingPage from "./pages/BookingPage";
 import BookingConfirmation from "./pages/BookingConfirmation";
@@ -23,6 +23,8 @@ function App() {
           <Route path="/booking/:screeningId" element={<BookingPage />} />
           <Route path="/Bekräftelse/:bookingId" element={<BookingConfirmation />} />
           <Route path="/AboutUs" element={<AboutUs />} />
+          <Route path="/kiosk" element={<KioskPage />} />
+
         </Routes>
         
         {isMobile && <BottomNavbar />}

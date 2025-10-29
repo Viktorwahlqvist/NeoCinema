@@ -4,7 +4,7 @@ import { describe, test, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 
-// ---------------- Hoisted state ----------------
+// Hoisted state 
 const h = vi.hoisted(() => ({
   mockNavigate: vi.fn(),
   useFetchValue: {
@@ -27,7 +27,7 @@ const h = vi.hoisted(() => ({
   },
 }))
 
-// ---------------- Mocks ----------------
+//  Mocks 
 
 // react-router-dom
 vi.mock('react-router-dom', async () => {
@@ -104,7 +104,7 @@ vi.mock('../components/filter/FilterBtn', () => {
   return { __esModule: true, default: Btn }
 })
 
-// ---------------- Import page after mocks ----------------
+// Import page after mocks
 import AllMoviesPage from './AllMoviesPage'
 
 const renderWithRouter = () =>
@@ -116,7 +116,7 @@ const renderWithRouter = () =>
 
 beforeEach(() => vi.clearAllMocks())
 
-// ---------------- Tests ----------------
+// Tests 
 describe('AllMoviesPage', () => {
   test('renderar rubrik och filterknappar', () => {
     renderWithRouter()

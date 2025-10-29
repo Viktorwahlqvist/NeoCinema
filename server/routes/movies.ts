@@ -4,7 +4,7 @@ import type { RowDataPacket } from 'mysql2/promise';
 
 export const moviesRouter = Router();
 
-/* ----------  GET /movies/:id---------- */
+/* ----------  GET /movies/:id ---------- */
 moviesRouter.get('/:id', async (req, res, next) => {
   try {
     const [rows] = await db.execute<RowDataPacket[]>(
@@ -24,7 +24,7 @@ moviesRouter.get('/:id', async (req, res, next) => {
   } catch (e) { next(e); }
 });
 
-
+/* ----------  GET /movies ---------- */
 moviesRouter.get('/', async (req, res, next) => {
   try {
     const { genre } = req.query;            
@@ -48,7 +48,7 @@ moviesRouter.get('/', async (req, res, next) => {
     const [rows] = await db.execute(sql, values);
     res.json(rows);
   } catch (e) {
-    console.error('🔥 FEL I /api/movies:', e); // 👈 lägg till denna rad
+    console.error('🔥 FEL I /api/movies:', e);
     next(e);
   }
 });

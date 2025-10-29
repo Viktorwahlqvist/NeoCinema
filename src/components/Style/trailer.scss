@@ -1,0 +1,13 @@
+@use "../../styles/variables" as *;
+.trailer {
+  margin-top: 5rem;
+  margin-inline: auto;
+  width: 750px;
+  max-width: 70%;
+
+  .trailer-iframe {
+    border: $border-style $border-color $border-width;
+    box-shadow: $glow-strong;
+    border-radius: $border-radius;
+  }
+}

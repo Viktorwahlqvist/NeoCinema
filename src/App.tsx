@@ -1,7 +1,6 @@
 import "./styles/_global.scss";
 import { useState, useEffect } from "react";
 import type { Movie } from "./types/movie";
-import "./App.css";
 import { MovieCarousel } from "./components/MovieCarousel";
 import NeoNavbar from "./components/NeoNavbar";
 

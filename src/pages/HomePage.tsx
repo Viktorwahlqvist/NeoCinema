@@ -5,6 +5,8 @@ import { Movie } from "../types/movie";
 import useFetch from "../hook/useFetch";
 import "./PagesStyle/HomePage.scss";
 import UpcomingMovies from "../components/UpcomingMovies";
+import { useIsMobile } from "../hook/useIsMobile";
+import { MovieCarousel } from "../components/MovieCarousel";
 
 function chunk<T>(arr: T[], size: number): T[][] {
   const out: T[][] = [];
@@ -17,6 +19,7 @@ function chunk<T>(arr: T[], size: number): T[][] {
 export default function HomePage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const { data, isLoading, error } = useFetch<Movie[]>("api/moviesWithGenres");
+  const isMobile = useIsMobile();
 
   const movies = Array.isArray(data)
     ? data.filter((m: Movie) => m && m.id && m.title)
@@ -26,9 +29,7 @@ export default function HomePage() {
   const active = movies[activeIndex];
   // handling loading, error and empty states
   if (isLoading)
-    return (
-      <div className="text-center text-light mt-5">Laddar filmer...</div>
-    );
+    return <div className="text-center text-light mt-5">Laddar filmer...</div>;
 
   if (error)
     return (
@@ -46,17 +47,26 @@ export default function HomePage() {
 
   return (
     <main className="container-fluid home-page">
-      <section className="sticky-top header-box">
-        {/* <img src="/NeoCinema.png" alt="NeoCinema loga" className="site-logo" /> */}
-        <h2 className="neon-text">{active?.title ?? ""}</h2>
-        <div className="genre-row">
-          {active?.genres?.map((g) => (
-            <span key={g} className="genre-pill">{g}</span>
-          ))}
-        </div>
-        <button className="btn neon-btn mt-2" onClick={() => alert(`Köp biljetter för ${active?.title}`)}>Köp biljetter</button>
-      </section>
-
+      {isMobile ? (
+        <>
+          {" "}
+          <section className="sticky-top header-box">
+            {/* <img src="/NeoCinema.png" alt="NeoCinema loga" className="site-logo" /> */}
+            <h2 className="neon-text">{active?.title ?? ""}</h2>
+            <div className="genre-row">
+              {active?.genres?.map((g) => (
+                <span key={g} className="genre-pill">
+                  {g}
+                </span>
+              ))}
+            </div>
+            <button
+              className="btn neon-btn mt-2"
+              onClick={() => alert(`Köp biljetter för ${active?.title}`)}
+            >
+              Köp biljetter
+            </button>
+          </section>
           <Carousel
             activeIndex={activeIndex}
             onSelect={(idx) => setActiveIndex(idx)}
@@ -72,11 +82,17 @@ export default function HomePage() {
                 </div>
               </Carousel.Item>
             ))}
-    </Carousel>
+          </Carousel>
+        </>
+      ) : (
+        <>
+          {" "}
+          <h2 className="section-title">Nu på bio</h2>
+          <MovieCarousel movies={movies} />
+        </>
+      )}
 
-    <UpcomingMovies />
-
-
+      <UpcomingMovies />
     </main>
   );
 }

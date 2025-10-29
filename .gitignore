@@ -23,5 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .env
-gmail-secret.json
+server/gmail-secret.json
+
 

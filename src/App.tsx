@@ -3,6 +3,7 @@ import HomePage from "./pages/HomePage";
 import AllMoviesPage from "./pages/AllMoviesPage";
 import MovieDetailPage from "./pages/MovieDetailPage";
 import AboutUs from "./pages/AboutUs";
+import KioskPage from "./pages/KioskPage";
 import BottomNavbar from "./components/BottomNavbar";
 import BookingPage from "./pages/BookingPage";
 import BookingConfirmation from "./pages/BookingConfirmation";

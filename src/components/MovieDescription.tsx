@@ -15,7 +15,7 @@ export default function MovieDescription({
   return (
     <>
       <h1 className="movie-title">{title}</h1>
-      <article className="descsription-container">
+      <article className="description-container">
         <p className="movie-description">{description}</p>
         <p className="movie-director">
           {Array.isArray(director) ? director.join(" & ") : director}

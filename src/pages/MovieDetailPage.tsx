@@ -18,7 +18,7 @@ export default function MovieDetailPage() {
     return <p>Loading movie...</p>;
   }
 
-    const {
+  const {
     data: movies,
     isLoading: movieLoading,
     error: movieError /*Hårdkodad id för att fixa sidan ändra senare */,
@@ -42,43 +42,37 @@ export default function MovieDetailPage() {
         {movieLoading && <p>Movie loading...</p>}
         {movie && (
           <>
-            <Trailer videoId={movie.info.trailer} title={movie.title} />{" "}
-          <MovieTags
-            actors={movie.info.actors}
-            ageLimit={movie.info.ageLimit}
-            duration={movie.info.duration}
-            genrer={movie.genres}
-          />
-          <MovieDescription
-            title={movie.title}
-            description={movie.info.description}
-            director={movie.info.director}
+            <Trailer videoId={movie.info.trailer} title={movie.title} />
+            <MovieTags
+              actors={movie.info.actors}
+              ageLimit={movie.info.ageLimit}
+              duration={movie.info.duration}
+              genrer={movie.genres}
+            />
+            <MovieDescription
+              title={movie.title}
+              description={movie.info.description}
+              director={movie.info.director}
             />
           </>
-
-
         )}
-
-   
-  
       </Stack>
 
-<div className="container my-4">
-  <div className="row align-items-start">
-    <div className="col-lg-7 col-md-12 mb-4">
-      <DateTimeSelector
-        movieId={Number(id)}
-        limit={50}
-        onSelect={(screening) => console.log("Vald visning:", screening)}
-      />
-    </div>
+      <div className="container my-4">
+        <div className="row align-items-start">
+          <div className="col-lg-7 col-md-12 mb-4">
+            <DateTimeSelector
+              movieId={Number(id)}
+              limit={50}
+              onSelect={(screening) => console.log("Vald visning:", screening)}
+            />
+          </div>
 
-    <div className="col-lg-5 col-md-12">
-      <MovieReviews movie={movie} />
-    </div>
-  </div>
-</div>
-
+          <div className="col-lg-5 col-md-12">
+            <MovieReviews movie={movie} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,0 +1,257 @@
+@import "variables";
+
+// Booking Confirmation Styling
+
+
+@keyframes fadeInGlow {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+    box-shadow: none;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 40px $color-hover;
+  }
+}
+
+.confirmation-title {
+  color: $color-stroke;
+  font-size: $font-size-heading-md;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: $spacing-lg;
+  text-shadow: $text-glow;
+}
+
+.booking-confirmation {
+  min-height: 65vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: $color-text;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: $spacing-lg;
+  box-shadow: 0 0 40px $color-hover;
+  border-radius: 30px;
+  background-color: rgba(26, 27, 46, 0.4);
+  animation: fadeInGlow 0.8s ease-in-out;
+  margin-top: 3rem;
+
+
+ // Tablet (mindre layout, mer luft)
+@media (min-width: 1080px) and (max-width: 1080px) {
+ 
+
+  .confirmation-title {
+    color: $color-stroke;
+    font-size: $font-size-heading-md;
+    font-weight: 700;
+    text-shadow: $text-glow;
+    margin-bottom: $spacing-lg;
+  }
+
+  
+
+  .confirmation-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-md;
+    width: 100%;
+    max-width: 500px;
+    font-size: $font-size-body;
+    color: $color-text;
+
+    .booking-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: $spacing-sm;
+
+      p {
+        margin: 0;
+        line-height: 1.4;
+      }
+
+      strong {
+        color: $color-text;
+        font-weight: 700;
+      }
+    }
+  }
+
+  .movie-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    img {
+      max-width: 300px;
+      height: auto;
+      border-radius: $border-radius;
+      box-shadow: 0 0 15px $color-hover;
+    }
+  }
+
+  .btn-group {
+   
+    margin-top: $spacing-lg;
+    width: 90%;
+    padding-left: 2rem;
+  }
+
+  .btn-glow {
+    width: 100%;
+    border-radius: 2rem;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    background-color: transparent;
+    border: $border-width $border-style $color-hover;
+    color: $color-text;
+    box-shadow: 0 0 20px $color-hover;
+    transition: all $transition-speed ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.4rem;
+
+
+    i {
+      margin-left: 0.3rem;
+    }
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 25px $color-hover;
+      border-color: $color-hover;
+    }
+  }
+}
+
+
+
+  @media ((max-width: 690px)) {
+  width: 100%;
+  max-width: 90%;
+  min-height: auto; 
+  max-height: 30dvh; 
+  display: block;
+  box-sizing: border-box; 
+  padding: 1rem;
+    margin-top: 7rem;
+
+  .booking-confirmation {
+    margin: 20px auto; 
+    min-height: auto;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 500px; 
+  }
+
+  .neon-border .movie-image {
+    display: none;
+  }
+
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 0;
+    gap: 0.5rem; 
+  }
+
+  .btn-glow {
+    width: 100%;
+    border-radius: 20rem !important;
+    font-size: clamp(0.9rem, 2.5vw, 1rem); 
+    font-weight: 500;
+    justify-content: center;
+    box-shadow: 0 0 20px $color-hover !important;
+    border-color: $color-hover !important;
+    margin: 0;
+    transition: all $transition-speed ease;
+    padding: 0.9rem;
+    color: white;
+  }
+}
+
+
+
+
+
+.neon-border {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-xl;
+  max-width: 1000px;
+  width: 100%;
+  padding: $spacing-lg;
+}
+
+.confirmation-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20rem;
+  font-family: $font-family-heading;
+  color: $color-text;
+
+  .booking-text {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    text-align: center;
+  }
+
+  strong {
+    color: $color-text;
+  }
+}
+
+.movie-image {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+
+  img {
+    max-width: 400px;
+    height: auto;
+    border-radius: $border-radius;
+    box-shadow: $glow-strong;
+  }
+}
+
+.btn-glow {
+  display: flex;
+  justify-content: center;
+  gap: $spacing-sm;
+  margin-top: $spacing-lg;
+  background-color: transparent;
+  font-family: $font-family-heading;
+  border: $border-width $border-style $color-stroke;
+  font-weight: 500;
+  font-size: $font-size-body;
+  border-radius: $border-radius;
+  padding: 0.75rem 2rem;
+  margin-right: 2.5rem;
+  cursor: pointer;
+  transition: all $transition-speed ease;
+  box-shadow: $glow-strong;
+  color: white;
+
+  &:hover {
+    box-shadow: 0 0 25px $color-hover;
+    transform: scale(1.05);
+    border-color: $color-hover;
+  }
+}
+}
+
+

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useFetch from "../hook/useFetch";
 import TicketSelector from "../components/TicketSelector";
+import { getMovieImage } from "../utils/getMovieImage";
 import "./PagesStyle/BookingPage.scss";
 
 // helper : find N adjacent seats 
@@ -117,46 +118,30 @@ export default function BookingPage() {
     }
   }
 
-  // build booking body (guest or user)
-  const bookingData = {
-    screeningId: Number(screeningId),
-    userId: isGuest ? null : 6, 
-    guestEmail: isGuest ? guestEmail.trim() : null,
-    seats: seatList,
-  };
-  
-  try {
-    const result = await postBooking(bookingData, "POST");
-    const bookingId = result.bookingId;
-     console.log("📦 booking body:", bookingData);
-    console.log("🔍 price URL:", `/api/priceTotals?bookingId=${bookingId}`);
-    const breakdown = await getPriceBreakdown(
-      `/api/priceTotals?bookingId=${bookingId}`,
-      "GET"
-    );
-    
-    const lines = breakdown.map(
-      (row) => `${row.quantity} × ${row.ticketType}  ${row.subTotal} kr`
-    );
-    const total = breakdown[0]?.totalPrice ?? 0;
-  
-    const msg = [
-      `Bokningen lyckades! 🎬`,
-      ``,
-      `Platser: ${result.bookedSeats.join(", ")}`,
-      ``,
-      ...lines,
-      ``,
-      `Total: ${total} kr`,
-    ].join("\n");
+   const bookingData = {
+      screeningId: Number(screeningId),
+      userId: 6,
+      seats: seatList,
+    };
 
-    alert(msg);
-    navigate("/movies");
-  } catch (err: any) {
-    alert(`Kunde inte boka platser: ${err.message}`);
-  }
-  
-};
+    try {
+      const result = await postBooking(bookingData, "POST");
+      const bookingId = result.bookingId;
+
+      const breakdown = await getPriceBreakdown(
+        `/api/priceTotals?bookingId=${bookingId}`,
+        "GET"
+      );
+
+      const lines = breakdown.map(
+        (row) => `${row.quantity} × ${row.ticketType}  ${row.subTotal} kr`
+      );
+      
+      navigate(`/Bekräftelse/${bookingId}`);
+    } catch (err: any) {
+      alert(`Kunde inte boka platser: ${err.message}`);
+    }
+  };
     
     const { data: screening, isLoading: screeningLoading } = useFetch<
     {
@@ -183,7 +168,7 @@ export default function BookingPage() {
             <>
               <div className="movie-poster-box">
                 <img
-                  src={screening[0].info?.mobileImg || "/placeholder.jpg"}
+                src={getMovieImage(screening[0].title)}
                   alt={screening[0].title}
                   className="movie-poster"
                 />

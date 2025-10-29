@@ -6,6 +6,7 @@ import AboutUs from "./pages/AboutUs";
 import KioskPage from "./pages/KioskPage";
 import BottomNavbar from "./components/BottomNavbar";
 import BookingPage from "./pages/BookingPage";
+import BookingConfirmation from "./pages/BookingConfirmation";
 import NavDesk from "./components/NavDesk";
 import { useIsMobile } from "./hook/useIsMobile";
 
@@ -20,7 +21,7 @@ function App() {
           <Route path="/movies" element={<AllMoviesPage />} />
           <Route path="/movie/:id" element={<MovieDetailPage />} />
           <Route path="/booking/:screeningId" element={<BookingPage />} />
-          <Route path="/kiosk" element={<KioskPage />} />
+          <Route path="/Bekräftelse/:bookingId" element={<BookingConfirmation />} />
           <Route path="/AboutUs" element={<AboutUs />} />
         </Routes>
         

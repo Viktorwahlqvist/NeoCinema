@@ -1,4 +1,4 @@
-@import "./variables";
+@use "./variables" as *;
 
 
 .date-time-selector {
@@ -11,7 +11,7 @@
     margin-bottom: $spacing-sm;
     color: $color-stroke;
     text-shadow: $text-glow;
-margin-bottom: 2rem;
+    margin-bottom: 2rem;
   }
 
   .heading-sm {

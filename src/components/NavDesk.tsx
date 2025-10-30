@@ -12,14 +12,17 @@ export default function NavDesk() {
         {/* Vänster: logga → hem */}
         <div className="neo-logo">
           <NavLink to="/" className="neo-logo-link">
-            <img src="/NeoCinema.png" alt="NeoCinema" className="neo-logo-img" />
+            <img
+              src="/NeoCinema.png"
+              alt="NeoCinema"
+              className="neo-logo-img"
+            />
           </NavLink>
         </div>
 
         {/* Mitten: meny */}
         <Nav className="neo-menu">
-
-             <NavLink to="/" end className="neo-link">
+          <NavLink to="/" end className="neo-link">
             <House className="neo-icon" />
             {/* Hem */}
             <span className="neo-text">Hem</span>
@@ -45,11 +48,10 @@ export default function NavDesk() {
         <div className="neo-account">
           <NavLink to="/login" className="neo-link">
             <Person className="neo-icon" />
-            <span className="neo-text">Konto</span>
+            <span className="neo-text">Logga in</span>
           </NavLink>
         </div>
       </Container>
     </Navbar>
   );
-};
-
+}

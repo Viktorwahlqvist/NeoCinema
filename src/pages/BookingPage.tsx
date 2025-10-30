@@ -118,10 +118,12 @@ export default function BookingPage() {
   }
 
    const bookingData = {
-      screeningId: Number(screeningId),
-      userId: 6,
-      seats: seatList,
-    };
+  screeningId: Number(screeningId),
+  userId: isGuest ? null : 6, 
+  guestEmail: guestEmail || null, 
+  seats: seatList,
+};
+
 
     try {
       const result = await postBooking(bookingData, "POST");

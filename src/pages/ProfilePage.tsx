@@ -1,88 +1,187 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react"; 
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../AuthContext";
-import useFetch from "../hook/useFetch";
-import "./PagesStyle/ProfilePage.scss";
 
-interface Booking {
+type User = { id: number; firstName: string; lastName: string; email: string };
+
+type Booking = {
   bookingId: number;
+  bookingNumber: string;
+  date: string;
   movieTitle: string;
   screeningTime: string;
   auditoriumName: string;
   totalPrice: number;
-}
+};
 
 export default function ProfilePage() {
-  const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const { data: bookings, isLoading, error, doFetch } = useFetch<Booking[]>(
-    "/api/bookings/history",
-    { skip: !user } // only fetch when logged in
-  );
+  const [user, setUser] = useState<User | null>(null);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  /* ---------- delete booking ---------- */
-  const handleCancel = async (bookingId: number, screeningTime: string) => {
-    const screening = new Date(screeningTime);
-    const now = new Date();
-    const msUntil = screening.getTime() - now.getTime();
-    const hoursUntil = msUntil / (1000 * 60 * 60);
+  const [cancelStatus, setCancelStatus] = useState<{ id: number | null, loading: boolean, error: string | null }>({
+    id: null,
+    loading: false,
+    error: null
+  });
 
-    if (hoursUntil < 2) {
-      alert("Du kan bara avboka senast 2 timmar innan visningen.");
-      return;
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const [userRes, bookingsRes] = await Promise.all([
+          fetch("/api/users/me", { credentials: "include" }),
+          fetch("/api/users/me/bookings", { credentials: "include" })
+        ]);
+        if (!userRes.ok || !bookingsRes.ok) throw new Error("Auth failed");
+        
+        const userData = await userRes.json();
+        const bookingsData = await bookingsRes.json();
+        setUser(userData.user);
+        setBookings(bookingsData.bookings);
+      } catch (error) {
+        console.error("Kunde inte hämta profildata:", error);
+        navigate("/login", { replace: true });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProfileData();
+  }, [navigate]);
+
+
+  const logout = async () => {
+    try {
+      await fetch("/api/users/logout", {
+        method: "POST",
+        credentials: "include"
+      });
+    } catch (err) {
+      console.error("Utloggning misslyckades:", err);
     }
-    if (!confirm("Avboka denna bokning?")) return;
+    navigate("/");
+  };
+
+  const handleCancel = async (bookingId: number) => {
+    if (!window.confirm("Är du säker på att du vill avboka?")) return;
+
+    setCancelStatus({ id: bookingId, loading: true, error: null });
 
     try {
-      await fetch(`/api/bookings/${bookingId}`, { method: "DELETE" });
-      alert("Bokningen är avbokad – platserna är nu lediga igen.");
-      await doFetch(undefined, "GET"); // re-fetch list
+    
+      const res = await fetch(`/api/booking/${bookingId}`, { 
+        method: "DELETE",
+        credentials: "include" 
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || `Avbokning misslyckades (status ${res.status})`);
+      }
+
+      setBookings(currentBookings => 
+        currentBookings.filter(b => b.bookingId !== bookingId)
+      );
+      setCancelStatus({ id: null, loading: false, error: null });
+
     } catch (err: any) {
-      alert(`Kunde inte avboka: ${err.message}`);
+      console.error(err);
+      setCancelStatus({ id: bookingId, loading: false, error: err.message });
     }
   };
 
-  if (!user) return <p>Du måste logga in för att se denna sida.</p>
-  if (isLoading) return <p>Laddar bokningar…</p>
-  if (error) return <p>Ett fel uppstod: {error}</p>
-  if (!bookings?.length) return <p>Du har inga bokningar ännu.</p>
+  const canCancel = (screeningTime: string) => {
+    const screeningDate = new Date(screeningTime);
+    const twoHoursBefore = screeningDate.getTime() - (2 * 60 * 60 * 1000);
+    return Date.now() < twoHoursBefore;
+  };
 
-  const now = new Date();
+ 
+  const { upcomingBookings, pastBookings } = useMemo(() => {
+    const now = Date.now();
+    const upcoming: Booking[] = [];
+    const past: Booking[] = [];
+
+    
+    for (const b of bookings) {
+      if (new Date(b.screeningTime).getTime() > now) {
+        upcoming.push(b);
+      } else {
+        past.push(b);
+      }
+    }
+
+    upcoming.sort((a, b) => new Date(a.screeningTime).getTime() - new Date(b.screeningTime).getTime());
+    past.sort((a, b) => new Date(b.screeningTime).getTime() - new Date(a.screeningTime).getTime());
+
+    return { upcomingBookings: upcoming, pastBookings: past };
+  }, [bookings]);
+
+
+  if (loading) return <p>Laddar...</p>;
+  if (!user) return null;
+
+  const BookingCard = ({ booking }: { booking: Booking }) => {
+    const isCancellable = canCancel(booking.screeningTime);
+    const isThisCancelling = cancelStatus.loading && cancelStatus.id === booking.bookingId;
+
+    return (
+      <div
+        key={booking.bookingId}
+        style={{
+          border: "1px solid #ccc",
+          borderRadius: 6,
+          padding: 12,
+          marginBottom: 12,
+          opacity: isThisCancelling ? 0.5 : 1 
+        }}
+      >
+        <strong>{booking.movieTitle}</strong> — {booking.auditoriumName}
+        <br />
+        {new Date(booking.screeningTime).toLocaleString("sv-SE")}
+        <br />
+        Bokningsnummer: <code>{booking.bookingNumber}</code>
+        <br />
+        Totalt: {booking.totalPrice} kr
+        <br />
+
+        {isCancellable && (
+          <button 
+            onClick={() => handleCancel(booking.bookingId)} 
+            disabled={isThisCancelling}
+            style={{ marginTop: 8, color: 'red', background: 'none', border: '1px solid red', cursor: 'pointer' }}
+          >
+            {isThisCancelling ? "Avbokar..." : "Avboka"}
+          </button>
+        )}
+
+
+        {cancelStatus.error && cancelStatus.id === booking.bookingId && (
+          <p style={{ color: "red", fontSize: '0.9em' }}>{cancelStatus.error}</p>
+        )}
+      </div>
+    );
+  };
+
 
   return (
-    <main className="profile-page text-center">
-      <h2 className="neon-text mb-3">Hej {user.firstName} 👋</h2>
-      <button className="btn neon-btn mb-4" onClick={logout}>
-        Logga ut
-      </button>
+    <div style={{ maxWidth: 800, margin: "40px auto", padding: 16 }}>
+      <h2>
+        Hej {user.firstName} {user.lastName}
+      </h2>
+      <p>E-post: {user.email}</p>
+      <button onClick={logout}>Logga ut</button>
+      
+      <h3 style={{ marginTop: 32 }}>Kommande bokningar</h3>
+      {upcomingBookings.length === 0 && <p>Du har inga kommande bokningar.</p>}
+      {upcomingBookings.map((b) => (
+        <BookingCard key={b.bookingId} booking={b} />
+      ))}
 
-      <h3 className="neon-text mb-4">Dina bokningar</h3>
-
-      <div className="booking-history">
-        {bookings.map((b) => {
-          const screening = new Date(b.screeningTime);
-          const msUntil = screening.getTime() - now.getTime();
-          const hoursUntil = msUntil / (1000 * 60 * 60);
-          const canCancel = hoursUntil >= 2;
-
-          return (
-            <article key={b.bookingId} className="booking-card">
-              <h4 className="neon-text">{b.movieTitle}</h4>
-              <p>{b.auditoriumName} – {new Date(b.screeningTime).toLocaleString()}</p>
-              <p className="price">Totalt: {b.totalPrice} kr</p>
-
-              {canCancel && (
-                <button
-                  className="btn btn-danger neon-btn-cancel mt-2"
-                  onClick={() => handleCancel(b.bookingId, b.screeningTime)}
-                >
-                  Avboka
-                </button>
-              )}
-            </article>
-          );
-        })}
-      </div>
-    </main>
+      <h3 style={{ marginTop: 32 }}>Genomförda bokningar</h3>
+      {pastBookings.length === 0 && <p>Du har inga tidigare bokningar.</p>}
+      {pastBookings.map((b) => (
+        <BookingCard key={b.bookingId} booking={b} />
+      ))}
+    </div>
   );
 }

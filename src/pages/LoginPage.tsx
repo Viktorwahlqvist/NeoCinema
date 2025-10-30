@@ -1,78 +1,94 @@
-import { useEffect, useState } from "react";
-import { useAuth } from "../AuthContext";
-import { useNavigate } from "react-router-dom";
+import React, { FormEvent, useState, useEffect } from "react"; 
+import { useNavigate, Link } from "react-router-dom";
 
 export default function LoginPage() {
-  const { user, login, register, loading } = useAuth();
   const navigate = useNavigate();
-  const [isRegister, setIsRegister] = useState(false);
-  const [form, setForm] = useState({ firstName: "", lastName: "", email: "", password: "" });
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [isCheckingLogin, setIsCheckingLogin] = useState(true); 
 
-  // ✅ Only redirect if user is logged in (no extra API calls)
+
   useEffect(() => {
-    if (!loading && user) {
-      navigate("/profile");
-    }
-  }, [user, loading, navigate]);
+    fetch("/api/users/me", { credentials: "include" })
+      .then(res => {
+        if (res.ok) {
+          
+          console.log("Redan inloggad, skickar till /profile");
+          navigate("/profile", { replace: true });
+        } else {
+         
+          setIsCheckingLogin(false);
+        }
+      })
+      .catch(() => {
+       
+        setIsCheckingLogin(false);
+      });
+  }, [navigate]); // loads once
 
-  const handleSubmit = async (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError("");
-    try {
-      if (isRegister) {
-        await register(form);
-      } else {
-        await login(form.email, form.password);
-      }
-      navigate("/profile");
-    } catch (err: any) {
-      setError(err.message);
-    }
+    setError(null);
+    setLoading(true);
+
+    const res = await fetch("/api/users/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+      credentials: "include", 
+    });
+
+    setLoading(false);
+    if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    setError(data.error || "Inloggning misslyckades");
+    return; 
+  }
+    console.log("login ok -> navigate to /profile");
+    navigate("/profile", { replace: true });
   };
 
-  if (loading) return <p>Laddar...</p>;
+  if (isCheckingLogin) {
+    return <p>Laddar...</p>;
+  }
 
   return (
-    <div className="auth-page">
-      <h2>{isRegister ? "Skapa konto" : "Logga in"}</h2>
+    <div style={{ maxWidth: 400, margin: "40px auto", padding: 16 }}>
+      <h2>Logga in</h2>
       <form onSubmit={handleSubmit}>
-        {isRegister && (
-          <>
-            <input
-              placeholder="Förnamn"
-              value={form.firstName}
-              onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-            />
-            <input
-              placeholder="Efternamn"
-              value={form.lastName}
-              onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-            />
-          </>
-        )}
-        <input
-          placeholder="E-post"
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-        />
-        <input
-          placeholder="Lösenord"
-          type="password"
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-        />
-        <button type="submit">{isRegister ? "Registrera" : "Logga in"}</button>
-      </form>
-
-      <p style={{ marginTop: "1rem" }}>
-        {isRegister ? "Har du redan ett konto?" : "Har du inget konto?"}{" "}
-        <button onClick={() => setIsRegister(!isRegister)}>
-          {isRegister ? "Logga in" : "Skapa konto"}
+  
+        <label>
+          E-post
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </label>
+        <br />
+        <label>
+          Lösenord
+          <input
+            type="password"
+            required
+            minLength={8}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </label>
+        <br />
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        <button type="submit" disabled={loading}>
+          {loading ? "Loggar in..." : "Logga in"}
         </button>
+      </form>
+      <p>
+        Inget konto? <Link to="/register">Registrera dig</Link>
       </p>
-
-      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 }

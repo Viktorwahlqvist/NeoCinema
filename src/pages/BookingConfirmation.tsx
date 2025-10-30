@@ -3,22 +3,36 @@ import { useParams, useNavigate } from "react-router-dom";
 import { jsPDF } from "jspdf";
 import { getMovieImage } from "../utils/getMovieImage";
 import { Booking } from "../types/Booking";
-import "../styles/BookingConfirmation.scss"; // 
+import "../styles/BookingConfirmation.scss"; 
 
 export default function BookingConfirmation() {
   const { bookingId } = useParams<{ bookingId: string }>();
   const navigate = useNavigate();
   const [booking, setBooking] = useState<Booking | null>(null);
 
+  
+
   useEffect(() => {
-    fetch(`/api/bookings/${bookingId}`)
-      .then(res => res.json())
+    if (!bookingId) return; 
+
+    fetch(`/api/booking/${bookingId}`, {
+      credentials: "include" // COOKIES!
+    })
+      .then(res => {
+        if (!res.ok) { 
+          throw new Error(`Något gick fel: ${res.statusText}`);
+        }
+        return res.json(); 
+      })
       .then((data: Booking) => {
-  console.log("✅ Hämtad booking:", data);
-  setBooking(data);
-})
-      .catch(err => console.error(err));
-  }, [bookingId]);
+        console.log("✅ Hämtad booking:", data);
+        setBooking(data);
+      })
+      .catch(err => {
+        console.error("Kunde inte hämta bokningsbekräftelse:", err);
+  
+      });
+  }, [bookingId, navigate]); 
 
   if (!booking) return <p>Laddar bekräftelse...</p>;
 

@@ -41,13 +41,6 @@ export default function HomePage() {
       </div>
     );
 
-  if (!movies.length)
-    return (
-      <div className="text-center text-light mt-5">
-        Inga filmer tillgängliga just nu.
-      </div>
-    );
-
   return (
     <>
       {isMobile ? (

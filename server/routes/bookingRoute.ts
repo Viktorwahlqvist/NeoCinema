@@ -413,7 +413,7 @@ router.delete("/:bookingId", requireAuth, async (req, res) => {
     res.status(200).json({ message: "Bokningen har avbokats" });
 
   } catch (e) {
-    // Något gick fel, ångra allt!
+    
     if (connection) await connection.rollback();
     console.error("!!! OVÄNTAT SERVERFEL VID AVBOKNING:", e);
     res.status(500).json({ error: "Serverfel vid avbokning" });

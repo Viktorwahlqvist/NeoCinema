@@ -43,7 +43,7 @@ export default function NavDesk() {
 
         {/* Konto */}
         <div className="neo-account">
-          <NavLink to="/konto" className="neo-link">
+          <NavLink to="/login" className="neo-link">
             <Person className="neo-icon" />
             <span className="neo-text">Konto</span>
           </NavLink>

@@ -1,0 +1,42 @@
+.profile-page {
+  background: #050510;
+  color: #e0e0e0;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.neon-text {
+  color: #00eaff;
+  text-shadow: 0 0 5px #00eaff, 0 0 10px #00eaff, 0 0 20px #00eaff;
+}
+
+.booking-history {
+  display: grid;
+  gap: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.booking-card {
+  background: rgba(#00eaff, 0.05);
+  border: 1px solid #00eaff;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: left;
+}
+
+.price {
+  color: #00eaff;
+  font-weight: 600;
+}
+
+.neon-btn-cancel {
+  background: #e50914;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}

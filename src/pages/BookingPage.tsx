@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import useFetch from "../hook/useFetch";
 import TicketSelector from "../components/TicketSelector";
 import "./PagesStyle/BookingPage.scss";
+import { useAuth } from "../AuthContext";
 
 // helper : find N adjacent seats 
 function findAdjacentSeats(seats: Seat[], n: number, startSeatId?: number): number[] {
@@ -44,7 +45,6 @@ function findAdjacentSeats(seats: Seat[], n: number, startSeatId?: number): numb
   }
   return [];
 }
-
 //  types 
 interface Seat {
   seatId: number;
@@ -57,6 +57,7 @@ interface Seat {
 }
 
 export default function BookingPage() {
+  const { user } = useAuth();
   const { screeningId } = useParams<{ screeningId: string }>();
   const navigate = useNavigate();
 
@@ -98,6 +99,7 @@ export default function BookingPage() {
  
  
   const handleBooking = async () => {
+    
   if (!totalTickets) return alert("Välj minst en biljett!");
   if (selectedSeats.length < totalTickets)
     return alert("Du har valt färre stolar än antal biljetter!");
@@ -119,11 +121,13 @@ export default function BookingPage() {
     }
   }
 
-   const bookingData = {
+    
+    const bookingData = {
       screeningId: Number(screeningId),
-      userId: 6,
+      userId: user ? user.id : null,
       seats: seatList,
     };
+
 
     try {
       const result = await postBooking(bookingData, "POST");

@@ -133,6 +133,7 @@
 
   &__premiere {
     color: #ffffff;
+
     font-size: 0.65rem;
     margin: 0; // Remove top margin since it's now first
     padding: 0;
@@ -141,7 +142,8 @@
   }
 
   &__title {
-    color: #ffffff;
+    color: $color-text;
+    text-shadow: $text-glow;
     font-size: 1.2rem; // Reduced from 2rem
     font-weight: bold;
     margin-bottom: $spacing-sm; // Also reduced margin for better proportions

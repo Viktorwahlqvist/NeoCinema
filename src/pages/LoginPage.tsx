@@ -1,8 +1,7 @@
-// src/pages/LoginPage.tsx
 import React, { FormEvent, useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./PagesStyle/LoginPage.scss";
-import { useAuth } from "../AuthContext"; // <-- 1. Importera hooken
+import { useAuth } from "../AuthContext"; 
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -12,24 +11,22 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [isCheckingLogin, setIsCheckingLogin] = useState(true);
 
-  // 2. Hämta globalt state och funktioner
+ 
   const { login, user, isLoading: isAuthLoading } = useAuth();
 
-  // 3. Uppdaterad useEffect: Läs från Context istället för fetch
+ 
   useEffect(() => {
     if (isAuthLoading) {
-      // Vänta tills contexten har laddat klart
       return;
     }
     if (user) {
-      // Om användare finns, skicka vidare
       console.log("Redan inloggad, skickar till /profile");
       navigate("/profile", { replace: true });
     } else {
-      // Auth har laddat och ingen användare finns, visa sidan
+      
       setIsCheckingLogin(false);
     }
-  }, [user, isAuthLoading, navigate]); // Beroende av context-värden
+  }, [user, isAuthLoading, navigate]); 
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -50,15 +47,15 @@ export default function LoginPage() {
       return;
     }
 
-    // 4. NYTT: Hämta användardata och uppdatera globalt state!
-    const data = await res.json(); // <-- Antag att den returnerar { user: User }
-    login(data.user); // <-- Säg till contexten att vi är inloggade
+    
+    const data = await res.json(); 
+    login(data.user); // telling context that we're logged in
 
     console.log("login ok -> navigate to /profile");
     navigate("/profile", { replace: true });
   };
 
-  // 5. Ändrad laddnings-koll (kollar nu contexten)
+  
   if (isCheckingLogin || isAuthLoading) {
     return <p>Laddar...</p>;
   }

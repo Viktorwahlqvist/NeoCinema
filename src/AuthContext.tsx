@@ -1,4 +1,3 @@
-// src/context/AuthContext.tsx
 import React, {
   createContext,
   useState,
@@ -7,8 +6,6 @@ import React, {
   ReactNode,
 } from "react";
 
-// 1. Definiera typerna (samma User-typ som du redan har)
-// Du kan behöva exportera denna från en global 'types.ts' fil senare
 type User = { id: number; firstName: string; lastName: string; email: string };
 
 interface AuthContextType {
@@ -18,41 +15,38 @@ interface AuthContextType {
   logout: () => void;
 }
 
-// 2. Skapa Context med ett default-värde
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// 3. Skapa en "Provider"-komponent
-// Denna komponent kommer att hämta användardata och dela ut den.
+// create provider component which will wrap the app and provide the auth state
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Viktig!
+  const [isLoading, setIsLoading] = useState(true); 
 
-  // Körs en gång när appen laddas för att kolla om vi har en session
+  // runs once on mount to check if user is logged in
   useEffect(() => {
     fetch("/api/users/me", { credentials: "include" })
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data) => {
-        setUser(data.user); // Inloggad!
+        setUser(data.user); 
       })
       .catch(() => {
-        setUser(null); // Inte inloggad
+        setUser(null); 
       })
       .finally(() => {
-        setIsLoading(false); // Sluta ladda, vi har ett svar
+        setIsLoading(false); 
       });
   }, []);
 
-  // Funktioner för att ändra state från andra komponenter
+  // function to log in the user
   const login = (userData: User) => {
     setUser(userData);
   };
 
   const logout = () => {
-    // Vi litar på att komponenten som kallar 'logout'
-    // också har anropat /api/users/logout
+    
     setUser(null);
   };
-
   const value = { user, isLoading, login, logout };
 
   return (
@@ -60,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// 4. Skapa en "custom hook" för att enkelt använda din context
+// custom hook to use the auth context
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {

@@ -7,6 +7,7 @@ import "./PagesStyle/HomePage.scss";
 import UpcomingMovies from "../components/UpcomingMovies";
 import { useIsMobile } from "../hook/useIsMobile";
 import { MovieCarousel } from "../components/MovieCarousel";
+import { Stack } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 function chunk<T>(arr: T[], size: number): T[][] {
@@ -49,10 +50,9 @@ export default function HomePage() {
     );
 
   return (
-    <main className="container-fluid home-page">
+    <>
       {isMobile ? (
-        <>
-          {" "}
+        <main className="container-fluid home-page">
           <section className="sticky-top header-box">
             {/* <img src="/NeoCinema.png" alt="NeoCinema loga" className="site-logo" /> */}
             <h2 className="neon-text">{active?.title ?? ""}</h2>
@@ -88,16 +88,13 @@ export default function HomePage() {
               </Carousel.Item>
             ))}
           </Carousel>
-        </>
+        </main>
       ) : (
-        <>
-          {" "}
-          <h2 className="section-title">Nu på bio</h2>
+        <Stack gap={4} className="fullscreen">
           <MovieCarousel movies={movies} />
-        </>
+          <UpcomingMovies />
+        </Stack>
       )}
-
-      <UpcomingMovies />
-    </main>
+    </>
   );
 }

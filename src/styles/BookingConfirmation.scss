@@ -136,15 +136,16 @@
 
 
 
-  @media ((max-width: 690px)) {
-  width: 100%;
-  max-width: 90%;
-  min-height: auto; 
+@media ((max-width: 690px)) {
+width: 90%;
+    max-width: 500px;
+    min-height: 43vh; 
   max-height: 30dvh; 
   display: block;
   box-sizing: border-box; 
   padding: 1rem;
     margin-top: 7rem;
+    margin-bottom: 2rem;
 
   .booking-confirmation {
     margin: 20px auto; 
@@ -153,6 +154,7 @@
     width: 100%;
     max-width: 500px; 
   }
+
 
   .neon-border .movie-image {
     display: none;
@@ -184,7 +186,6 @@
 
 
 
-
 .neon-border {
   display: flex;
   align-items: center;
@@ -204,15 +205,55 @@
   color: $color-text;
 
   .booking-text {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-sm;
-    text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: $spacing-md;
+
+  p {
+    margin: 0;
+    font-size: $font-size-body;
+    line-height: 1.4;
   }
 
   strong {
     color: $color-text;
+    font-weight: 700;
   }
+
+  .ticket-summary {
+    margin-top: $spacing-md;
+    padding-top: $spacing-sm;
+    border-top: 1px solid rgba($color-stroke, 0.4);
+
+    h4 {
+      color: $color-stroke;
+      font-size: $font-size-heading-md;
+      margin-bottom: $spacing-sm;
+      text-shadow: $text-glow;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 $spacing-sm 0;
+
+      li {
+        font-size: $font-size-body;
+        line-height: 1.5;
+      }
+    }
+
+    p {
+      margin-top: $spacing-xs;
+      font-weight: 600;
+    }
+  }
+}
+
+
+
 }
 
 .movie-image {
@@ -253,5 +294,4 @@
   }
 }
 }
-
 

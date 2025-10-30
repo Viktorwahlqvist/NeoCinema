@@ -1,10 +1,6 @@
 @use "../../styles/variables" as *;
 
 .upcoming-movies {
-  position: fixed;
-  bottom: 0px;
-  left: 0;
-  right: 0;
   width: 100%;
   background: $background-gradient;
   padding: $spacing-sm $spacing-md; // Reduced from $spacing-md to $spacing-sm
@@ -12,17 +8,6 @@
   backdrop-filter: blur(10px);
   z-index: 90;
 
-   
-    // Mobile: hide completely since navbar is at bottom
-    @media (max-width: 767px) {
-      display: none;
-    }
-  
-  // Desktop/tablet: show normally
-  @media (min-width: 768px) {
-    display: block;
-  }
-  
   &__container {
     display: flex;
     align-items: center;
@@ -33,13 +18,11 @@
 
   // Scrollable container for movies - limited to left side
   &__scroll-container {
-    width: 50%; // Limit to left half of container
     display: flex;
     gap: $spacing-md;
     overflow-x: auto;
     padding-bottom: $spacing-xs;
     scroll-behavior: smooth;
-    max-width: 70%; // Limit width to make room for centering
 
     // scrollbar
     &::-webkit-scrollbar {
@@ -128,7 +111,12 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.7); // Semi-transparent background for readability
+    background: rgba(
+      0,
+      0,
+      0,
+      0.7
+    ); // Semi-transparent background for readability
     text-align: center;
     padding: 4px;
     border-radius: 0 0 $border-radius $border-radius; // Match poster border radius
@@ -153,7 +141,7 @@
   }
 
   &__title {
-    color:#ffffff;
+    color: #ffffff;
     font-size: 1.2rem; // Reduced from 2rem
     font-weight: bold;
     margin-bottom: $spacing-sm; // Also reduced margin for better proportions

@@ -1,3 +1,4 @@
+
  import nodemailer from "nodemailer";
 
 // Hämta inloggningsuppgifter från miljövariabler

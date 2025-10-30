@@ -24,6 +24,7 @@ function App() {
           <Route path="/movie/:id" element={<MovieDetailPage />} />
           <Route path="/booking/:screeningId" element={<BookingPage />} />
           <Route path="/Bekräftelse/:bookingId" element={<BookingConfirmation />} />
+          <Route path="/kiosk" element={<KioskPage />} />
           <Route path="/AboutUs" element={<AboutUs />} />
           <Route path="/kiosk" element={<KioskPage />} />
           <Route path="/login" element={<LoginPage />} />

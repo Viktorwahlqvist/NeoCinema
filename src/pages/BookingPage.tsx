@@ -121,6 +121,7 @@ export default function BookingPage() {
     }
   }
 
+
     
     const bookingData = {
       screeningId: Number(screeningId),
@@ -128,6 +129,13 @@ export default function BookingPage() {
       seats: seatList,
     };
 
+  //  const bookingData = {
+  // screeningId: Number(screeningId),
+  // userId: isGuest ? null : 6, 
+  // guestEmail: guestEmail || null, 
+  // seats: seatList,
+
+  //  };
 
     try {
       const result = await postBooking(bookingData, "POST");

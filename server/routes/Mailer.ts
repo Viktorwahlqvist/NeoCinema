@@ -1,4 +1,5 @@
-import nodemailer from "nodemailer";
+
+ import nodemailer from "nodemailer";
 
 // Hämta inloggningsuppgifter från miljövariabler
 const email = process.env.GMAIL_USER;

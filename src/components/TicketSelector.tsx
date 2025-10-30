@@ -24,9 +24,16 @@ export default function TicketSelector({ onTicketChange }: Props) {
 }, [tickets]);
 
 
-  useEffect(() => {
-    onTicketChange(selected);
-  }, [selected]);
+ useEffect(() => {
+  // Skapa en lista med id, count och price från aktuell state
+  const selectedWithPrice = selected.map((sel) => {
+    const ticketInfo = tickets?.find((t) => t.id === sel.id);
+    return { ...sel, price: ticketInfo?.price ?? 0 };
+  });
+
+  onTicketChange(selectedWithPrice);
+}, [selected, tickets]);
+
 
 const updateCount = (id: number, delta: number) => {
   setSelected((prev) => {

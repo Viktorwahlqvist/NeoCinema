@@ -33,7 +33,7 @@ app.use(
       maxAge: (Number(process.env.SESSION_TTL_MIN) || 60) * 60 * 1000,
       httpOnly: true,
       sameSite: "lax",
-      secure: false,
+      secure: true,
     },
   })
 );
@@ -51,6 +51,10 @@ app.use("/api/screenings", screeningsRouter);
 
 
 const PORT = process.env.PORT || 5000;
+app.use((req, res, next) => {
+  console.log("🚀 Incoming request:", req.method, req.url);
+  next();
+});
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

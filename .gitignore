@@ -23,5 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 .env
-gmail-secret.json
-
+./server/gmail-secret.json
+./src/pages/LoginPage.tsx
+./src/pages/ProfilePage.tsx
+./src/pages/PagesStyle/ProfilePage.scss

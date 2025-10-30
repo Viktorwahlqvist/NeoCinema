@@ -25,7 +25,7 @@ const isString = (value: unknown) : value is string =>
 // Skapa konto och loggar in användaren direkt
 router.post("/register", async (req, res) => {
   const {firstName, lastName, email, password } = req.body ?? {};
-
+  
   // här
   if (!isString(email) || !isValidEmail(email)) {
     return res.status(400).json({error: "ogiltig e-postadress"});
@@ -56,12 +56,13 @@ router.post("/register", async (req, res) => {
        VALUES (?, ?, ?, ?)`,
       [firstName ?? null, lastName ?? null, email, hashedPassword]
     );
-
-    const newUserId = (result as any).omsertId as number;
+    
+    const newUserId = (result as any).insertId as number;
 
     //Du skapar konto sen blir du inloggad direkt genpm att skapa session
     req.session.user = { id: newUserId, email };
-
+    console.log("Registration result:", result);
+    console.log("New user ID:", newUserId);
     //skickar tillbaka info om den nya användaren utan lösen
     return res.status(201).json({
       message: "Ditt konto har skapats",
@@ -116,6 +117,10 @@ router.post("/login", async (req, res) => {
     console.error("Login error:", error);
     return res.status(500).json({ error: "Ett internt serverfel uppstod" });
   }
+});
+router.get("/auth/me", (req, res) => {
+  if (req.session.user) return res.sendStatus(200);
+  res.sendStatus(401);
 });
 
 router.get("/me", async (req, res) => {

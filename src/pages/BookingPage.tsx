@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import useFetch from "../hook/useFetch";
 import TicketSelector from "../components/TicketSelector";
 import "./PagesStyle/BookingPage.scss";
+import { useAuth } from "../AuthContext";
 
 // helper : find N adjacent seats 
 function findAdjacentSeats(seats: Seat[], n: number, startSeatId?: number): number[] {
@@ -44,7 +45,6 @@ function findAdjacentSeats(seats: Seat[], n: number, startSeatId?: number): numb
   }
   return [];
 }
-
 //  types 
 interface Seat {
   seatId: number;
@@ -57,12 +57,15 @@ interface Seat {
 }
 
 export default function BookingPage() {
+  const { user } = useAuth();
   const { screeningId } = useParams<{ screeningId: string }>();
   const navigate = useNavigate();
 
   const [tickets, setTickets] = useState<{ id: number; count: number }[]>([]);
   const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
   const totalTickets = tickets.reduce((sum, t) => sum + t.count, 0);
+  const totalPrice = tickets.reduce((sum, t) => sum + t.count * (t as any).price, 0);
+
 
   const { data: seats, isLoading, error } = useFetch<Seat[]>(
     `/api/seatStatusView?screeningId=${screeningId}`
@@ -96,6 +99,7 @@ export default function BookingPage() {
  
  
   const handleBooking = async () => {
+    
   if (!totalTickets) return alert("Välj minst en biljett!");
   if (selectedSeats.length < totalTickets)
     return alert("Du har valt färre stolar än antal biljetter!");
@@ -117,13 +121,21 @@ export default function BookingPage() {
     }
   }
 
-   const bookingData = {
-  screeningId: Number(screeningId),
-  userId: isGuest ? null : 6, 
-  guestEmail: guestEmail || null, 
-  seats: seatList,
-};
 
+    
+    const bookingData = {
+      screeningId: Number(screeningId),
+      userId: user ? user.id : null,
+      seats: seatList,
+    };
+
+  //  const bookingData = {
+  // screeningId: Number(screeningId),
+  // userId: isGuest ? null : 6, 
+  // guestEmail: guestEmail || null, 
+  // seats: seatList,
+
+  //  };
 
     try {
       const result = await postBooking(bookingData, "POST");
@@ -169,7 +181,7 @@ export default function BookingPage() {
             <>
               <div className="movie-poster-box">
                 
-<img src={screening[0].info?.mobileImg || "/placeholder.jpg"}
+          <img src={screening[0].info?.mobileImg || "/placeholder.jpg"}
  
                   alt={screening[0].title}
                   className="movie-poster"
@@ -183,6 +195,13 @@ export default function BookingPage() {
             <h5 className="neon-text">Välj biljetter</h5>
             <TicketSelector onTicketChange={setTickets} />
           </div>
+          {totalTickets > 0 && (
+          <div className="ticket-total-box mt-3">
+            <p className="text-light">Totalt pris</p>
+            <h4 className="neon-text">{totalPrice} kr</h4>
+          </div>
+        )}
+
         </aside>
 
         {/* seats + button */}

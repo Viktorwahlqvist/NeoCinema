@@ -9,6 +9,8 @@ import BookingPage from "./pages/BookingPage";
 import BookingConfirmation from "./pages/BookingConfirmation";
 import NavDesk from "./components/NavDesk";
 import { useIsMobile } from "./hook/useIsMobile";
+import ProfilePage from "./pages/ProfilePage";
+import LoginPage from "./pages/LoginPage";
 
 function App() {
   const isMobile = useIsMobile();
@@ -24,6 +26,10 @@ function App() {
           <Route path="/Bekräftelse/:bookingId" element={<BookingConfirmation />} />
           <Route path="/kiosk" element={<KioskPage />} />
           <Route path="/AboutUs" element={<AboutUs />} />
+          <Route path="/kiosk" element={<KioskPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+
         </Routes>
         
         {isMobile && <BottomNavbar />}

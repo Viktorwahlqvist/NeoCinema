@@ -8,6 +8,7 @@ import UpcomingMovies from "../components/UpcomingMovies";
 import { useIsMobile } from "../hook/useIsMobile";
 import { MovieCarousel } from "../components/MovieCarousel";
 import { Stack } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 function chunk<T>(arr: T[], size: number): T[][] {
   const out: T[][] = [];
@@ -21,6 +22,8 @@ export default function HomePage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const { data, isLoading, error } = useFetch<Movie[]>("api/moviesWithGenres");
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
+  
 
   const movies = Array.isArray(data)
     ? data.filter((m: Movie) => m && m.id && m.title)
@@ -60,12 +63,14 @@ export default function HomePage() {
                 </span>
               ))}
             </div>
-            <button
-              className="btn neon-btn mt-2"
-              onClick={() => alert(`Köp biljetter för ${active?.title}`)}
-            >
-              Köp biljetter
-            </button>
+<button
+  className="btn neon-btn mt-2"
+  type="button"
+  onClick={() => active?.id && navigate(`/movie/${active.id}`)}
+  disabled={!active?.id}
+>
+  Köp biljetter
+</button>
           </section>
           <Carousel
             activeIndex={activeIndex}

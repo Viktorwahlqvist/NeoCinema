@@ -163,3 +163,75 @@
   align-self: center; opacity: .4;
 }
 .kA-divider { height: 12px; }
+
+/* ===== Mobile tweaks för Kiosk ===== */
+@media (max-width: 768px) {
+  .kioskA-root {
+    /* mindre padding och extra botten-padding för fixed bottom navbar */
+    padding: $spacing-md $spacing-sm 120px; /* ~100px navbar + luft */
+    min-height: 100svh; /* bättre på mobil än 100vh */
+  }
+
+  .kioskA-title {
+    font-size: clamp(24px, 6vw, 32px);
+    margin-bottom: $spacing-sm;
+  }
+
+  .kioskA-grid {
+    grid-template-columns: 1fr;   /* stacka panelerna */
+    gap: $spacing-md;
+  }
+
+  .kioskA-panel,
+  .kA-box {
+    padding: $spacing-md;
+    border-radius: 16px;
+  }
+
+  .kioskA-heading {
+    margin: 0 0 $spacing-md;
+  }
+
+  .kioskA-lead {
+    margin: 0 auto $spacing-md;
+    font-size: 0.95rem;
+  }
+
+  .kioskA-cols {
+    grid-template-columns: 1fr;   /* en kolumn på mobil */
+    gap: $spacing-sm;
+    max-width: none;
+
+    p {
+      max-width: 42ch;
+    }
+  }
+
+  .kioskA-icons {
+    gap: clamp(24px, 12vw, 48px);
+
+    .kA-icon {
+      width: 64px;
+      height: 64px;
+    }
+  }
+
+  /* Högerkolumn – rubriker & rader lite kompaktare */
+  .kA-menuHead h3 {
+    font-size: 1.25rem;
+  }
+
+  .kA-row {
+    grid-template-columns: auto 1fr auto;
+    column-gap: .5rem;
+  }
+
+  .kA-item,
+  .kA-price {
+    font-size: 0.95rem;
+  }
+
+  .kA-dots {
+    background-size: 4px 1px;  /* tätare prickledare */
+  }
+}

@@ -20,7 +20,7 @@
   .card-poster {
     display: block;
     width: 100%;
-    height: 380px;
-    object-fit: cover;
+    height: 340px;
+    object-fit: contain; 
   }
 }

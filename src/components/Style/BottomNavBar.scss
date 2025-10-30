@@ -9,7 +9,8 @@
   border-top: 2px solid rgba(0, 255, 255, 0.4);
   font-family: $font-family-heading;
 
-  a, button {
+  a,
+  button {
     color: $color-stroke;
     transition: all 0.2s ease;
 
@@ -31,13 +32,12 @@
   }
 }
 
-
 .fullscreen-menu {
   position: fixed;
   bottom: -100%;
   left: 0;
   width: 100%;
-  height: 50%;
+  height: 30%;
   background: rgba(10, 10, 26, 0.95);
   border-top: 2px solid #00eaff;
   border-top-left-radius: 20px;

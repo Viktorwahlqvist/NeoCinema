@@ -165,7 +165,6 @@ useEffect(() => {
       const lines = breakdown.map(
         (row) => `${row.quantity} × ${row.ticketType}  ${row.subTotal} kr`
       );
-      console.log("Booking summary:\n" + lines.join("\n"));
 
       navigate(`/Bekräftelse/${bookingId}`);
     } catch (err: any) {
@@ -181,7 +180,7 @@ useEffect(() => {
   return (
     <main className="booking-page text-center mb-5">
       <div className="booking-layout">
-        {/* LEFT COLUMN */}
+        
         <aside className="booking-left">
           {screening?.[0] && (
             <div className="movie-poster-box">

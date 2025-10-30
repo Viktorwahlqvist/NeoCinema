@@ -1,0 +1,149 @@
+@use "../../styles/variables" as *;
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 5.5rem; 
+}
+
+.auth-card {
+  width: min(400px, 100%);
+  background: $background-gradient;
+  border: $border-width $border-style rgba($color-stroke, .35);
+  border-radius: 18px;
+  box-shadow: 0 0 16px rgb(225, 0, 255),
+    inset 0 0 0 1px rgba(0, 255, 255, .08);
+  padding: $spacing-lg;
+}
+
+.auth-card h2 {
+  text-align: center;
+  margin-bottom: $spacing-md;
+  font-family: $font-family-heading;
+  text-shadow: $text-glow;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.auth-label {
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+  font-size: .85rem;
+}
+
+.auth-input {
+  background: rgba(0, 0, 0, .25);
+  border: 1px solid rgba($color-stroke, .25);
+  border-radius: 10px;
+  padding: .6rem .75rem;
+  color: $color-text;
+  outline: none;
+  font-size: 1rem;
+
+  &:focus {
+    border-color: $color-stroke;
+    box-shadow: 0 0 6px rgba($color-stroke, .7);
+  }
+}
+
+.auth-error {
+  color: #ff6b6b;
+  font-size: .8rem;
+}
+
+.auth-submit {
+  margin-top: .75rem;
+  background: linear-gradient(90deg, #a349e8 0%, #00ffff 100%);
+  border: none;
+  border-radius: 999px;
+  padding: .65rem 1rem;
+  color: #000000;
+  font-weight: 600;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+
+  &:hover:enabled {
+    transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(163, 73, 232, 0.7),
+                0 0 25px rgba(0, 255, 255, 0.4);
+  }
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 0 10px rgba(163, 73, 232, 0.5);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    filter: grayscale(0.4);
+  }
+}
+
+.auth-foot {
+  margin-top: $spacing-sm;
+  text-align: center;
+  font-size: .8rem;
+
+  a {
+    color: $color-stroke;
+  }
+}
+
+.auth-loading {
+  color: $color-text;
+  text-align: center;
+  padding-top: 5rem;
+}
+
+//for mobile
+@media (max-width: 480px) {
+  .auth-page {
+    padding-top: 4rem;
+    padding-inline: 1rem;       
+    overflow-y: auto;          
+  }
+
+  .auth-card {
+    width: 100%;
+    padding: $spacing-md;     
+    border-radius: 14px;
+    box-shadow: 0 0 10px rgb(225, 0, 255),
+      inset 0 0 0 1px rgba(0, 255, 255, .06);
+  }
+
+  .auth-card h2 {
+    font-size: 1.2rem;
+    margin-bottom: $spacing-sm;
+  }
+
+  .auth-label {
+    font-size: 0.75rem;         
+    gap: 0.25rem;
+  }
+
+  .auth-input {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.6rem;
+    border-radius: 8px;
+  }
+
+  .auth-submit {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.8rem;
+  }
+
+  .auth-foot {
+    font-size: 0.75rem;
+  }
+}

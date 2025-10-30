@@ -327,7 +327,7 @@ const requireAuth = (req: any, res: any, next: any) => {
 
 router.delete("/:bookingId", requireAuth, async (req, res) => {
   const { bookingId } = req.params;
-  const userId = req.session.user!.id; // Vi vet att användaren finns pga requireAuth
+  const userId = (req as any).session.user.id; // Vi vet att användaren finns pga requireAuth
   let connection;
 
 

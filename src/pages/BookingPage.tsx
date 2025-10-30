@@ -149,7 +149,7 @@ useEffect(() => {
     const bookingData = {
       screeningId: Number(screeningId),
       seats: seatList,
-      guestEmail: user ? undefined : guestEmail, // logged-in → no guestEmail
+      guestEmail: user ? undefined : guestEmail, // logged-in  no guestEmail
     };
 
     try {

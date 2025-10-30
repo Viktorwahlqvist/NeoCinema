@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react"; 
 import { useNavigate } from "react-router-dom";
+import "./PagesStyle/ProfilePage.scss";
 
 type User = { id: number; firstName: string; lastName: string; email: string };
 

@@ -1,0 +1,117 @@
+// ProfilePage.scss
+$neon-cyan: #00ffff;
+$neon-pink: #ff00ff;
+$neon-green: #39ff14;
+$dark-bg: #0d0d0d;
+$card-bg: #1a1a1a;
+
+.profile-wrapper {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 16px;
+  color: #ffffff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  /* ----  header / user info  ---- */
+  .profile-header {
+    text-align: center;
+    margin-bottom: 32px;
+
+    h2 {
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: $neon-cyan;
+      text-shadow: 0 0 6px $neon-cyan, 0 0 12px rgba($neon-cyan, 0.7);
+      margin-bottom: 8px;
+    }
+
+    p {
+      margin: 4px 0 16px;
+      color: rgba(white, 0.8);
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid $neon-pink;
+      color: $neon-pink;
+      padding: 8px 24px;
+      font-size: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+
+      &:hover {
+        background: $neon-pink;
+        color: $dark-bg;
+        box-shadow: 0 0 12px $neon-pink, 0 0 20px rgba($neon-pink, 0.6);
+      }
+    }
+  }
+
+  /* ----  section titles  ---- */
+  .section-title {
+    margin-top: 32px;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: $neon-green;
+    text-shadow: 0 0 4px $neon-green;
+    border-bottom: 1px solid rgba($neon-green, 0.3);
+    padding-bottom: 8px;
+  }
+
+  /* ----  booking card  ---- */
+  .booking-card {
+    background: $card-bg;
+    border: 1px solid rgba(white, 0.1);
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: border-color 0.25s ease;
+
+    &:hover {
+      border-color: rgba($neon-cyan, 0.5);
+    }
+
+    strong {
+      color: $neon-cyan;
+      font-weight: 600;
+    }
+
+    code {
+      background: rgba($neon-pink, 0.15);
+      color: $neon-pink;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .cancel-btn {
+      margin-top: 10px;
+      background: transparent;
+      border: 1px solid red;
+      color: red;
+      padding: 6px 18px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &:hover:not(:disabled) {
+        background: red;
+        color: $dark-bg;
+        box-shadow: 0 0 8px red;
+      }
+    }
+
+    .error-text {
+      margin-top: 6px;
+      color: red;
+      font-size: 0.9em;
+    }
+  }
+}

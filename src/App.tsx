@@ -11,7 +11,7 @@ import NavDesk from "./components/NavDesk";
 import { useIsMobile } from "./hook/useIsMobile";
 import ProfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/LoginPage";
-
+import RegisterPage from "./pages/RegisterPage";
 function App() {
   const isMobile = useIsMobile();
   return (
@@ -28,6 +28,7 @@ function App() {
           <Route path="/AboutUs" element={<AboutUs />} />
           <Route path="/kiosk" element={<KioskPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/profile" element={<ProfilePage />} />
 
         </Routes>

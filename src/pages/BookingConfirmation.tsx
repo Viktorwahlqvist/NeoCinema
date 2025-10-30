@@ -13,7 +13,10 @@ export default function BookingConfirmation() {
   useEffect(() => {
     fetch(`/api/bookings/${bookingId}`)
       .then(res => res.json())
-      .then((data: Booking) => setBooking(data))
+      .then((data: Booking) => {
+  console.log("✅ Hämtad booking:", data);
+  setBooking(data);
+})
       .catch(err => console.error(err));
   }, [bookingId]);
 
@@ -44,8 +47,7 @@ export default function BookingConfirmation() {
 
   <div className="neon-border">
 
-    <div className="confirmation-info">
-  
+  <div className="confirmation-info">
   <div className="booking-text">
     <p>
       Bokningsid: <strong>{booking.rNumber}</strong>
@@ -55,8 +57,23 @@ export default function BookingConfirmation() {
       <br />
       <strong>{booking.email}</strong>
     </p>
+
+    {booking.tickets && booking.tickets.length > 0 && (
+      <div className="ticket-summary">
+        <h4>Biljetter</h4>
+        <ul>
+          {booking.tickets.map((t, index) => (
+            <li key={index}>
+              {t.quantity} × {t.ticketType} ({t.price} kr)
+            </li>
+          ))}
+        </ul>
+        <p><b>Totalt:</b> {booking.totalPrice} kr</p>
+      </div>
+    )}
   </div>
-    </div>
+</div>
+
 
     <div className="movie-image">
       <img

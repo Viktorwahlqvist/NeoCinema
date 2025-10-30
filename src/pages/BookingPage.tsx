@@ -1,11 +1,11 @@
-// src/pages/BookingPage.tsx
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useFetch from "../hook/useFetch";
 import TicketSelector from "../components/TicketSelector";
 import "./PagesStyle/BookingPage.scss";
+import { useAuth } from "../AuthContext"; 
 
-/* --------------  TYPES -------------- */
+
 interface Seat {
   seatId: number;
   row_num: number;
@@ -23,7 +23,12 @@ interface User {
 }
 
 /* --------------  ADJACENT-SEAT HELPER (unchanged) -------------- */
-function findAdjacentSeats(seats: Seat[], n: number, startSeatId?: number): number[] {
+function findAdjacentSeats(
+  seats: Seat[],
+  n: number,
+  startSeatId?: number
+): number[] {
+  
   const rows = seats.reduce((acc: Record<number, Seat[]>, seat) => {
     if (!acc[seat.row_num]) acc[seat.row_num] = [];
     acc[seat.row_num].push(seat);
@@ -50,41 +55,47 @@ function findAdjacentSeats(seats: Seat[], n: number, startSeatId?: number): numb
       .sort((a, b) => a.seat_num - b.seat_num);
     for (let i = 0; i <= available.length - n; i++) {
       const segment = available.slice(i, i + n);
-      const contiguous = segment.every((s, j, arr) => j === 0 || s.seat_num === arr[j - 1].seat_num + 1);
+      const contiguous = segment.every(
+        (s, j, arr) => j === 0 || s.seat_num === arr[j - 1].seat_num + 1
+      );
       if (contiguous) return segment.map((s) => s.seatId);
     }
   }
   return [];
 }
 
-/* --------------  COMPONENT -------------- */
+// Component start
 export default function BookingPage() {
   const { screeningId } = useParams<{ screeningId: string }>();
   const navigate = useNavigate();
 
-  /* ----------  STATE  ---------- */
-  const [tickets, setTickets] = useState<{ id: number; count: number; price?: number }[]>([]);
+ 
+  const [tickets, setTickets] = useState<
+    { id: number; count: number; price?: number }[]
+  >([]);
   const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
-  const [user, setUser] = useState<User | null>(null); // logged-in user
+  
+  
+  const { user, isLoading: isAuthLoading } = useAuth();
+  
+  
   const [guestEmail, setGuestEmail] = useState("");
   const totalTickets = tickets.reduce((sum, t) => sum + t.count, 0);
-  const totalPrice = tickets.reduce((sum, t) => sum + t.count * (t.price ?? 0), 0);
-
-  /* ----------  DATA FETCHING  ---------- */
-  // 1. seats for this screening
-  const { data: seats, isLoading, error } = useFetch<Seat[]>(
-    `/api/seatStatusView?screeningId=${screeningId}`
+  const totalPrice = tickets.reduce(
+    (sum, t) => sum + t.count * (t.price ?? 0),
+    0
   );
 
-  // 2. who is logged in? (sets cookie)
-useEffect(() => {
-  fetch("/api/users/me", { credentials: "include" })
-    .then((res) => (res.ok ? res.json() : Promise.reject()))
-    .then((data) => setUser(data.user))
-    .catch(() => setUser(null)); // not logged in → stay null
-}, []);
+  
+  // 1. seats for this screening
+  const {
+    data: seats,
+    isLoading: isSeatsLoading, 
+    error,
+  } = useFetch<Seat[]>(`/api/seatStatusView?screeningId=${screeningId}`);
 
-  // 3. price breakdown helper (skip until we have a booking)
+
+  // 3. price breakdown helper
   const { doFetch: postBooking } = useFetch<{
     bookingId: number;
     bookedSeats: number[];
@@ -104,8 +115,8 @@ useEffect(() => {
     }[]
   >(`/api/screeningsInfo?screeningId=${screeningId}`, { skip: !screeningId });
 
-  /* ----------  SIDE EFFECTS  ---------- */
-  // auto-pick adjacent seats when ticket count changes
+ 
+  
   useEffect(() => {
     if (!seats || totalTickets === 0) {
       setSelectedSeats([]);
@@ -115,13 +126,15 @@ useEffect(() => {
     setSelectedSeats(best);
   }, [seats, totalTickets]);
 
-  /* ----------  EVENT HANDLERS  ---------- */
+ 
+  // (handleSeatClick är oförändrad)
   const handleSeatClick = (seatId: number, status: string) => {
     if (status === "booked" || !seats) return;
     const best = findAdjacentSeats(seats, totalTickets, seatId);
     if (best.length === totalTickets) setSelectedSeats(best);
   };
 
+  // handleBooking form submission
   const handleBooking = async () => {
     if (!totalTickets) return alert("Välj minst en biljett!");
     if (selectedSeats.length < totalTickets)
@@ -130,12 +143,15 @@ useEffect(() => {
       return alert("Ange din e-post för att boka som gäst.");
 
     // collapse duplicates & build seatList
-    const uniqueTickets = tickets.reduce((acc, cur) => {
-      const found = acc.find((t) => t.id === cur.id);
-      if (found) found.count += cur.count;
-      else acc.push({ ...cur });
-      return acc;
-    }, [] as { id: number; count: number }[]);
+    const uniqueTickets = tickets.reduce(
+      (acc, cur) => {
+        const found = acc.find((t) => t.id === cur.id);
+        if (found) found.count += cur.count;
+        else acc.push({ ...cur });
+        return acc;
+      },
+      [] as { id: number; count: number }[]
+    );
 
     const seatList: { seatId: number; ticketType: number }[] = [];
     const seatQueue = [...selectedSeats];
@@ -145,11 +161,11 @@ useEffect(() => {
         if (seatId !== undefined) seatList.push({ seatId, ticketType: t.id });
       }
     }
-
+    // bygg bookingData, kollar om user är inloggad eller gäst
     const bookingData = {
       screeningId: Number(screeningId),
       seats: seatList,
-      guestEmail: user ? undefined : guestEmail, // logged-in  no guestEmail
+      guestEmail: user ? undefined : guestEmail, 
     };
 
     try {
@@ -161,7 +177,6 @@ useEffect(() => {
         "GET"
       );
 
-      // optional: build a summary string
       const lines = breakdown.map(
         (row) => `${row.quantity} × ${row.ticketType}  ${row.subTotal} kr`
       );
@@ -172,15 +187,15 @@ useEffect(() => {
     }
   };
 
-  /* ----------  RENDER  ---------- */
-  if (isLoading) return <p>Laddar stolar...</p>;
+ 
+  // updated render
+  if (isSeatsLoading || isAuthLoading) return <p>Laddar...</p>;
   if (error) return <p>Ett fel uppstod: {error}</p>;
   if (!seats?.length) return <p>Inga stolar hittades.</p>;
 
   return (
     <main className="booking-page text-center mb-5">
       <div className="booking-layout">
-        
         <aside className="booking-left">
           {screening?.[0] && (
             <div className="movie-poster-box">
@@ -205,21 +220,22 @@ useEffect(() => {
           )}
         </aside>
 
-        {/* RIGHT COLUMN */}
+       
         <section className="booking-right">
           {screening?.[0] && (
             <div className="heading-box">
               <h2 className="neon-text">
-                {screening[0].auditoriumName} – {new Date(screening[0].startTime).toLocaleString()}
+                {screening[0].auditoriumName} –{" "}
+                {new Date(screening[0].startTime).toLocaleString()}
               </h2>
             </div>
           )}
           <div className="screen">DUKEN</div>
 
-          {/* GUEST EMAIL FIELD (only when NOT logged in) */}
+         
           {!user && totalTickets > 0 && (
             <div className="guest-email mb-3">
-              <label className="form-label text-light">E-post (valfritt)</label>
+              <label className="form-label text-light">E-post</label>
               <input
                 type="email"
                 className="form-control"
@@ -230,7 +246,7 @@ useEffect(() => {
             </div>
           )}
 
-          {/* SEATING AREA */}
+         
           <div className="seating-area">
             {Object.entries(
               seats.reduce((acc: Record<number, Seat[]>, seat) => {
@@ -247,10 +263,14 @@ useEffect(() => {
                     .map((seat) => (
                       <button
                         key={seat.seatId}
-                        className={`seat ${seat.seatStatus === "booked" ? "booked" : ""} ${
+                        className={`seat ${
+                          seat.seatStatus === "booked" ? "booked" : ""
+                        } ${
                           selectedSeats.includes(seat.seatId) ? "selected" : ""
                         }`}
-                        onClick={() => handleSeatClick(seat.seatId, seat.seatStatus)}
+                        onClick={() =>
+                          handleSeatClick(seat.seatId, seat.seatStatus)
+                        }
                       >
                         {seat.seatId}
                       </button>
@@ -259,7 +279,7 @@ useEffect(() => {
               ))}
           </div>
 
-          {/* BOOK BUTTON */}
+        
           {totalTickets > 0 && (
             <button className="btn neon-btn mt-4" onClick={handleBooking}>
               Boka {totalTickets} biljett(er)

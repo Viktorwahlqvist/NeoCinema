@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useMemo } from "react"; 
+// src/pages/ProfilePage.tsx
+import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import "./PagesStyle/ProfilePage.scss";
+import { useAuth } from "../AuthContext"; // <-- 1. Importera hooken
 
 type User = { id: number; firstName: string; lastName: string; email: string };
 
@@ -16,46 +17,59 @@ type Booking = {
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
+  // get user state from AuthContext
+  const { user, isLoading: isAuthLoading, logout: authLogout } = useAuth();
 
-  const [cancelStatus, setCancelStatus] = useState<{ id: number | null, loading: boolean, error: string | null }>({
+  
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(true); // only for bookings
+
+  const [cancelStatus, setCancelStatus] = useState<{
+    id: number | null;
+    loading: boolean;
+    error: string | null;
+  }>({
     id: null,
     loading: false,
-    error: null
+    error: null,
   });
 
+  
   useEffect(() => {
-    const fetchProfileData = async () => {
-      try {
-        const [userRes, bookingsRes] = await Promise.all([
-          fetch("/api/users/me", { credentials: "include" }),
-          fetch("/api/users/me/bookings", { credentials: "include" })
-        ]);
-        if (!userRes.ok || !bookingsRes.ok) throw new Error("Auth failed");
-        
-        const userData = await userRes.json();
-        const bookingsData = await bookingsRes.json();
-        setUser(userData.user);
-        setBookings(bookingsData.bookings);
-      } catch (error) {
-        console.error("Kunde inte hämta profildata:", error);
-        navigate("/login", { replace: true });
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfileData();
-  }, [navigate]);
+    // wait until Auth is done loading
+    if (isAuthLoading) {
+      return;
+    }
 
+    if (!user) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    fetch("/api/users/me/bookings", { credentials: "include" })
+      .then((res) => {
+        if (!res.ok) throw new Error("Kunde inte hämta bokningar");
+        return res.json();
+      })
+      .then((bookingsData) => {
+        setBookings(bookingsData.bookings);
+      })
+      .catch((error) => {
+        console.error("Kunde inte hämta profildata:", error);
+        
+      })
+      .finally(() => {
+        setLoading(false); 
+      });
+  }, [user, isAuthLoading, navigate]); 
 
   const logout = async () => {
     try {
       await fetch("/api/users/logout", {
         method: "POST",
-        credentials: "include"
+        credentials: "include",
       });
+      authLogout(); // update global auth state
     } catch (err) {
       console.error("Utloggning misslyckades:", err);
     }
@@ -68,22 +82,22 @@ export default function ProfilePage() {
     setCancelStatus({ id: bookingId, loading: true, error: null });
 
     try {
-    
-      const res = await fetch(`/api/booking/${bookingId}`, { 
+      const res = await fetch(`/api/booking/${bookingId}`, {
         method: "DELETE",
-        credentials: "include" 
+        credentials: "include",
       });
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || `Avbokning misslyckades (status ${res.status})`);
+        throw new Error(
+          data.error || `Avbokning misslyckades (status ${res.status})`
+        );
       }
 
-      setBookings(currentBookings => 
-        currentBookings.filter(b => b.bookingId !== bookingId)
+      setBookings((currentBookings) =>
+        currentBookings.filter((b) => b.bookingId !== bookingId)
       );
       setCancelStatus({ id: null, loading: false, error: null });
-
     } catch (err: any) {
       console.error(err);
       setCancelStatus({ id: bookingId, loading: false, error: err.message });
@@ -92,17 +106,15 @@ export default function ProfilePage() {
 
   const canCancel = (screeningTime: string) => {
     const screeningDate = new Date(screeningTime);
-    const twoHoursBefore = screeningDate.getTime() - (2 * 60 * 60 * 1000);
+    const twoHoursBefore = screeningDate.getTime() - 2 * 60 * 60 * 1000;
     return Date.now() < twoHoursBefore;
   };
 
- 
   const { upcomingBookings, pastBookings } = useMemo(() => {
     const now = Date.now();
     const upcoming: Booking[] = [];
     const past: Booking[] = [];
 
-    
     for (const b of bookings) {
       if (new Date(b.screeningTime).getTime() > now) {
         upcoming.push(b);
@@ -111,19 +123,27 @@ export default function ProfilePage() {
       }
     }
 
-    upcoming.sort((a, b) => new Date(a.screeningTime).getTime() - new Date(b.screeningTime).getTime());
-    past.sort((a, b) => new Date(b.screeningTime).getTime() - new Date(a.screeningTime).getTime());
+    upcoming.sort(
+      (a, b) =>
+        new Date(a.screeningTime).getTime() - new Date(b.screeningTime).getTime()
+    );
+    past.sort(
+      (a, b) =>
+        new Date(b.screeningTime).getTime() - new Date(a.screeningTime).getTime()
+    );
 
     return { upcomingBookings: upcoming, pastBookings: past };
   }, [bookings]);
 
+  
+  if (loading || isAuthLoading) return <p>Laddar...</p>;
+  if (!user) return null; 
 
-  if (loading) return <p>Laddar...</p>;
-  if (!user) return null;
-
+  
   const BookingCard = ({ booking }: { booking: Booking }) => {
     const isCancellable = canCancel(booking.screeningTime);
-    const isThisCancelling = cancelStatus.loading && cancelStatus.id === booking.bookingId;
+    const isThisCancelling =
+      cancelStatus.loading && cancelStatus.id === booking.bookingId;
 
     return (
       <div
@@ -133,7 +153,7 @@ export default function ProfilePage() {
           borderRadius: 6,
           padding: 12,
           marginBottom: 12,
-          opacity: isThisCancelling ? 0.5 : 1 
+          opacity: isThisCancelling ? 0.5 : 1,
         }}
       >
         <strong>{booking.movieTitle}</strong> — {booking.auditoriumName}
@@ -144,25 +164,29 @@ export default function ProfilePage() {
         <br />
         Totalt: {booking.totalPrice} kr
         <br />
-
         {isCancellable && (
-          <button 
-            onClick={() => handleCancel(booking.bookingId)} 
+          <button
+            onClick={() => handleCancel(booking.bookingId)}
             disabled={isThisCancelling}
-            style={{ marginTop: 8, color: 'red', background: 'none', border: '1px solid red', cursor: 'pointer' }}
+            style={{
+              marginTop: 8,
+              color: "red",
+              background: "none",
+              border: "1px solid red",
+              cursor: "pointer",
+            }}
           >
             {isThisCancelling ? "Avbokar..." : "Avboka"}
           </button>
         )}
-
-
         {cancelStatus.error && cancelStatus.id === booking.bookingId && (
-          <p style={{ color: "red", fontSize: '0.9em' }}>{cancelStatus.error}</p>
+          <p style={{ color: "red", fontSize: "0.9em" }}>
+            {cancelStatus.error}
+          </p>
         )}
       </div>
     );
   };
-
 
   return (
     <div style={{ maxWidth: 800, margin: "40px auto", padding: 16 }}>
@@ -171,7 +195,7 @@ export default function ProfilePage() {
       </h2>
       <p>E-post: {user.email}</p>
       <button onClick={logout}>Logga ut</button>
-      
+
       <h3 style={{ marginTop: 32 }}>Kommande bokningar</h3>
       {upcomingBookings.length === 0 && <p>Du har inga kommande bokningar.</p>}
       {upcomingBookings.map((b) => (

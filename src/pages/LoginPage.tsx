@@ -1,6 +1,8 @@
-import React, { FormEvent, useState, useEffect } from "react"; 
+// src/pages/LoginPage.tsx
+import React, { FormEvent, useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "./PagesStyle/LoginPage.scss";
+import { useAuth } from "../AuthContext"; // <-- 1. Importera hooken
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -8,27 +10,26 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [isCheckingLogin, setIsCheckingLogin] = useState(true); 
+  const [isCheckingLogin, setIsCheckingLogin] = useState(true);
 
+  // 2. Hämta globalt state och funktioner
+  const { login, user, isLoading: isAuthLoading } = useAuth();
 
+  // 3. Uppdaterad useEffect: Läs från Context istället för fetch
   useEffect(() => {
-    fetch("/api/users/me", { credentials: "include" })
-      .then(res => {
-        if (res.ok) {
-          
-          console.log("Redan inloggad, skickar till /profile");
-          navigate("/profile", { replace: true });
-        } else {
-         
-          setIsCheckingLogin(false);
-        }
-      })
-      .catch(() => {
-       
-        setIsCheckingLogin(false);
-      });
-  }, [navigate]); // loads once
-
+    if (isAuthLoading) {
+      // Vänta tills contexten har laddat klart
+      return;
+    }
+    if (user) {
+      // Om användare finns, skicka vidare
+      console.log("Redan inloggad, skickar till /profile");
+      navigate("/profile", { replace: true });
+    } else {
+      // Auth har laddat och ingen användare finns, visa sidan
+      setIsCheckingLogin(false);
+    }
+  }, [user, isAuthLoading, navigate]); // Beroende av context-värden
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -39,60 +40,65 @@ export default function LoginPage() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
-      credentials: "include", 
+      credentials: "include",
     });
 
     setLoading(false);
     if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    setError(data.error || "Inloggning misslyckades");
-    return; 
-  }
+      const data = await res.json().catch(() => ({}));
+      setError(data.error || "Inloggning misslyckades");
+      return;
+    }
+
+    // 4. NYTT: Hämta användardata och uppdatera globalt state!
+    const data = await res.json(); // <-- Antag att den returnerar { user: User }
+    login(data.user); // <-- Säg till contexten att vi är inloggade
+
     console.log("login ok -> navigate to /profile");
     navigate("/profile", { replace: true });
   };
 
-  if (isCheckingLogin) {
+  // 5. Ändrad laddnings-koll (kollar nu contexten)
+  if (isCheckingLogin || isAuthLoading) {
     return <p>Laddar...</p>;
   }
 
   return (
     <div className="auth-page">
       <div className="auth-card">
-      <h2>Logga in</h2>
-      <form onSubmit={handleSubmit} className="auth-form">
-  
-        <label className="auth-label">
-          E-post
-          <input
-            className="auth-input"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </label>
+        <h2>Logga in</h2>
+        <form onSubmit={handleSubmit} className="auth-form">
+          <label className="auth-label">
+            E-post
+            <input
+              className="auth-input"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </label>
 
-        <label className="auth-label">
-          Lösenord
-          <input
-            className="auth-input"
-            type="password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </label>
+          <label className="auth-label">
+            Lösenord
+            <input
+              className="auth-input"
+              type="password"
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </label>
 
-        {error && <p className="auth-error">{error}</p>}
-        <button type="submit" disabled={loading} className="auth-submit">
-          {loading ? "Loggar in..." : "Logga in"}
-        </button>
-      </form>
-      <p className="auth-foot">
-        Inget konto? <Link to="/register">Registrera dig</Link>
-      </p>
+          {error && <p className="auth-error">{error}</p>}
+          <button type="submit" disabled={loading} className="auth-submit">
+            {loading ? "Loggar in..." : "Logga in"}
+          </button>
+        </form>
+        <p className="auth-foot">
+          Inget konto? <Link to="/register">Registrera dig</Link>
+        </p>
       </div>
     </div>
   );

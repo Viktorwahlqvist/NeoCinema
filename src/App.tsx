@@ -15,7 +15,7 @@ import RegisterPage from "./pages/RegisterPage";
 function App() {
   const isMobile = useIsMobile();
   return (
-    <Router>
+    <>
       {!isMobile && <NavDesk />}
       <div className="app-container">
         <Routes>
@@ -36,7 +36,7 @@ function App() {
         {isMobile && <BottomNavbar />}
         
       </div>
-    </Router>
+    </>
   );
 }
 

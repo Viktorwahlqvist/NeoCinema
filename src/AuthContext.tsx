@@ -1,12 +1,14 @@
-import React, { 
-  createContext, 
-  useState, 
-  useEffect, 
-  useContext, 
-  ReactNode 
+// src/context/AuthContext.tsx
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  ReactNode,
 } from "react";
 
 // 1. Definiera typerna (samma User-typ som du redan har)
+// Du kan behöva exportera denna från en global 'types.ts' fil senare
 type User = { id: number; firstName: string; lastName: string; email: string };
 
 interface AuthContextType {
@@ -48,15 +50,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     // Vi litar på att komponenten som kallar 'logout'
     // också har anropat /api/users/logout
-    setUser(null); 
+    setUser(null);
   };
 
   const value = { user, isLoading, login, logout };
 
   return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
   );
 }
 

@@ -1,0 +1,79 @@
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Fredericka+the+Great&family=Irish+Grover&family=Jersey+15&family=Lora:ital,wght@0,400..700;1,400..700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Orbitron:wght@400..900&family=Outfit:wght@100..900&family=Patrick+Hand&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Road+Rage&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Secular+One&family=Sour+Gummy:ital,wght@0,100..900;1,100..900&family=Teko:wght@300..700&family=Unna:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+.neo-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 2000;
+  background: #000;
+  padding-block: 8px;
+}
+
+.neo-shell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.neo-logo-img {
+  width: auto;
+  max-width: 150px;
+  min-width: unset;
+  height: 100px;
+  -o-object-fit: contain;
+     object-fit: contain;
+  display: block;
+}
+
+.neo-menu {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(8px, 4vw, 32px);
+  position: relative;
+  padding-bottom: 8px;
+}
+.neo-menu::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;
+  height: 2px;
+  width: min(90%, 740px);
+  background: linear-gradient(90deg, #a349e8 0%, #00ffff 50%, #a349e8 100%);
+  box-shadow: 0 0 5px #00ffff;
+  pointer-events: none;
+}
+
+.neo-account {
+  display: flex;
+  align-items: center;
+}
+
+.neo-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  font-family: "Orbitron", sans-serif;
+  color: #00ffff;
+}
+.neo-link .neo-icon {
+  font-size: 1.8rem;
+  text-shadow: 0 0 8px #00ffff;
+}
+.neo-link .neo-text {
+  font-size: 0.95rem;
+}
+
+@media (max-width: 1024px) {
+  .neo-menu {
+    gap: 16px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .neo-menu::-webkit-scrollbar {
+    display: none;
+  }
+}/*# sourceMappingURL=NavDesk.css.map */

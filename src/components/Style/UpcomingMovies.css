@@ -1,0 +1,139 @@
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Fredericka+the+Great&family=Irish+Grover&family=Jersey+15&family=Lora:ital,wght@0,400..700;1,400..700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Orbitron:wght@400..900&family=Outfit:wght@100..900&family=Patrick+Hand&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Road+Rage&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Secular+One&family=Sour+Gummy:ital,wght@0,100..900;1,100..900&family=Teko:wght@300..700&family=Unna:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+.upcoming-movies {
+  position: fixed;
+  bottom: 0px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background: linear-gradient(180deg, #1a1b2e 0%, #0d0d14 100%);
+  padding: 8px 16px;
+  border-top: 1px solid #00ffff;
+  -webkit-backdrop-filter: blur(10px);
+          backdrop-filter: blur(10px);
+  z-index: 90;
+}
+@media (max-width: 767px) {
+  .upcoming-movies {
+    display: none;
+  }
+}
+@media (min-width: 768px) {
+  .upcoming-movies {
+    display: block;
+  }
+}
+.upcoming-movies__container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  height: auto;
+}
+.upcoming-movies__scroll-container {
+  width: 50%;
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scroll-behavior: smooth;
+  max-width: 70%;
+}
+.upcoming-movies__scroll-container::-webkit-scrollbar {
+  height: 4px;
+}
+.upcoming-movies__scroll-container::-webkit-scrollbar-track {
+  background: rgba(26, 27, 46, 0.5);
+  border-radius: 3px;
+}
+.upcoming-movies__scroll-container::-webkit-scrollbar-thumb {
+  background: #00ffff;
+  border-radius: 3px;
+  box-shadow: 0 0 5px #00ffff;
+}
+.upcoming-movies__scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #a349e8;
+  box-shadow: 0 0 15px #a349e8;
+}
+.upcoming-movies__soon {
+  position: absolute;
+  left: 42%;
+  top: 48%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+.upcoming-movies__soon-image {
+  width: 250px;
+  height: auto;
+  opacity: 0.9;
+  transition: all 0.3s ease;
+}
+.upcoming-movies__soon-image:hover {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.05);
+}
+.upcoming-movies__card {
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  position: relative;
+}
+.upcoming-movies__card:hover {
+  transform: translateY(-3px);
+}
+.upcoming-movies__poster {
+  width: 6rem;
+  height: 9rem;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #1a1b2e;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  position: relative;
+}
+.upcoming-movies__poster:hover {
+  border-color: #00ffff;
+  box-shadow: 0 0 10px #00ffff;
+}
+.upcoming-movies__image {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.upcoming-movies__card:hover .upcoming-movies__image {
+  transform: scale(1.05);
+}
+.upcoming-movies__info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  text-align: center;
+  padding: 4px;
+  border-radius: 0 0 8px 8px;
+}
+.upcoming-movies__genre {
+  color: #ffffff;
+  font-size: 0.75rem;
+  margin: 2px 0 0 0;
+  padding: 0;
+  line-height: 1.1;
+  text-align: center;
+}
+.upcoming-movies__premiere {
+  color: #ffffff;
+  font-size: 0.65rem;
+  margin: 0;
+  padding: 0;
+  line-height: 1.1;
+  text-align: center;
+}
+.upcoming-movies__title {
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+  letter-spacing: 0.05em;
+}/*# sourceMappingURL=UpcomingMovies.css.map */

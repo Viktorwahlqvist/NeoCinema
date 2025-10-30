@@ -1,0 +1,45 @@
+@import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Fredericka+the+Great&family=Irish+Grover&family=Jersey+15&family=Lora:ital,wght@0,400..700;1,400..700&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&family=Orbitron:wght@400..900&family=Outfit:wght@100..900&family=Patrick+Hand&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Road+Rage&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Secular+One&family=Sour+Gummy:ital,wght@0,100..900;1,100..900&family=Teko:wght@300..700&family=Unna:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+.filter-container {
+  position: relative;
+  margin-top: 2rem;
+  display: inline-block;
+}
+.filter-container .filter-btn {
+  margin: 0;
+  box-shadow: 0 0 5px #00ffff;
+}
+.filter-container .filter-btn:hover {
+  box-shadow: 0 0 5px #a349e8;
+}
+.filter-container .option-container {
+  position: absolute;
+  top: 100;
+  left: 0;
+  z-index: 100;
+  padding: 0;
+  margin: 1rem 0 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+.filter-container .option-container .options-dropdown {
+  margin: 0;
+  animation: 0.4s fadeSlideDown ease-in-out forwards;
+  border: border-width solid #00ffff;
+  box-shadow: 0 0 5px #00ffff;
+}
+.filter-container .option-container .options-dropdown:hover {
+  box-shadow: 0 0 5px #a349e8;
+}
+
+@keyframes fadeSlideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}/*# sourceMappingURL=filter-dropdown.css.map */

@@ -14,22 +14,23 @@
   text-align: center;
   padding: 2rem 0 1rem;
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), transparent);
-  
+
   .site-logo {
-  position: absolute;
-  top: -1rem;
-  left: -0.5rem;
-  width: 100px; /* ändra storlek efter behov */
-  height: auto;
-  z-index: 10
-}
+    position: absolute;
+    top: -1rem;
+    left: -0.5rem;
+    width: 100px; /* ändra storlek efter behov */
+    height: auto;
+    z-index: 10;
+  }
 }
 
 .neon-text {
   font-size: 2rem;
   font-weight: 700;
   color: #00eaff;
-  text-shadow: 0 0 6px #00eaff, 0 0 12px #00eaff, 0 0 24px rgba(0, 234, 255, 0.8);
+  text-shadow: 0 0 6px #00eaff, 0 0 12px #00eaff,
+    0 0 24px rgba(0, 234, 255, 0.8);
   letter-spacing: 1px;
   margin-top: 40px;
 }
@@ -62,7 +63,7 @@
 /* ===== Neon-button ===== */
 .neon-btn {
   color: $color-stroke;
-  border: 2px solid ;
+  border: 2px solid;
   background: transparent;
   font-weight: 600;
   padding: 0.6rem 1.5rem;
@@ -89,4 +90,11 @@
 
 .carousel-indicators .active {
   background-color: #b000ff;
+}
+
+.fullscreen {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  min-height: 100vh;
 }

@@ -4,6 +4,8 @@ import { ResultSetHeader, RowDataPacket } from "mysql2";
 import randomNumber from "../utils/randomNumber.js";
 import { sendEmail } from "./Mailer.js";
 
+
+
 const router = express.Router();
 
 /* ----------  tiny helper  ---------- */
@@ -17,51 +19,157 @@ type Seat = RowDataPacket & {
 type SeatInput = { seatId: number; ticketType: number };
 
 /* ----------  POST /bookings  ---------- */
+// router.post("/bookings", async (req, res) => {
+//   const { screeningId, seats, guestEmail } = req.body;
+//   const userId = req.session.user?.id || null;      // <-- from session now
+
+//   if (!screeningId || !seats || !Array.isArray(seats) || seats.length === 0) {
+//     return res.status(400).json({ message: "Missing screeningId or seats" });
+//   }
+
+//   // If user is logged in we ignore guestEmail, otherwise guestEmail is required
+//   if (!userId && !guestEmail) {
+//     return res.status(400).json({ message: "guestEmail required when not logged in" });
+//   }
+
+//   try {
+//     // 1. Make sure all requested seats are still available
+//     const [seatsRows] = await db.query<Seat[]>(
+//       "SELECT * FROM seatStatusView WHERE screeningId = ?",
+//       [screeningId]
+//     );
+//     const available = seatsRows.filter((s) => s.seatStatus === "available");
+//     const allAvailable = seats.every((wanted: SeatInput) =>
+//       available.some((a) => a.seatId === wanted.seatId)
+//     );
+//     if (!allAvailable) {
+//       return res.status(400).json({ message: "One or more seats already booked" });
+//     }
+
+//     // 2. Create the booking
+//     const bookingNumber = randomNumber();
+//     const [bookingRes] = await db.query<ResultSetHeader>(
+//       `INSERT INTO bookings (bookingNumber, userId, screeningId, date, guestEmail)
+//        VALUES (?, ?, ?, NOW(), ?)`,
+//       [bookingNumber, userId, screeningId, userId ? null : guestEmail]
+//     );
+//     const bookingId = bookingRes.insertId;
+
+//     // 3. Insert seats
+//     const seatValues = seats.map((s: SeatInput) => [bookingId, s.seatId, s.ticketType]);
+//     await db.query(
+//       "INSERT INTO bookingXSeats (bookingId, seatId, ticketTypeId) VALUES ?",
+//       [seatValues]
+//     );
+
+//     // 4. Build confirmation email
+//     const [rows] = await db.query<RowDataPacket[]>(
+//       `SELECT m.title, s.start_time, a.name
+//          FROM screenings s
+//          JOIN movies m ON m.id = s.movie_id
+//          JOIN auditoriums a ON a.id = s.auditorium_id
+//         WHERE s.id = ?`,
+//       [screeningId]
+//     );
+//     const screening = rows[0];
+
+//     const [ticketRows] = await db.query<RowDataPacket[]>(
+//       `SELECT t.ticketType, t.price, COUNT(*) AS qty
+//          FROM bookingXSeats bx
+//          JOIN tickets t ON t.id = bx.ticketTypeId
+//         WHERE bx.bookingId = ?
+//         GROUP BY t.id`,
+//       [bookingId]
+//     );
+//     const totalPrice = ticketRows.reduce((sum, t) => sum + t.price * t.qty, 0);
+
+//     const emailHtml = `
+//       <h2>Tack för din bokning!</h2>
+//       <p><b>Film:</b> ${screening.title}</p>
+//       <p><b>Salong:</b> ${screening.name}</p>
+//       <p><b>Tid:</b> ${new Date(screening.start_time).toLocaleString("sv-SE")}</p>
+//       <p><b>Bokningsnummer:</b> ${bookingNumber}</p>
+//       <p><b>Totalt pris:</b> ${totalPrice} kr</p>
+//     `;
+    
+//     const [userRows] = await db.query<RowDataPacket[]>(
+//   "SELECT firstName, lastName, email FROM users WHERE id = ? LIMIT 1",
+//     [userId]
+//   );
+//   const user = userRows[0] as { firstName: string; lastName: string; email: string };
+//   const recipient = user.email;   // <-- now ok
+
+//     if (recipient) {
+//       await sendEmail({
+//         to: recipient,
+//         subject: `Bekräftelse – ${screening.title}`,
+//         html: emailHtml,
+//       });
+//     }
+
+//     res.status(201).json({
+//       message: "Booking created",
+//       bookingId,
+//       bookingNumber,
+//       seats: seats.map((s: SeatInput) => s.seatId),
+//     });
+//   } catch (e: any) {
+//     console.error("Booking error:", e);
+//     res.status(500).json({ error: "Server error" });
+//   }
+// });
 router.post("/bookings", async (req, res) => {
   const { screeningId, seats, guestEmail } = req.body;
-  const userId = req.session.user?.id || null;      // <-- from session now
+  const userId = req.session.user?.id || null;
 
+  // ... (din validering för screeningId, seats, guestEmail är bra) ...
   if (!screeningId || !seats || !Array.isArray(seats) || seats.length === 0) {
     return res.status(400).json({ message: "Missing screeningId or seats" });
   }
-
-  // If user is logged in we ignore guestEmail, otherwise guestEmail is required
   if (!userId && !guestEmail) {
     return res.status(400).json({ message: "guestEmail required when not logged in" });
   }
 
+  
+  let connection;
   try {
-    // 1. Make sure all requested seats are still available
-    const [seatsRows] = await db.query<Seat[]>(
+    connection = await db.getConnection(); 
+    await connection.beginTransaction(); 
+
+   
+    const [seatsRows] = await connection.query<Seat[]>(
       "SELECT * FROM seatStatusView WHERE screeningId = ?",
       [screeningId]
     );
+    
     const available = seatsRows.filter((s) => s.seatStatus === "available");
     const allAvailable = seats.every((wanted: SeatInput) =>
       available.some((a) => a.seatId === wanted.seatId)
     );
     if (!allAvailable) {
+      await connection.rollback(); 
       return res.status(400).json({ message: "One or more seats already booked" });
     }
 
-    // 2. Create the booking
+
+    
     const bookingNumber = randomNumber();
-    const [bookingRes] = await db.query<ResultSetHeader>(
+    const [bookingRes] = await connection.query<ResultSetHeader>( 
       `INSERT INTO bookings (bookingNumber, userId, screeningId, date, guestEmail)
        VALUES (?, ?, ?, NOW(), ?)`,
       [bookingNumber, userId, screeningId, userId ? null : guestEmail]
     );
     const bookingId = bookingRes.insertId;
 
-    // 3. Insert seats
+  
     const seatValues = seats.map((s: SeatInput) => [bookingId, s.seatId, s.ticketType]);
-    await db.query(
+    await connection.query( // 'connection.query'
       "INSERT INTO bookingXSeats (bookingId, seatId, ticketTypeId) VALUES ?",
       [seatValues]
     );
 
-    // 4. Build confirmation email
-    const [rows] = await db.query<RowDataPacket[]>(
+   
+    const [rows] = await connection.query<RowDataPacket[]>(
       `SELECT m.title, s.start_time, a.name
          FROM screenings s
          JOIN movies m ON m.id = s.movie_id
@@ -70,8 +178,7 @@ router.post("/bookings", async (req, res) => {
       [screeningId]
     );
     const screening = rows[0];
-
-    const [ticketRows] = await db.query<RowDataPacket[]>(
+    const [ticketRows] = await connection.query<RowDataPacket[]>(
       `SELECT t.ticketType, t.price, COUNT(*) AS qty
          FROM bookingXSeats bx
          JOIN tickets t ON t.id = bx.ticketTypeId
@@ -79,8 +186,7 @@ router.post("/bookings", async (req, res) => {
         GROUP BY t.id`,
       [bookingId]
     );
-    const totalPrice = ticketRows.reduce((sum, t) => sum + t.price * t.qty, 0);
-
+    const totalPrice = ticketRows.reduce((sum: number, t: any) => sum + t.price * t.qty, 0);
     const emailHtml = `
       <h2>Tack för din bokning!</h2>
       <p><b>Film:</b> ${screening.title}</p>
@@ -89,21 +195,35 @@ router.post("/bookings", async (req, res) => {
       <p><b>Bokningsnummer:</b> ${bookingNumber}</p>
       <p><b>Totalt pris:</b> ${totalPrice} kr</p>
     `;
-    
-    const [userRows] = await db.query<RowDataPacket[]>(
-  "SELECT firstName, lastName, email FROM users WHERE id = ? LIMIT 1",
-    [userId]
-  );
-  const user = userRows[0] as { firstName: string; lastName: string; email: string };
-  const recipient = user.email;   // <-- now ok
 
-    if (recipient) {
+    
+    let recipientEmail: string | null = null;
+
+    if (userId) {
+     
+      const [userRows] = await connection.query<RowDataPacket[]>(
+        "SELECT email FROM users WHERE id = ? LIMIT 1",
+        [userId]
+      );
+      if (userRows.length > 0) {
+        recipientEmail = userRows[0].email;
+      }
+    } else {
+      
+      recipientEmail = guestEmail;
+    }
+    
+   
+    if (recipientEmail) {
       await sendEmail({
-        to: recipient,
+        to: recipientEmail,
         subject: `Bekräftelse – ${screening.title}`,
         html: emailHtml,
       });
     }
+
+    
+    await connection.commit(); 
 
     res.status(201).json({
       message: "Booking created",
@@ -111,12 +231,18 @@ router.post("/bookings", async (req, res) => {
       bookingNumber,
       seats: seats.map((s: SeatInput) => s.seatId),
     });
+
   } catch (e: any) {
+    if (connection) await connection.rollback(); 
+    
     console.error("Booking error:", e);
+  
     res.status(500).json({ error: "Server error" });
+  } finally {
+    
+    if (connection) connection.release();
   }
 });
-
 
 /* ----------  GET /api/bookings?userId=XX  ---------- */
 router.get("/", async (req, res) => {

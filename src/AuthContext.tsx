@@ -1,98 +1,70 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import React, { 
+  createContext, 
+  useState, 
+  useEffect, 
+  useContext, 
+  ReactNode 
+} from "react";
 
-interface User {
-  id: number;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-}
+// 1. Definiera typerna (samma User-typ som du redan har)
+type User = { id: number; firstName: string; lastName: string; email: string };
 
 interface AuthContextType {
   user: User | null;
-  loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (data: { firstName: string; lastName: string; email: string; password: string }) => Promise<void>;
-  logout: () => Promise<void>;
-  fetchUser: () => Promise<void>;
+  isLoading: boolean;
+  login: (userData: User) => void;
+  logout: () => void;
 }
-  
-const AuthContext = createContext<AuthContextType | null>(null);
-  
- const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+
+// 2. Skapa Context med ett default-värde
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// 3. Skapa en "Provider"-komponent
+// Denna komponent kommer att hämta användardata och dela ut den.
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // Viktig!
 
-const fetchUser = async () => {
-  try {
-    const res = await fetch("/api/users/me", {
-      credentials: "include", // ✅ viktigt
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setUser(data.user);
-    } else {
-      setUser(null);
-    }
-  } catch {
-    setUser(null);
-  } finally {
-    setLoading(false);
-  }
-};
-
-
+  // Körs en gång när appen laddas för att kolla om vi har en session
   useEffect(() => {
-    fetchUser();
+    fetch("/api/users/me", { credentials: "include" })
+      .then((res) => (res.ok ? res.json() : Promise.reject()))
+      .then((data) => {
+        setUser(data.user); // Inloggad!
+      })
+      .catch(() => {
+        setUser(null); // Inte inloggad
+      })
+      .finally(() => {
+        setIsLoading(false); // Sluta ladda, vi har ett svar
+      });
   }, []);
 
-  const login = async (email: string, password: string) => {
-    const res = await fetch("/api/users/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-      credentials: "include",
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setUser(data.user);
-    } else {
-      const err = await res.json();
-      throw new Error(err.error || "Kunde inte logga in");
-    }
-  };
-  
-  const register = async (data: { firstName: string; lastName: string; email: string; password: string }) => {
-    const res = await fetch("/api/users/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-      credentials: "include",
-    });
-    if (res.ok) {
-      const result = await res.json();
-      setUser(result.user);
-    } else {
-      const err = await res.json();
-      throw new Error(err.error || "Kunde inte skapa konto");
-    }
+  // Funktioner för att ändra state från andra komponenter
+  const login = (userData: User) => {
+    setUser(userData);
   };
 
-  const logout = async () => {
-    await fetch("/api/users/logout", { method: "POST", credentials: "include" });
-    setUser(null);
+  const logout = () => {
+    // Vi litar på att komponenten som kallar 'logout'
+    // också har anropat /api/users/logout
+    setUser(null); 
   };
+
+  const value = { user, isLoading, login, logout };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, fetchUser }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = () => {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
-  return ctx;
-};
-
-export default AuthProvider;
+// 4. Skapa en "custom hook" för att enkelt använda din context
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+}

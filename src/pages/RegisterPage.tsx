@@ -1,5 +1,6 @@
 import React, { FormEvent, useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import "./PagesStyle/LoginPage.scss";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -58,47 +59,52 @@ export default function RegisterPage() {
   };
 
   if (isCheckingLogin) {
-    return <p>Laddar...</p>;
+    return <p className="auth-loading">Laddar...</p>;
   }
 
   return (
-    <div style={{ maxWidth: 400, margin: "40px auto", padding: 16 }}>
+    <div className="auth-page">
+      <div className="auth-card">
       <h2>Registrera dig</h2> 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="auth-form">
 
         
-        <label>
+        <label className="auth-label">
           Förnamn
           <input
+            className="auth-input"
             type="text"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
           />
         </label>
-        <br />
-        <label>
+
+        <label className="auth-label">
           Efternamn
           <input
+          className="auth-input"
             type="text"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
           />
         </label>
-        <br />
+
         
-        <label>
+        <label className="auth-label">
           E-post
           <input
+          className="auth-input"
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </label>
-        <br />
-        <label>
+
+        <label className="auth-label">
           Lösenord
           <input
+            className="auth-input"
             type="password"
             required
             minLength={8} 
@@ -107,14 +113,16 @@ export default function RegisterPage() {
           />
         </label>
         <br />
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <button type="submit" disabled={loading}>
+        {error && <p className="auth-error">{error}</p>}
+
+        <button type="submit" disabled={loading} className="auth-submit">
           {loading ? "Registrerar..." : "Registrera dig"} 
         </button>
       </form>
-      <p>
+      <p className="auth-foot">
         Redan ett konto? <Link to="/login">Logga in</Link> 
       </p>
+    </div>
     </div>
   );
 }

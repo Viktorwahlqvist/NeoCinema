@@ -25,6 +25,12 @@ export default function AllMoviesPage() {
   const { data, isLoading, error } = useFetch<ScreeningsInfo[]>(
     "/api/screeningsInfo"
   );
+
+  const auditoriumOptions = [
+    { label: "Neo Lilla", value: "Neo Lilla" },
+    { label: "Neo Stora", value: "Neo Stora" },
+  ];
+
   // Filter out dates that have already passed
   const now = new Date();
   const filteredDates =
@@ -42,12 +48,11 @@ export default function AllMoviesPage() {
   // formating dates so we get weekday before
   const formattedDays = limitedDays.map((d) => formatDate(d));
 
-  // sets formattedDays and iso dates to a object
-  //  so we can use formated in label and iso in filtering
-  const dateMap: Record<string, string> = {};
-  limitedDays.forEach((d) => {
-    dateMap[formatDate(d)] = d;
-  });
+  // labe is what user sees, and value is whats beeing filtered with
+  const dateOptions = limitedDays.map((d) => ({
+    label: formatDate(d),
+    value: d,
+  }));
 
   const handleOnClickDate = (date: string) => {
     setFilterOptions((prev) => ({ ...prev, date }));
@@ -58,6 +63,7 @@ export default function AllMoviesPage() {
   const handleOnClickAge = () => {
     setFilterOptions((prev) => ({ ...prev, age: !prev.age }));
   };
+
   // useEffect if data or filterOptions change, (if data and auditorium is false show all)
   useEffect(() => {
     if (!data) return;
@@ -94,16 +100,15 @@ export default function AllMoviesPage() {
           <Col xs="4" md="auto">
             <FilterDropdown
               label="Välj ett datum"
-              onClick={(label) => handleOnClickDate(dateMap[label])}
-              className="day-filter"
-              options={formattedDays}
+              onClick={handleOnClickDate}
+              options={dateOptions}
             />
           </Col>
           <Col xs="4" md="auto">
             <FilterDropdown
               label="Välj en salong"
               onClick={handleOnClickAuditorium}
-              options={["Neo Lilla", "Neo Stora"]}
+              options={auditoriumOptions}
             />
           </Col>
           <Col xs="3" md="auto" className="d-flex align-items-end">

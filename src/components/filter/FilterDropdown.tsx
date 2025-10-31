@@ -2,9 +2,14 @@ import React, { useEffect, useState } from "react";
 import FilterBtn from "./FilterBtn";
 import "./filter-dropdown.scss";
 
+interface Option {
+  label: string;
+  value: string;
+}
+
 interface SelectProps {
   label: string;
-  options: string[];
+  options: Option[];
   className?: string;
   onClick: (value: string) => void;
 }
@@ -37,11 +42,14 @@ export default function FilterDropdown({
 
       {isOpen && (
         <section className="option-container">
-          <FilterBtn
-            btnName={options}
-            className={`options-dropdown ${className}`}
-            onClick={handleClickSelect}
-          />
+          {options.map((option) => (
+            <FilterBtn
+              key={option.value}
+              btnName={[option.label]}
+              className={`options-dropdown ${className}`}
+              onClick={() => handleClickSelect(option.value)}
+            />
+          ))}
         </section>
       )}
     </section>

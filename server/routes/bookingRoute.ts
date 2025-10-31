@@ -8,6 +8,15 @@ import { sendEmail } from "./Mailer.js";
 
 const router = express.Router();
 
+declare module "express-session" {
+  interface SessionData {
+    user?: {
+      id: number;
+      email: string;
+    };
+  }
+}
+
 /* ----------  tiny helper  ---------- */
 type Seat = RowDataPacket & {
   seatId: number;

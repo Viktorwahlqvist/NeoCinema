@@ -42,7 +42,7 @@ export default function BookingConfirmation() {
     doc.text("NeoCinema - Biobiljett", 20, 20);
 
     doc.setFontSize(12);
-    doc.text(`Bokningsnummer: ${booking.rNumber}`, 20, 40);
+    doc.text(`Bokningsnummer: ${booking.bookingNumber}`, 20, 40);
     doc.text(`Film: ${booking.movieTitle}`, 20, 50);
     doc.text(
       `Tid: ${new Date(booking.screeningTime).toLocaleString("sv-SE")}`,
@@ -52,7 +52,7 @@ export default function BookingConfirmation() {
     doc.text(`Salong: ${booking.auditoriumName}`, 20, 70);
     doc.text(`Totalt pris: ${booking.totalPrice} kr`, 20, 80);
     doc.text(`E-post: ${booking.email}`, 20, 90);
-    doc.save(`biljett_${booking.rNumber}.pdf`);
+    doc.save(`biljett_${booking.bookingNumber}.pdf`);
   };
 
   return (
@@ -64,7 +64,7 @@ export default function BookingConfirmation() {
   <div className="confirmation-info">
   <div className="booking-text">
     <p>
-      Bokningsid: <strong>{booking.rNumber}</strong>
+      Bokningsid: <strong>{booking.bookingNumber}</strong>
     </p>
     <p>
       Bekräftelse har skickats till:

@@ -1,6 +1,6 @@
 export interface Booking {
   bookingId: number;
-  rNumber: string;
+  bookingNumber: string;
   email: string;
   movieTitle: string;
   screeningTime: string;

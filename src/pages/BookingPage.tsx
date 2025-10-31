@@ -22,7 +22,7 @@ interface User {
   email: string;
 }
 
-/* --------------  ADJACENT-SEAT HELPER (unchanged) -------------- */
+/* --------------  ADJACENT-SEAT HELPER -------------- */
 function findAdjacentSeats(
   seats: Seat[],
   n: number,

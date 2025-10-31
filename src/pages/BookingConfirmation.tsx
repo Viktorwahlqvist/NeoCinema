@@ -9,7 +9,7 @@ export default function BookingConfirmation() {
   const { bookingId } = useParams<{ bookingId: string }>();
   const navigate = useNavigate();
   const [booking, setBooking] = useState<Booking | null>(null);
-
+  console.log(booking)
   
 
   useEffect(() => {

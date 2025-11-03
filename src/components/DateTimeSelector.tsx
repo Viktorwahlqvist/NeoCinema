@@ -86,7 +86,7 @@ const res = await fetch(`/api/screenings/${movieId}?limit=${limit}`);
   <section className="date-time-selector">
     {/* Datumväljare */}
     <div className="selector-box mb-3">
-      <h3 className="heading mb-3">Välj datum</h3>
+      <h3 className="heading mb-4">Välj datum</h3>
 
       <div className="dates-grid d-flex flex-wrap gap-3">
         {uniqueDateKeys.map((key) => {
@@ -114,7 +114,7 @@ const res = await fetch(`/api/screenings/${movieId}?limit=${limit}`);
     {/* Tidsväljare */}
     {selectedDateKey && (
       <div className="selector-box">
-        <h4 className="heading-sm mb-3">Välj sal</h4>
+        <h4 className="heading-sm mb-4">Välj sal</h4>
 
         {timesForSelectedDate.length === 0 ? (
           <div className="no-times">Inga tider för valt datum.</div>

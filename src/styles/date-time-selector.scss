@@ -69,3 +69,7 @@ box-shadow: 0 0 15px $color-hover;
     font-size: 0.9rem;
   }
 }
+
+.hstack.movie-layout__stack {
+  align-items: flex-start !important;
+}

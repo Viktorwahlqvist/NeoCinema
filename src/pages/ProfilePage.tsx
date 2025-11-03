@@ -1,7 +1,7 @@
-// src/pages/ProfilePage.tsx
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../AuthContext"; // <-- 1. Importera hooken
+import { useAuth } from "../AuthContext"; 
+import "./PagesStyle/ProfilePage.scss";
 
 type User = { id: number; firstName: string; lastName: string; email: string };
 
@@ -189,24 +189,53 @@ export default function ProfilePage() {
   };
 
   return (
-    <div style={{ maxWidth: 800, margin: "40px auto", padding: 16 }}>
-      <h2>
-        Hej {user.firstName} {user.lastName}
-      </h2>
-      <p>E-post: {user.email}</p>
-      <button onClick={logout}>Logga ut</button>
+  <div className="profile-container">
+    <h2>Hej, {user.firstName} {user.lastName}</h2>
+    <p>E-post: {user.email}</p>
+    <button className="logout-btn" onClick={logout}>Logga ut</button>
 
-      <h3 style={{ marginTop: 32 }}>Kommande bokningar</h3>
-      {upcomingBookings.length === 0 && <p>Du har inga kommande bokningar.</p>}
-      {upcomingBookings.map((b) => (
-        <BookingCard key={b.bookingId} booking={b} />
-      ))}
+    <h3 className="section-title">Kommande bokningar</h3>
+    {upcomingBookings.length === 0 && (
+      <p className="empty-text">Du har inga kommande bokningar.</p>
+    )}
+    {upcomingBookings.map((b) => (
+      <div key={b.bookingId} className="booking-card">
+        <strong>{b.movieTitle}</strong> — {b.auditoriumName}<br />
+        {new Date(b.screeningTime).toLocaleString("sv-SE")}<br />
+        Bokningsnummer: <code>{b.bookingNumber}</code><br />
+        Totalt: {b.totalPrice} kr<br />
 
-      <h3 style={{ marginTop: 32 }}>Genomförda bokningar</h3>
-      {pastBookings.length === 0 && <p>Du har inga tidigare bokningar.</p>}
-      {pastBookings.map((b) => (
-        <BookingCard key={b.bookingId} booking={b} />
-      ))}
-    </div>
-  );
+        {canCancel(b.screeningTime) && (
+          <button
+            className="cancel-btn"
+            onClick={() => handleCancel(b.bookingId)}
+            disabled={cancelStatus.loading && cancelStatus.id === b.bookingId}
+          >
+            {cancelStatus.loading && cancelStatus.id === b.bookingId
+              ? "Avbokar..."
+              : "Avboka"}
+          </button>
+        )}
+
+        {cancelStatus.error && cancelStatus.id === b.bookingId && (
+          <p className="cancel-error">{cancelStatus.error}</p>
+        )}
+      </div>
+    ))}
+
+    <h3 className="section-title">Tidigare bokningar</h3>
+    {pastBookings.length === 0 && (
+      <p className="empty-text">Du har inga tidigare bokningar.</p>
+    )}
+    {pastBookings.map((b) => (
+      <div key={b.bookingId} className="booking-card">
+        <strong>{b.movieTitle}</strong> — {b.auditoriumName}<br />
+        {new Date(b.screeningTime).toLocaleString("sv-SE")}<br />
+        Bokningsnummer: <code>{b.bookingNumber}</code><br />
+        Totalt: {b.totalPrice} kr
+      </div>
+    ))}
+  </div>
+);
+
 }

@@ -1,9 +1,47 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../AuthContext"; 
 import "./Style/BottomNavbar.scss";
 
 export default function BottomNavbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  // get state from AuthContext
+  const { user, isLoading } = useAuth();
+
+  // render account link based on auth state
+  const renderAccountLink = () => {
+    if (isLoading) {
+      // still loading: show placeholder
+      return (
+        <span
+          className="text-decoration-none text-center"
+          style={{ opacity: 0.5, pointerEvents: "none" }}
+        >
+          <i className="bi bi-person neon-icon"></i>
+          <div className="nav-label">...</div>
+        </span>
+      );
+    }
+
+    if (user) {
+      // Logged in: show "Profile"
+      return (
+        <Link to="/profile" className="text-decoration-none text-center">
+          <i className="bi bi-person neon-icon"></i>
+          <div className="nav-label">Profil</div>
+        </Link>
+      );
+    }
+
+    // Not logged in: show "Login"
+    return (
+      <Link to="/login" className="text-decoration-none text-center">
+        <i className="bi bi-person neon-icon"></i>
+        <div className="nav-label">Logga in</div>
+      </Link>
+    );
+  };
 
   return (
     <>
@@ -18,10 +56,7 @@ export default function BottomNavbar() {
           <div className="nav-label">Filmer</div>
         </Link>
 
-        <Link to="/profile" className="text-decoration-none text-center">
-          <i className="bi bi-person neon-icon"></i>
-          <div className="nav-label">Profil</div>
-        </Link>
+        {renderAccountLink()}
 
         <button
           className="btn btn-link text-decoration-none text-center p-0"
@@ -32,7 +67,7 @@ export default function BottomNavbar() {
         </button>
       </nav>
 
-      {/* Fullbredd glidande meny */}
+     
       <div className={`fullscreen-menu ${menuOpen ? "open" : ""}`}>
         <div className="menu-content">
           <button className="close-btn" onClick={() => setMenuOpen(false)}>

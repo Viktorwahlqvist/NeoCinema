@@ -102,6 +102,7 @@ export default function AllMoviesPage() {
               label="Välj ett datum"
               onClick={handleOnClickDate}
               options={dateOptions}
+              className="date-opt"
             />
           </Col>
           <Col xs="4" md="auto">

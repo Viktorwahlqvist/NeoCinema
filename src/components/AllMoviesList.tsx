@@ -60,13 +60,19 @@ export default function AllMoviesList({ movies }: AllMoviesListPRops) {
             <p className=" d-md-none">{movie.startTime.slice(11, 16)}</p>
           </Col>
 
-          <Col xs={12} md={2} lg={2} className="d-md-flex flex-column mx-md-3">
+          <Col
+            xs={12}
+            md={2}
+            lg={2}
+            className="d-flex flex-row flex-md-column gap-3 mx-md-3 my-4"
+          >
             <FilterBtn
-              className="my-4 mx-5 mx-md-0"
+              className="flex-fill flex-md-grow-0 mx-2"
               btnName={["Mer info"]}
               onClick={() => navigate(`/movie/${movie.movieId}`)}
             />
             <FilterBtn
+              className="flex-fill flex-md-grow-0 mx-2"
               btnName={["Köp biljetter"]}
               onClick={() => navigate(`/booking/${movie.screeningId}`)}
             />

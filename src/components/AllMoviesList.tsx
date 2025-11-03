@@ -60,7 +60,7 @@ export default function AllMoviesList({ movies }: AllMoviesListPRops) {
             <p className=" d-md-none">{movie.startTime.slice(11, 16)}</p>
           </Col>
 
-          <Col xs={12} md={2} lg={2}>
+          <Col xs={12} md={2} lg={2} className="d-md-flex flex-column mx-md-3">
             <FilterBtn
               className="my-4 mx-5 mx-md-0"
               btnName={["Mer info"]}

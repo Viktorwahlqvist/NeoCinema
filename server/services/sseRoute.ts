@@ -16,7 +16,8 @@ export function initSeatSse(app: Express) {
     res.write(": connected\n\n");
 
     // Store connection
-    seatConnections.push({ req, res });
+    const screeningId = Number(req.query.screeningId);
+    seatConnections.push({ req, res, screeningId });
 
     // Cleanup when client disconnects
     req.on("close", () => {
@@ -29,10 +30,12 @@ export function initSeatSse(app: Express) {
 // broadcast update to every connected users
 export function broadcastSeatUpdate(seatData: {
   seatId: number;
-  status: "booked";
+  status: "booked" | "available";
+  screeningId: number;
 }) {
   for (const connection of seatConnections) {
-    connection.res.write(`data: ${JSON.stringify(seatData)}\n\n`);
+    if (connection.screeningId === seatData.screeningId)
+      connection.res.write(`data: ${JSON.stringify(seatData)}\n\n`);
   }
 }
 

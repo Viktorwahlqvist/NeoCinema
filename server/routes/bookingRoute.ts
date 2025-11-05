@@ -6,7 +6,6 @@ import { sendEmail } from "./Mailer.js";
 import { broadcastSeatUpdate } from "../services/sseRoute.js";
 import "express-session";
 
-
 const router = express.Router();
 
 type Seat = RowDataPacket & {
@@ -31,7 +30,7 @@ router.post("/bookings", async (req, res) => {
       .status(400)
       .json({ message: "guestEmail required when not logged in" });
   }
-  
+
   let connection;
   try {
     connection = await db.getConnection();
@@ -61,8 +60,13 @@ router.post("/bookings", async (req, res) => {
     );
     const bookingId = bookingRes.insertId;
 
-    const seatValues = seats.map((s: SeatInput) => [bookingId, s.seatId, s.ticketType]);
-    await connection.query( // 'connection.query'
+    const seatValues = seats.map((s: SeatInput) => [
+      bookingId,
+      s.seatId,
+      s.ticketType,
+    ]);
+    await connection.query(
+      // 'connection.query'
       "INSERT INTO bookingXSeats (bookingId, seatId, ticketTypeId) VALUES ?",
       [seatValues]
     );
@@ -122,9 +126,13 @@ router.post("/bookings", async (req, res) => {
 
     await connection.commit();
 
-    // Broadcast to sse cliets
+    // Broadcast to sse cliets (with correct screening)
     for (const s of seats) {
-      broadcastSeatUpdate({ seatId: s.seatId, status: "booked" });
+      broadcastSeatUpdate({
+        seatId: s.seatId,
+        status: "booked",
+        screeningId: Number(screeningId),
+      });
     }
 
     res.status(201).json({
@@ -227,10 +235,10 @@ router.delete("/:bookingId", requireAuth, async (req, res) => {
   const userId = (req as any).session.user.id; // we know user is logged in due to requireAuth middleware
   let connection;
 
-  try { 
-    connection = await db.getConnection(); 
-    await connection.beginTransaction(); 
-    
+  try {
+    connection = await db.getConnection();
+    await connection.beginTransaction();
+
     const [bookingRows] = await connection.query<RowDataPacket[]>(
       `SELECT
          b.userId,
@@ -240,6 +248,12 @@ router.delete("/:bookingId", requireAuth, async (req, res) => {
        LEFT JOIN screenings s ON b.screeningId = s.id
        WHERE b.id = ?
        LIMIT 1`,
+      [bookingId]
+    );
+
+    // Need seatId for SSE
+    const [seatRows] = await connection.query<RowDataPacket[]>(
+      "SELECT seatId FROM bookingXSeats WHERE bookingId = ?",
       [bookingId]
     );
 
@@ -253,13 +267,17 @@ router.delete("/:bookingId", requireAuth, async (req, res) => {
     }
 
     const booking = bookingRows[0];
-  
+
     if (!booking.screeningIdExists) {
       await connection.rollback();
-      console.log("!!! DATABASFEL: 'screeningIdExists' är NULL -> SKICKAR 500 !!!");
-      return res.status(500).json({ error: "Databasfel: Bokningen är korrupt och kan inte raderas." });
+      console.log(
+        "!!! DATABASFEL: 'screeningIdExists' är NULL -> SKICKAR 500 !!!"
+      );
+      return res.status(500).json({
+        error: "Databasfel: Bokningen är korrupt och kan inte raderas.",
+      });
     }
- 
+
     if (booking.userId !== userId) {
       await connection.rollback();
       console.log(
@@ -292,6 +310,15 @@ router.delete("/:bookingId", requireAuth, async (req, res) => {
     );
 
     await connection.commit();
+
+    // Broadcast to sse cliets (with correct screening)
+    for (const row of seatRows) {
+      broadcastSeatUpdate({
+        seatId: row.seatId,
+        status: "available",
+        screeningId: bookingRows[0].screeningIdExists,
+      });
+    }
     console.log("== AVBOKNING LYCKADES! -> SKICKAR 200 ==");
     res.status(200).json({ message: "Bokningen har avbokats" });
   } catch (e) {

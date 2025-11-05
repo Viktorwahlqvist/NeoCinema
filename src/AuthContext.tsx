@@ -6,7 +6,7 @@ import React, {
   ReactNode,
 } from "react";
 
-type User = { id: number; firstName: string; lastName: string; email: string };
+type User = { id: number; firstName: string; lastName: string; email: string; role: 'admin' | 'user'; };
 
 interface AuthContextType {
   user: User | null;

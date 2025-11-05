@@ -121,26 +121,28 @@ export default function BookingPage() {
   >(`/api/screeningsInfo?screeningId=${screeningId}`, { skip: !screeningId });
 
   useEffect(() => {
-    if (!seats || totalTickets === 0) {
+    // If user havent selected any ticket types.
+    if (totalTickets === 0) {
       setSelectedSeats([]);
       return;
     }
-    const best = findAdjacentSeats(seats, totalTickets);
-    setSelectedSeats(best);
+    // If user havent selected any seats, findAdjacentSeats.
+    if (selectedSeats.length === 0) {
+      const best = findAdjacentSeats(seats, totalTickets);
+      setSelectedSeats(best);
+    }
   }, [seats, totalTickets]);
 
-  // If a seat has the same seatId as the one booked, update it to booked.
-  const handleSeatUpdate = (seatId: number, status: "booked") => {
+  // If a seat has the same seatId as the one booked , update it to booked.
+  const handleSeatUpdate = (seatId: number, status: "booked" | "available") => {
     setSeats((prev) =>
       prev.map((s) => (s.seatId === seatId ? { ...s, seatStatus: status } : s))
     );
 
     // Remove any seats from selectedSeats that are no longer available
-    setSelectedSeats((prev) =>
-      prev.filter(
-        (id) => seats.find((s) => s.seatId === id)?.seatStatus === "available"
-      )
-    );
+    if (status === "booked") {
+      setSelectedSeats((prev) => prev.filter((id) => id !== seatId));
+    }
   };
 
   // (handleSeatClick är oförändrad)
@@ -207,7 +209,12 @@ export default function BookingPage() {
 
   return (
     <main className="booking-page text-center mb-5">
-      {<SeatSSE onSeatUpdate={handleSeatUpdate} />}
+      {
+        <SeatSSE
+          onSeatUpdate={handleSeatUpdate}
+          screeningId={Number(screeningId)}
+        />
+      }
       <div className="booking-layout">
         <aside className="booking-left">
           {screening?.[0] && (

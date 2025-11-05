@@ -1,23 +1,32 @@
 import { useEffect } from "react";
 
+type SeatStatus = "booked" | "available";
 interface Props {
-  onSeatUpdate: (seatId: number, status: "booked") => void;
+  onSeatUpdate: (seatId: number, status: SeatStatus) => void;
+  screeningId: number;
 }
 
-export default function SeatSSE({ onSeatUpdate }: Props) {
+export default function SeatSSE({ onSeatUpdate, screeningId }: Props) {
   useEffect(() => {
-    const eventSource = new EventSource("/api/seats-sse");
+    // only starts event for users with correct screening
+    const eventSource = new EventSource(
+      `/api/seats-sse?screeningId=${screeningId}`
+    );
 
+    // Listen for incoming SSE messages, parse the JSON string,
     eventSource.onmessage = (event) => {
-      const data: { seatId: number; status: "booked" } = JSON.parse(event.data);
+      const data: { seatId: number; status: SeatStatus } = JSON.parse(
+        event.data
+      );
 
+      // and pass it as an object to our callback
       onSeatUpdate(data.seatId, data.status);
     };
 
     return () => {
       eventSource.close();
     };
-  }, []);
+  }, [screeningId]);
 
   return null;
 }

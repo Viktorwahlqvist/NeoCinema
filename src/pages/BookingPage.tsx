@@ -282,7 +282,6 @@ export default function BookingPage() {
                           handleSeatClick(seat.seatId, seat.seatStatus)
                         }
                       >
-                        {/* Ska vi updatera denna så det är från nummer 1, sen multi med varje rad så det blir t.ex 1-87 eller hur många platser det finns */}
                         {seat.seatId}
                       </button>
                     ))}

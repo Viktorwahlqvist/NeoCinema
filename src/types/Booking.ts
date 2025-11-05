@@ -1,3 +1,4 @@
+import { RowDataPacket } from "mysql2";
 export interface Booking {
   bookingId: number;
   bookingNumber: string;
@@ -12,4 +13,3 @@ export interface Booking {
     price: number;
   }[];
 }
-

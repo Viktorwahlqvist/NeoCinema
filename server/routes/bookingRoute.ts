@@ -3,8 +3,7 @@ import { db } from "../db.js";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import randomNumber from "../utils/randomNumber.js";
 import { sendEmail } from "./Mailer.js";
-
-
+import { broadcastSeatUpdate } from "../services/sseRoute.js";
 
 const router = express.Router();
 
@@ -37,48 +36,51 @@ router.post("/bookings", async (req, res) => {
     return res.status(400).json({ message: "Missing screeningId or seats" });
   }
   if (!userId && !guestEmail) {
-    return res.status(400).json({ message: "guestEmail required when not logged in" });
+    return res
+      .status(400)
+      .json({ message: "guestEmail required when not logged in" });
   }
 
-  
   let connection;
   try {
-    connection = await db.getConnection(); 
-    await connection.beginTransaction(); 
+    connection = await db.getConnection();
+    await connection.beginTransaction();
 
-   
     const [seatsRows] = await connection.query<Seat[]>(
       "SELECT * FROM seatStatusView WHERE screeningId = ?",
       [screeningId]
     );
-    
+
     const available = seatsRows.filter((s) => s.seatStatus === "available");
     const allAvailable = seats.every((wanted: SeatInput) =>
       available.some((a) => a.seatId === wanted.seatId)
     );
     if (!allAvailable) {
-      await connection.rollback(); 
-      return res.status(400).json({ message: "One or more seats already booked" });
+      await connection.rollback();
+      return res
+        .status(400)
+        .json({ message: "One or more seats already booked" });
     }
 
-
-    
     const bookingNumber = randomNumber();
-    const [bookingRes] = await connection.query<ResultSetHeader>( 
+    const [bookingRes] = await connection.query<ResultSetHeader>(
       `INSERT INTO bookings (bookingNumber, userId, screeningId, date, guestEmail)
        VALUES (?, ?, ?, NOW(), ?)`,
       [bookingNumber, userId, screeningId, userId ? null : guestEmail]
     );
     const bookingId = bookingRes.insertId;
 
-  
-    const seatValues = seats.map((s: SeatInput) => [bookingId, s.seatId, s.ticketType]);
-    await connection.query( // 'connection.query'
+    const seatValues = seats.map((s: SeatInput) => [
+      bookingId,
+      s.seatId,
+      s.ticketType,
+    ]);
+    await connection.query(
+      // 'connection.query'
       "INSERT INTO bookingXSeats (bookingId, seatId, ticketTypeId) VALUES ?",
       [seatValues]
     );
 
-   
     const [rows] = await connection.query<RowDataPacket[]>(
       `SELECT m.title, s.start_time, a.name
          FROM screenings s
@@ -96,21 +98,24 @@ router.post("/bookings", async (req, res) => {
         GROUP BY t.id`,
       [bookingId]
     );
-    const totalPrice = ticketRows.reduce((sum: number, t: any) => sum + t.price * t.qty, 0);
+    const totalPrice = ticketRows.reduce(
+      (sum: number, t: any) => sum + t.price * t.qty,
+      0
+    );
     const emailHtml = `
       <h2>Tack för din bokning!</h2>
       <p><b>Film:</b> ${screening.title}</p>
       <p><b>Salong:</b> ${screening.name}</p>
-      <p><b>Tid:</b> ${new Date(screening.start_time).toLocaleString("sv-SE")}</p>
+      <p><b>Tid:</b> ${new Date(screening.start_time).toLocaleString(
+        "sv-SE"
+      )}</p>
       <p><b>Bokningsnummer:</b> ${bookingNumber}</p>
       <p><b>Totalt pris:</b> ${totalPrice} kr</p>
     `;
 
-    
     let recipientEmail: string | null = null;
 
     if (userId) {
-     
       const [userRows] = await connection.query<RowDataPacket[]>(
         "SELECT email FROM users WHERE id = ? LIMIT 1",
         [userId]
@@ -119,11 +124,9 @@ router.post("/bookings", async (req, res) => {
         recipientEmail = userRows[0].email;
       }
     } else {
-      
       recipientEmail = guestEmail;
     }
-    
-   
+
     if (recipientEmail) {
       await sendEmail({
         to: recipientEmail,
@@ -132,8 +135,12 @@ router.post("/bookings", async (req, res) => {
       });
     }
 
-    
-    await connection.commit(); 
+    await connection.commit();
+
+    // Broadcast to sse cliets
+    for (const s of seats) {
+      broadcastSeatUpdate({ seatId: s.seatId, status: "booked" });
+    }
 
     res.status(201).json({
       message: "Booking created",
@@ -141,15 +148,13 @@ router.post("/bookings", async (req, res) => {
       bookingNumber,
       seats: seats.map((s: SeatInput) => s.seatId),
     });
-
   } catch (e: any) {
-    if (connection) await connection.rollback(); 
-    
+    if (connection) await connection.rollback();
+
     console.error("Booking error:", e);
-  
+
     res.status(500).json({ error: "Server error" });
   } finally {
-    
     if (connection) connection.release();
   }
 });
@@ -185,7 +190,6 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
-
 
 /* ----------  GET /bookings/:id  ---------- */
 router.get("/:bookingId", async (req, res) => {
@@ -233,23 +237,17 @@ const requireAuth = (req: any, res: any, next: any) => {
   next();
 };
 
-
-
 router.delete("/:bookingId", requireAuth, async (req, res) => {
   const { bookingId } = req.params;
   const userId = (req as any).session.user.id; // Vi vet att användaren finns pga requireAuth
   let connection;
 
-
-
   try {
-    
-    connection = await db.getConnection(); 
-    await connection.beginTransaction(); 
-
+    connection = await db.getConnection();
+    await connection.beginTransaction();
 
     console.log(`== Kör SQL: ... LEFT JOIN ... WHERE b.id = ${bookingId}`);
-    
+
     const [bookingRows] = await connection.query<RowDataPacket[]>(
       `SELECT
          b.userId,
@@ -258,7 +256,7 @@ router.delete("/:bookingId", requireAuth, async (req, res) => {
        FROM bookings b
        LEFT JOIN screenings s ON b.screeningId = s.id
        WHERE b.id = ?
-       LIMIT 1`, 
+       LIMIT 1`,
       [bookingId]
     );
 
@@ -270,37 +268,45 @@ router.delete("/:bookingId", requireAuth, async (req, res) => {
       console.log("!!! HITTADE INTE BOKNINGEN -> SKICKAR 404 !!!");
       return res.status(404).json({ error: "Bokningen hittades inte" });
     }
-    
+
     const booking = bookingRows[0];
 
-    
     if (!booking.screeningIdExists) {
       await connection.rollback();
-      console.log("!!! DATABASFEL: 'screeningIdExists' är NULL -> SKICKAR 500 !!!");
+      console.log(
+        "!!! DATABASFEL: 'screeningIdExists' är NULL -> SKICKAR 500 !!!"
+      );
       // Detta är ett serverfel, inte användarens fel.
-      return res.status(500).json({ error: "Databasfel: Bokningen är korrupt och kan inte raderas." });
+      return res.status(500).json({
+        error: "Databasfel: Bokningen är korrupt och kan inte raderas.",
+      });
     }
 
-    
     if (booking.userId !== userId) {
       await connection.rollback();
-      console.log(`!!! SÄKERHETSFEL: Användare ${userId} äger inte bokning ${bookingId} -> SKICKAR 403 !!!`);
-      return res.status(403).json({ error: "Du har inte behörighet att avboka detta" });
+      console.log(
+        `!!! SÄKERHETSFEL: Användare ${userId} äger inte bokning ${bookingId} -> SKICKAR 403 !!!`
+      );
+      return res
+        .status(403)
+        .json({ error: "Du har inte behörighet att avboka detta" });
     }
 
     // 5. TIDSKONTROLL: Är det mer än 2 timmar kvar?
     const screeningTime = new Date(booking.start_time).getTime();
-    const twoHoursBefore = screeningTime - (2 * 60 * 60 * 1000); // 2 timmar i ms
+    const twoHoursBefore = screeningTime - 2 * 60 * 60 * 1000; // 2 timmar i ms
     const now = Date.now();
 
     if (now > twoHoursBefore) {
       await connection.rollback();
-      console.log(`!!! TIDSGRÄNS UPPNÅDD: ${now} är efter ${twoHoursBefore} -> SKICKAR 403 !!!`);
-      return res.status(403).json({ error: "Tidsgränsen för avbokning har passerat (2 timmar)" });
+      console.log(
+        `!!! TIDSGRÄNS UPPNÅDD: ${now} är efter ${twoHoursBefore} -> SKICKAR 403 !!!`
+      );
+      return res
+        .status(403)
+        .json({ error: "Tidsgränsen för avbokning har passerat (2 timmar)" });
     }
 
-    
-    
     // Steg 6a: Ta bort kopplingarna i 'bookingXSeats'
     // Detta gör att din `seatStatusView` automatiskt ser platserna som lediga!
     console.log(`== RADERAR från bookingXSeats WHERE bookingId = ${bookingId}`);
@@ -316,14 +322,11 @@ router.delete("/:bookingId", requireAuth, async (req, res) => {
       [bookingId]
     );
 
-    
     await connection.commit();
-    
+
     console.log("== AVBOKNING LYCKADES! -> SKICKAR 200 ==");
     res.status(200).json({ message: "Bokningen har avbokats" });
-
   } catch (e) {
-    
     if (connection) await connection.rollback();
     console.error("!!! OVÄNTAT SERVERFEL VID AVBOKNING:", e);
     res.status(500).json({ error: "Serverfel vid avbokning" });

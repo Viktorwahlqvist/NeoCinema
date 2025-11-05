@@ -3,8 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import useFetch from "../hook/useFetch";
 import TicketSelector from "../components/TicketSelector";
 import "./PagesStyle/BookingPage.scss";
-import { useAuth } from "../AuthContext"; 
-
+import { useAuth } from "../AuthContext";
+import SeatSSE from "../components/SeatSSE";
 
 interface Seat {
   seatId: number;
@@ -28,7 +28,6 @@ function findAdjacentSeats(
   n: number,
   startSeatId?: number
 ): number[] {
-  
   const rows = seats.reduce((acc: Record<number, Seat[]>, seat) => {
     if (!acc[seat.row_num]) acc[seat.row_num] = [];
     acc[seat.row_num].push(seat);
@@ -69,16 +68,13 @@ export default function BookingPage() {
   const { screeningId } = useParams<{ screeningId: string }>();
   const navigate = useNavigate();
 
- 
   const [tickets, setTickets] = useState<
     { id: number; count: number; price?: number }[]
   >([]);
   const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
-  
-  
+
   const { user, isLoading: isAuthLoading } = useAuth();
-  
-  
+
   const [guestEmail, setGuestEmail] = useState("");
   const totalTickets = tickets.reduce((sum, t) => sum + t.count, 0);
   const totalPrice = tickets.reduce(
@@ -86,14 +82,18 @@ export default function BookingPage() {
     0
   );
 
-  
   // 1. seats for this screening
   const {
-    data: seats,
-    isLoading: isSeatsLoading, 
+    data: initialSeats,
+    isLoading: isSeatsLoading,
     error,
   } = useFetch<Seat[]>(`/api/seatStatusView?screeningId=${screeningId}`);
 
+  const [seats, setSeats] = useState<Seat[]>([]);
+
+  useEffect(() => {
+    if (initialSeats) setSeats(initialSeats);
+  }, [initialSeats]);
 
   // 3. price breakdown helper
   const { doFetch: postBooking } = useFetch<{
@@ -102,7 +102,12 @@ export default function BookingPage() {
   }>("/api/booking/bookings");
 
   const { doFetch: getPriceBreakdown } = useFetch<
-    { ticketType: string; quantity: number; subTotal: number; totalPrice: number }[]
+    {
+      ticketType: string;
+      quantity: number;
+      subTotal: number;
+      totalPrice: number;
+    }[]
   >("/api/priceTotals", { skip: true });
 
   // 4. screening info for poster / heading
@@ -115,8 +120,6 @@ export default function BookingPage() {
     }[]
   >(`/api/screeningsInfo?screeningId=${screeningId}`, { skip: !screeningId });
 
- 
-  
   useEffect(() => {
     if (!seats || totalTickets === 0) {
       setSelectedSeats([]);
@@ -126,7 +129,20 @@ export default function BookingPage() {
     setSelectedSeats(best);
   }, [seats, totalTickets]);
 
- 
+  // If a seat has the same seatId as the one booked, update it to booked.
+  const handleSeatUpdate = (seatId: number, status: "booked") => {
+    setSeats((prev) =>
+      prev.map((s) => (s.seatId === seatId ? { ...s, seatStatus: status } : s))
+    );
+
+    // Remove any seats from selectedSeats that are no longer available
+    setSelectedSeats((prev) =>
+      prev.filter(
+        (id) => seats.find((s) => s.seatId === id)?.seatStatus === "available"
+      )
+    );
+  };
+
   // (handleSeatClick är oförändrad)
   const handleSeatClick = (seatId: number, status: string) => {
     if (status === "booked" || !seats) return;
@@ -143,15 +159,12 @@ export default function BookingPage() {
       return alert("Ange din e-post för att boka som gäst.");
 
     // collapse duplicates & build seatList
-    const uniqueTickets = tickets.reduce(
-      (acc, cur) => {
-        const found = acc.find((t) => t.id === cur.id);
-        if (found) found.count += cur.count;
-        else acc.push({ ...cur });
-        return acc;
-      },
-      [] as { id: number; count: number }[]
-    );
+    const uniqueTickets = tickets.reduce((acc, cur) => {
+      const found = acc.find((t) => t.id === cur.id);
+      if (found) found.count += cur.count;
+      else acc.push({ ...cur });
+      return acc;
+    }, [] as { id: number; count: number }[]);
 
     const seatList: { seatId: number; ticketType: number }[] = [];
     const seatQueue = [...selectedSeats];
@@ -165,7 +178,7 @@ export default function BookingPage() {
     const bookingData = {
       screeningId: Number(screeningId),
       seats: seatList,
-      guestEmail: user ? undefined : guestEmail, 
+      guestEmail: user ? undefined : guestEmail,
     };
 
     try {
@@ -187,7 +200,6 @@ export default function BookingPage() {
     }
   };
 
- 
   // updated render
   if (isSeatsLoading || isAuthLoading) return <p>Laddar...</p>;
   if (error) return <p>Ett fel uppstod: {error}</p>;
@@ -195,6 +207,7 @@ export default function BookingPage() {
 
   return (
     <main className="booking-page text-center mb-5">
+      {<SeatSSE onSeatUpdate={handleSeatUpdate} />}
       <div className="booking-layout">
         <aside className="booking-left">
           {screening?.[0] && (
@@ -220,7 +233,6 @@ export default function BookingPage() {
           )}
         </aside>
 
-       
         <section className="booking-right">
           {screening?.[0] && (
             <div className="heading-box">
@@ -232,7 +244,6 @@ export default function BookingPage() {
           )}
           <div className="screen">DUKEN</div>
 
-         
           {!user && totalTickets > 0 && (
             <div className="guest-email mb-3">
               <label className="form-label text-light">E-post</label>
@@ -246,7 +257,6 @@ export default function BookingPage() {
             </div>
           )}
 
-         
           <div className="seating-area">
             {Object.entries(
               seats.reduce((acc: Record<number, Seat[]>, seat) => {
@@ -279,7 +289,6 @@ export default function BookingPage() {
               ))}
           </div>
 
-        
           {totalTickets > 0 && (
             <button className="btn neon-btn mt-4" onClick={handleBooking}>
               Boka {totalTickets} biljett(er)

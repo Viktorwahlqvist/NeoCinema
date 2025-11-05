@@ -4,19 +4,11 @@ import { ResultSetHeader, RowDataPacket } from "mysql2";
 import randomNumber from "../utils/randomNumber.js";
 import { sendEmail } from "./Mailer.js";
 import { broadcastSeatUpdate } from "../services/sseRoute.js";
+import "express-session";
+
 
 const router = express.Router();
 
-declare module "express-session" {
-  interface SessionData {
-    user?: {
-      id: number;
-      email: string;
-    };
-  }
-}
-
-/* ----------  tiny helper  ---------- */
 type Seat = RowDataPacket & {
   seatId: number;
   row_num: number;
@@ -31,7 +23,6 @@ router.post("/bookings", async (req, res) => {
   const { screeningId, seats, guestEmail } = req.body;
   const userId = req.session.user?.id || null;
 
-  // ... (din validering för screeningId, seats, guestEmail är bra) ...
   if (!screeningId || !seats || !Array.isArray(seats) || seats.length === 0) {
     return res.status(400).json({ message: "Missing screeningId or seats" });
   }
@@ -40,7 +31,7 @@ router.post("/bookings", async (req, res) => {
       .status(400)
       .json({ message: "guestEmail required when not logged in" });
   }
-
+  
   let connection;
   try {
     connection = await db.getConnection();
@@ -70,13 +61,8 @@ router.post("/bookings", async (req, res) => {
     );
     const bookingId = bookingRes.insertId;
 
-    const seatValues = seats.map((s: SeatInput) => [
-      bookingId,
-      s.seatId,
-      s.ticketType,
-    ]);
-    await connection.query(
-      // 'connection.query'
+    const seatValues = seats.map((s: SeatInput) => [bookingId, s.seatId, s.ticketType]);
+    await connection.query( // 'connection.query'
       "INSERT INTO bookingXSeats (bookingId, seatId, ticketTypeId) VALUES ?",
       [seatValues]
     );
@@ -126,7 +112,6 @@ router.post("/bookings", async (req, res) => {
     } else {
       recipientEmail = guestEmail;
     }
-
     if (recipientEmail) {
       await sendEmail({
         to: recipientEmail,
@@ -229,7 +214,7 @@ router.get("/:bookingId", async (req, res) => {
   }
 });
 
-/* ----------  DELETE /bookings/:id  ---------- */
+/* ----------  DELETE /bookings/:id Required Auth ---------- */
 const requireAuth = (req: any, res: any, next: any) => {
   if (!req.session.user) {
     return res.status(401).json({ error: "Du är inte inloggad" });
@@ -239,15 +224,13 @@ const requireAuth = (req: any, res: any, next: any) => {
 
 router.delete("/:bookingId", requireAuth, async (req, res) => {
   const { bookingId } = req.params;
-  const userId = (req as any).session.user.id; // Vi vet att användaren finns pga requireAuth
+  const userId = (req as any).session.user.id; // we know user is logged in due to requireAuth middleware
   let connection;
 
-  try {
-    connection = await db.getConnection();
-    await connection.beginTransaction();
-
-    console.log(`== Kör SQL: ... LEFT JOIN ... WHERE b.id = ${bookingId}`);
-
+  try { 
+    connection = await db.getConnection(); 
+    await connection.beginTransaction(); 
+    
     const [bookingRows] = await connection.query<RowDataPacket[]>(
       `SELECT
          b.userId,
@@ -262,7 +245,7 @@ router.delete("/:bookingId", requireAuth, async (req, res) => {
 
     console.log("== Databasfråga resultat (bookingRows):", bookingRows);
 
-    // 2. KONTROLL: Finns bokningen överhuvudtaget?
+    // checks if booking exists
     if (bookingRows.length === 0) {
       await connection.rollback();
       console.log("!!! HITTADE INTE BOKNINGEN -> SKICKAR 404 !!!");
@@ -270,18 +253,13 @@ router.delete("/:bookingId", requireAuth, async (req, res) => {
     }
 
     const booking = bookingRows[0];
-
+  
     if (!booking.screeningIdExists) {
       await connection.rollback();
-      console.log(
-        "!!! DATABASFEL: 'screeningIdExists' är NULL -> SKICKAR 500 !!!"
-      );
-      // Detta är ett serverfel, inte användarens fel.
-      return res.status(500).json({
-        error: "Databasfel: Bokningen är korrupt och kan inte raderas.",
-      });
+      console.log("!!! DATABASFEL: 'screeningIdExists' är NULL -> SKICKAR 500 !!!");
+      return res.status(500).json({ error: "Databasfel: Bokningen är korrupt och kan inte raderas." });
     }
-
+ 
     if (booking.userId !== userId) {
       await connection.rollback();
       console.log(
@@ -292,7 +270,7 @@ router.delete("/:bookingId", requireAuth, async (req, res) => {
         .json({ error: "Du har inte behörighet att avboka detta" });
     }
 
-    // 5. TIDSKONTROLL: Är det mer än 2 timmar kvar?
+    // checks time limit (2 hours before screening)
     const screeningTime = new Date(booking.start_time).getTime();
     const twoHoursBefore = screeningTime - 2 * 60 * 60 * 1000; // 2 timmar i ms
     const now = Date.now();
@@ -307,23 +285,13 @@ router.delete("/:bookingId", requireAuth, async (req, res) => {
         .json({ error: "Tidsgränsen för avbokning har passerat (2 timmar)" });
     }
 
-    // Steg 6a: Ta bort kopplingarna i 'bookingXSeats'
-    // Detta gör att din `seatStatusView` automatiskt ser platserna som lediga!
     console.log(`== RADERAR från bookingXSeats WHERE bookingId = ${bookingId}`);
     await connection.query<ResultSetHeader>(
       "DELETE FROM bookingXSeats WHERE bookingId = ?",
       [bookingId]
     );
 
-    // Steg 6b: Ta bort själva bokningen
-    console.log(`== RADERAR från bookings WHERE id = ${bookingId}`);
-    await connection.query<ResultSetHeader>(
-      "DELETE FROM bookings WHERE id = ?",
-      [bookingId]
-    );
-
     await connection.commit();
-
     console.log("== AVBOKNING LYCKADES! -> SKICKAR 200 ==");
     res.status(200).json({ message: "Bokningen har avbokats" });
   } catch (e) {
@@ -331,7 +299,7 @@ router.delete("/:bookingId", requireAuth, async (req, res) => {
     console.error("!!! OVÄNTAT SERVERFEL VID AVBOKNING:", e);
     res.status(500).json({ error: "Serverfel vid avbokning" });
   } finally {
-    // Släpp anslutningen tillbaka till poolen oavsett vad
+    // release connection
     if (connection) connection.release();
   }
 });

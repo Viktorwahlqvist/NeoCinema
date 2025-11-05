@@ -12,6 +12,8 @@ import { useIsMobile } from "./hook/useIsMobile";
 import ProfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import ProtectedRoute from "./components/ProtectedRoute";
+
 function App() {
   const isMobile = useIsMobile();
   return (
@@ -23,13 +25,17 @@ function App() {
           <Route path="/movies" element={<AllMoviesPage />} />
           <Route path="/movie/:id" element={<MovieDetailPage />} />
           <Route path="/booking/:screeningId" element={<BookingPage />} />
-          <Route path="/Bekräftelse/:bookingId" element={<BookingConfirmation />} />
+
+          <Route path="/Bekräftelse/:bookingId" element={
+          <ProtectedRoute> <BookingConfirmation /> </ProtectedRoute>} />
+
           <Route path="/kiosk" element={<KioskPage />} />
           <Route path="/AboutUs" element={<AboutUs />} />
           <Route path="/kiosk" element={<KioskPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile" element={ 
+                 <ProfilePage />} />
 
         </Routes>
         

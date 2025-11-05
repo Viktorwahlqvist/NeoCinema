@@ -9,31 +9,43 @@ export default function BookingConfirmation() {
   const { bookingId } = useParams<{ bookingId: string }>();
   const navigate = useNavigate();
   const [booking, setBooking] = useState<Booking | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
   console.log(booking)
   
 
-  useEffect(() => {
+   useEffect(() => {
     if (!bookingId) return; 
 
     fetch(`/api/booking/${bookingId}`, {
-      credentials: "include" // COOKIES!
+      credentials: "include"
     })
-      .then(res => {
-        if (!res.ok) { 
-          throw new Error(`Något gick fel: ${res.statusText}`);
+      .then(async res => {
+        if (!res.ok) {
+          // Försök läsa backendens JSON-fel
+          let errorMsg = `Något gick fel (${res.status})`;
+          try {
+            const data = await res.json();
+            errorMsg = data.error || errorMsg;
+          } catch {
+            // Om JSON inte finns
+            errorMsg = res.statusText || errorMsg;
+          }
+          throw new Error(errorMsg);
         }
-        return res.json(); 
-      })
-      .then((data: Booking) => {
+
+        const data: Booking = await res.json();
         console.log("✅ Hämtad booking:", data);
         setBooking(data);
       })
       .catch(err => {
         console.error("Kunde inte hämta bokningsbekräftelse:", err);
-  
+        setError(err.message);
       });
+
   }, [bookingId, navigate]); 
 
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
   if (!booking) return <p>Laddar bekräftelse...</p>;
 
   const handleDownloadPDF = () => {

@@ -3,7 +3,7 @@ import { db } from "../db.js";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import randomNumber from "../utils/randomNumber.js";
 import { sendEmail } from "./Mailer.js";
-
+import "express-session";
 
 
 const router = express.Router();
@@ -186,14 +186,26 @@ router.get("/", async (req, res) => {
   }
 });
 
+/* ----------  DELETE /bookings/:id  ---------- */
+const requireAuth = (req: any, res: any, next: any) => {
+  if (!req.session.user) {
+    return res.status(401).json({ error: "Du är inte inloggad" });
+  }
+  next();
+};
+
 
 /* ----------  GET /bookings/:id  ---------- */
-router.get("/:bookingId", async (req, res) => {
+router.get("/:bookingId", requireAuth, async (req, res) => {
   const { bookingId } = req.params;
+  const sessionUser = req.session.user;
+
   try {
     const [rows] = await db.query<RowDataPacket[]>(
       `SELECT b.id AS bookingId, b.bookingNumber, b.date,
-              m.title AS movieTitle, s.start_time AS screeningTime, a.name AS auditoriumName,
+              b.userId,
+              m.title AS movieTitle, s.start_time AS screeningTime,
+              a.name AS auditoriumName,
               COALESCE(u.email, b.guestEmail) AS email,
               SUM(t.price) AS totalPrice
          FROM bookings b
@@ -207,8 +219,22 @@ router.get("/:bookingId", async (req, res) => {
         GROUP BY b.id`,
       [bookingId]
     );
-    if (!rows.length) return res.status(404).json({ message: "Not found" });
 
+    if (!rows.length) {
+      return res.status(404).json({ message: "Bokningen finns inte" });
+    }
+
+    const booking = rows[0];
+
+    // 🔒 Kontrollera att användaren äger bokningen
+   if (booking.userId !== sessionUser!.id) {
+  return res
+    .status(403)
+    .json({ error: "Du har inte behörighet att se denna bokning" });
+}
+
+
+    // Hämta biljetterna
     const [tickets] = await db.query<RowDataPacket[]>(
       `SELECT t.ticketType, t.price, COUNT(*) AS qty
          FROM bookingXSeats bx
@@ -217,21 +243,14 @@ router.get("/:bookingId", async (req, res) => {
         GROUP BY t.id`,
       [bookingId]
     );
-    const booking = { ...rows[0], tickets };
-    res.json(booking);
+    const bookingData = { ...rows[0], tickets };
+    res.json(bookingData);
   } catch (e: any) {
     console.error(e);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-/* ----------  DELETE /bookings/:id  ---------- */
-const requireAuth = (req: any, res: any, next: any) => {
-  if (!req.session.user) {
-    return res.status(401).json({ error: "Du är inte inloggad" });
-  }
-  next();
-};
 
 
 

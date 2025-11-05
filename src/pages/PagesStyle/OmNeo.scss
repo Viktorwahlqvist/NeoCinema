@@ -203,3 +203,36 @@
 .omneo-iconLink { display: inline-grid; }
 .omneo-iconLink .omneo-icon { cursor: pointer; }
 .omneo-iconLink:hover .omneo-icon { filter: drop-shadow(0 0 6px $color-stroke); }
+
+/* ikoner i mobilversion */
+.omneo-icon-mobile {
+  display: flex;
+  justify-content: center;
+  margin-top: $spacing-md;
+
+  .omneo-icon {
+    width: 28px;
+    height: 28px;
+    color: $color-stroke;
+    stroke-width: 1.8;
+  }
+
+  a.omneo-iconLink:hover .omneo-icon {
+    filter: drop-shadow(0 0 6px $color-stroke);
+  }
+}
+
+/* Visa bara ikonspalten (höger) på desktop */
+@media (max-width: $breakpoint-desktop) {
+  .omneo-icons {
+    display: none;
+  }
+}
+
+/* Visa bara ikoner under sektionerna på mobil */
+@media (min-width: $breakpoint-desktop) {
+  .omneo-icon-mobile {
+    display: none;
+  }
+}
+

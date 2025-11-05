@@ -121,17 +121,18 @@ export default function BookingPage() {
   >(`/api/screeningsInfo?screeningId=${screeningId}`, { skip: !screeningId });
 
   useEffect(() => {
-    // If user havent selected any ticket types.
+    // if user havent selected any ticket types
     if (totalTickets === 0) {
       setSelectedSeats([]);
       return;
     }
-    // If user havent selected any seats, findAdjacentSeats.
-    if (selectedSeats.length === 0) {
+
+    if (selectedSeats.length !== totalTickets) {
       const best = findAdjacentSeats(seats, totalTickets);
       setSelectedSeats(best);
     }
-  }, [seats, totalTickets]);
+  
+}, [seats, totalTickets]); 
 
   // If a seat has the same seatId as the one booked , update it to booked.
   const handleSeatUpdate = (seatId: number, status: "booked" | "available") => {
@@ -145,7 +146,7 @@ export default function BookingPage() {
     }
   };
 
-  // (handleSeatClick är oförändrad)
+  
   const handleSeatClick = (seatId: number, status: string) => {
     if (status === "booked" || !seats) return;
     const best = findAdjacentSeats(seats, totalTickets, seatId);
@@ -176,7 +177,7 @@ export default function BookingPage() {
         if (seatId !== undefined) seatList.push({ seatId, ticketType: t.id });
       }
     }
-    // bygg bookingData, kollar om user är inloggad eller gäst
+    // builds booking data, checks if user or guest
     const bookingData = {
       screeningId: Number(screeningId),
       seats: seatList,

@@ -2,110 +2,181 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { jsPDF } from "jspdf";
 import { getMovieImage } from "../utils/getMovieImage";
-import { Booking } from "../types/Booking";
-import "../styles/BookingConfirmation.scss"; 
+import "../styles/BookingConfirmation.scss";
+import { Booking } from "../types/Booking"
+
 
 export default function BookingConfirmation() {
   const { bookingId } = useParams<{ bookingId: string }>();
   const navigate = useNavigate();
   const [booking, setBooking] = useState<Booking | null>(null);
-  console.log(booking)
-  
+  console.log(booking);
 
   useEffect(() => {
-    if (!bookingId) return; 
+    if (!bookingId) return;
 
     fetch(`/api/booking/${bookingId}`, {
-      credentials: "include" // COOKIES!
+      credentials: "include", // COOKIES!
     })
-      .then(res => {
-        if (!res.ok) { 
+      .then((res) => {
+        if (!res.ok) {
           throw new Error(`Något gick fel: ${res.statusText}`);
         }
-        return res.json(); 
+        return res.json();
       })
       .then((data: Booking) => {
         console.log("✅ Hämtad booking:", data);
         setBooking(data);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Kunde inte hämta bokningsbekräftelse:", err);
-  
       });
-  }, [bookingId, navigate]); 
+  }, [bookingId, navigate]);
 
   if (!booking) return <p>Laddar bekräftelse...</p>;
 
   const handleDownloadPDF = () => {
     const doc = new jsPDF();
+    const x_position = 20;
+    const line_height = 9;
+    let y_position = 40; 
+
     doc.setFontSize(20);
-    doc.text("NeoCinema - Biobiljett", 20, 20);
+    doc.text("NeoCinema - Biobiljett", x_position, 20);
 
     doc.setFontSize(12);
-    doc.text(`Bokningsnummer: ${booking.bookingNumber}`, 20, 40);
-    doc.text(`Film: ${booking.movieTitle}`, 20, 50);
-    doc.text(
-      `Tid: ${new Date(booking.screeningTime).toLocaleString("sv-SE")}`,
-      20,
-      60
+    doc.text(`Bokningsnummer: ${booking.bookingNumber}`, x_position, y_position);
+    y_position += line_height;
+
+    doc.text(`Film: ${booking.movieTitle}`, x_position, y_position);
+    y_position += line_height;
+    // Format screening time, remove seconds for clarity
+    const screeningDate = new Date(booking.screeningTime);
+    const dateOptions: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    };
+    const formattedScreeningTime = screeningDate.toLocaleString(
+      "sv-SE",
+      dateOptions
     );
-    doc.text(`Salong: ${booking.auditoriumName}`, 20, 70);
-    doc.text(`Totalt pris: ${booking.totalPrice} kr`, 20, 80);
-    doc.text(`E-post: ${booking.email}`, 20, 90);
+    doc.text(`Tid: ${formattedScreeningTime}`, x_position, y_position);
+    y_position += line_height;
+
+    doc.text(`Salong: ${booking.auditoriumName}`, x_position, y_position);
+    y_position += line_height * 1.5; 
+
+    // --- Tickets ---
+    doc.setFontSize(12);
+    doc.text("Biljetter:", x_position, y_position);
+    y_position += line_height;
+
+    if (booking.tickets && booking.tickets.length > 0) {
+      doc.setFontSize(10);
+      booking.tickets.forEach((t) => {
+        const ticketLine = `${t.qty} × ${t.ticketType} (Totalt: ${
+          t.qty * t.price
+        } kr)`;
+        doc.text(ticketLine, x_position + 5, y_position);
+        y_position += line_height - 2;
+      });
+    }
+
+    // positions for seats in PDF
+    y_position += 4; 
+    doc.setFontSize(12);
+    doc.text("Platser:", x_position, y_position);
+    y_position += line_height;
+
+    if (booking.seatNumbers && booking.seatNumbers.length > 0) {
+      doc.setFontSize(10);
+      // loop through each seat and print it on its own line
+      booking.seatNumbers.forEach((seat) => {
+        doc.text(seat, x_position + 5, y_position);
+        y_position += line_height - 2;  //move down to next line
+      });
+    }
+  
+    
+    y_position += 4; 
+    doc.setFontSize(12);
+    doc.text(`Totalt pris: ${booking.totalPrice} kr`, x_position, y_position);
+    y_position += line_height;
+
+    doc.text(`E-post: ${booking.email}`, x_position, y_position);
+    y_position += line_height;
+
     doc.save(`biljett_${booking.bookingNumber}.pdf`);
   };
 
   return (
- <section className="booking-confirmation"> 
-  <div className="confirmation-title"> <h2 >Dina platser är bokade!</h2></div>
-
-  <div className="neon-border">
-
-  <div className="confirmation-info">
-  <div className="booking-text">
-    <p>
-      Bokningsid: <strong>{booking.bookingNumber}</strong>
-    </p>
-    <p>
-      Bekräftelse har skickats till:
-      <br />
-      <strong>{booking.email}</strong>
-    </p>
-
-    {booking.tickets && booking.tickets.length > 0 && (
-      <div className="ticket-summary">
-        <h4>Biljetter</h4>
-        <ul>
-          {booking.tickets.map((t, index) => (
-            <li key={index}>
-              {t.quantity} × {t.ticketType} ({t.price} kr)
-            </li>
-          ))}
-        </ul>
-        <p><b>Totalt:</b> {booking.totalPrice} kr</p>
+    <section className="booking-confirmation">
+      <div className="confirmation-title">
+        <h2>Dina platser är bokade!</h2>
       </div>
-    )}
-  </div>
-</div>
 
+      <div className="neon-border">
+        <div className="confirmation-info">
+          <div className="booking-text">
+            <p>
+              Bokningsid: <strong className="bookingNr">{booking.bookingNumber}</strong>
+            </p>
+            <p>
+              Bekräftelse har skickats till:
+              <br />
+              <strong>{booking.email}</strong>
+            </p>
 
-    <div className="movie-image">
-      <img
-        src={getMovieImage(booking.movieTitle)}
-        alt={booking.movieTitle}
-      />
-    </div>
-  </div>
+            {booking.tickets && booking.tickets.length > 0 && (
+              <div className="ticket-summary">
+                <h4>Biljetter</h4>
+                <ul>
+                  {booking.tickets.map((t, index) => (
+                    <li key={index}>
+                      {t.qty} × {t.ticketType} ({t.qty * t.price} kr)
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            
+            {booking.seatNumbers && booking.seatNumbers.length > 0 && (
+              <div className="ticket-summary">
+                <h4>Platser</h4>
+                {booking.seatNumbers.map((seat, index) => (
+                  <p key={index} style={{ margin: 0 }}>
+                    {seat}
+                  </p>
+                ))}
+              </div>
+            )}
 
-  <div className="btn-group">
-    <button className="btn-glow" onClick={handleDownloadPDF}>
-      Ladda ned biljett <i className="bi bi-download"></i>
-    </button>
-    <button className="btn-glow" onClick={() => navigate("/")}>
-      Tillbaka
-    </button>
-  </div>
-</section>
+            <p style={{marginTop: "16px"}}>
+              <b>Totalt:</b> {booking.totalPrice} kr
+            </p>
 
+          </div>
+        </div>
+
+        <div className="movie-image">
+          <img
+            src={getMovieImage(booking.movieTitle)}
+            alt={booking.movieTitle}
+          />
+        </div>
+      </div>
+
+      <div className="btn-group">
+        <button className="btn-glow" onClick={handleDownloadPDF}>
+          Ladda ned biljett <i className="bi bi-download"></i>
+        </button>
+        <button className="btn-glow" onClick={() => navigate("/")}>
+          Tillbaka
+        </button>
+      </div>
+    </section>
   );
 }

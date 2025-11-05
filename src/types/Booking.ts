@@ -1,15 +1,19 @@
 import { RowDataPacket } from "mysql2";
-export interface Booking {
+export type TicketLine = {
+  ticketType: string;
+  price: number;
+  qty: number;
+};
+
+export type Booking = {
   bookingId: number;
   bookingNumber: string;
-  email: string;
+  date: string;
   movieTitle: string;
   screeningTime: string;
   auditoriumName: string;
-  totalPrice: number;
-  tickets?: {
-    ticketType: string;
-    quantity: number;
-    price: number;
-  }[];
-}
+  email: string;
+  totalPrice: string | number;
+  tickets: TicketLine[];
+  seatNumbers: string[]; 
+};

@@ -1,3 +1,4 @@
+import e from "express";
 import "express-session";
 
 declare module "express-session" {
@@ -8,3 +9,5 @@ declare module "express-session" {
     };
   }
 }
+
+export {};

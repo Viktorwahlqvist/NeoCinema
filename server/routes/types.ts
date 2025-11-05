@@ -44,3 +44,26 @@ export interface PriceByType extends RowDataPacket {
   qty: number;
   subtotal_kr: number;       
 } 
+
+// src/types/Booking.ts
+
+// 1. Definiera den nästlade typen för en biljett-rad
+export type TicketLine = {
+  ticketType: string;
+  price: number;
+  qty: number; // Se till att den heter 'qty' som i din databas-respons
+};
+
+// 2. Uppdatera din huvudsakliga Booking-typ
+export type Booking = {
+  bookingId: number;
+  bookingNumber: string;
+  date: string;
+  movieTitle: string;
+  screeningTime: string;
+  auditoriumName: string;
+  email: string;
+  totalPrice: string | number; // Kan vara antingen
+  tickets: TicketLine[]; // <-- Använder typen ovan
+  seatNumbers: string[]; // <-- Det nya fältet för stolar
+};

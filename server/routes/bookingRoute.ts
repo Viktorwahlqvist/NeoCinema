@@ -4,7 +4,7 @@ import { ResultSetHeader, RowDataPacket } from "mysql2";
 import randomNumber from "../utils/randomNumber.js";
 import { sendEmail } from "./Mailer.js";
 import { broadcastSeatUpdate } from "../services/sseRoute.js";
-import "express-session";
+import "../utils/session.d.js";
 
 const router = express.Router();
 
@@ -214,7 +214,18 @@ router.get("/:bookingId", async (req, res) => {
         GROUP BY t.id`,
       [bookingId]
     );
-    const booking = { ...rows[0], tickets };
+    const [seatRows] = await db.query<RowDataPacket[]>(
+      `SELECT s.row_num, s.seat_num
+       FROM bookingXSeats bx
+       JOIN seats s ON s.id = bx.seatId
+       WHERE bx.bookingId = ?
+       ORDER BY s.row_num, s.seat_num`,
+      [bookingId]
+    );
+    const seatNumbers = seatRows.map(
+      (seat) => `Rad ${seat.row_num}, Plats ${seat.seat_num}`
+    );
+    const booking = { ...rows[0], tickets, seatNumbers };
     res.json(booking);
   } catch (e: any) {
     console.error(e);

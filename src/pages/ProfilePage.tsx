@@ -45,11 +45,8 @@ export default function ProfilePage() {
       navigate("/login", { replace: true });
       return;
     }
-
-    fetch("http://localhost:5000/api/bookings", {
-  method: "GET",
-  credentials: "include", // 
-})
+    
+    fetch("/api/users/me/bookings", { credentials: "include" })
       .then((res) => {
         if (!res.ok) throw new Error("Kunde inte hämta bokningar");
         return res.json();

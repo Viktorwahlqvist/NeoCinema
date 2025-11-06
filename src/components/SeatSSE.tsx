@@ -18,11 +18,7 @@ export default function SeatSSE({ onSeatUpdate, screeningId }: Props) {
       const data: { seatIds: number[]; status: SeatStatus } = JSON.parse(
         event.data
       );
-
-      console.log(data);
       
-
-      // and pass it as an object to our callback
       onSeatUpdate(data.seatIds, data.status);
     };
 

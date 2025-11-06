@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import AllMoviesList, { ScreeningsInfo } from "../components/AllMoviesList";
 import useFetch from "../hook/useFetch";
 import FilterDropdown from "../components/filter/FilterDropdown";
@@ -6,24 +6,41 @@ import "./PagesStyle/allmoviesPages.scss";
 import FilterBtn from "../components/filter/FilterBtn";
 import { Col, Container, Row } from "react-bootstrap";
 import { formatDate, getLimitedSortedDates } from "../utils/date";
-
 interface SelectedFilter {
-  date: string | null;
-  auditorium: string | null;
-  age: string | boolean;
+  date: string | null;        // ISO (YYYY-MM-DD) or null = all dates
+  auditorium: string | null;  // "Neo small" | "Neo big" | null = all
+  age: boolean;               // true = under 15
 }
 
 export default function AllMoviesPage() {
-  const [filteredData, setFilteredData] = useState<ScreeningsInfo[] | null>(
-    null
-  );
-  const [filterOptions, setFilterOptions] = useState<SelectedFilter>({
-    date: null,
-    auditorium: null,
-    age: false,
-  });
-  const { data, isLoading, error } = useFetch<ScreeningsInfo[]>(
-    "/api/screeningsInfo"
+  const { data, isLoading, error } = useFetch<ScreeningsInfo[]>("/api/screeningsInfo");
+
+
+  const todayISO = useMemo(() => new Date().toISOString().split("T")[0], []);
+  const todayLabel = useMemo(() => formatDate(todayISO), [todayISO]);
+
+  const [selectedDateLabel, setSelectedDateLabel] = useState<string>(todayLabel);
+  const [selectedAudLabel, setSelectedAudLabel] = useState<string>("Alla salonger");
+
+
+const [filterOptions, setFilterOptions] = useState<SelectedFilter>({
+  date: todayISO, // Shows todays date as default
+  auditorium: null,
+  age: false,
+});
+
+
+  const now = new Date();
+  const upcoming = (data ?? []).filter(s => new Date(s.startTime) >= now);
+
+  const limitedDays = useMemo(() => {
+    const raw = upcoming.map(d => d.startTime.split("T")[0]);     
+    return getLimitedSortedDates(raw);                           
+  }, [upcoming]);
+
+  const dateOptions = useMemo(
+    () => limitedDays.map(d => ({ label: formatDate(d), value: d })),
+    [limitedDays]
   );
 
   const auditoriumOptions = [
@@ -31,55 +48,40 @@ export default function AllMoviesPage() {
     { label: "Neo Stora", value: "Neo Stora" },
   ];
 
-  // Filter out dates that have already passed
-  const now = new Date();
-  const filteredDates =
-    data?.filter((d) => {
-      const date = new Date(d.startTime);
-      return date >= now;
-    }) ?? [];
-
-  // gets raw dates removes iso after T
-  const rawDates = filteredDates
-    ? filteredDates.map((d) => d.startTime.split("T")[0])
-    : [];
-  // sets a limit of 7 days and sort them.
-  const limitedDays = getLimitedSortedDates(rawDates);
-  // formating dates so we get weekday before
-  const formattedDays = limitedDays.map((d) => formatDate(d));
-
-  // labe is what user sees, and value is whats beeing filtered with
-  const dateOptions = limitedDays.map((d) => ({
-    label: formatDate(d),
-    value: d,
-  }));
-
-  const handleOnClickDate = (date: string) => {
-    setFilterOptions((prev) => ({ ...prev, date }));
+ 
+  const handleOnClickDate = (value: string) => {
+    if (!value) { 
+      setFilterOptions(prev => ({ ...prev, date: null }));
+      setSelectedDateLabel("Alla datum");
+    } else {
+      setFilterOptions(prev => ({ ...prev, date: value }));
+      setSelectedDateLabel(formatDate(value));
+    }
   };
-  const handleOnClickAuditorium = (auditorium: string) => {
-    setFilterOptions((prev) => ({ ...prev, auditorium }));
+
+  const handleOnClickAuditorium = (value: string) => {
+    if (!value) { 
+      setFilterOptions(prev => ({ ...prev, auditorium: null }));
+      setSelectedAudLabel("Alla salonger");
+    } else {
+      setFilterOptions(prev => ({ ...prev, auditorium: value }));
+      setSelectedAudLabel(value);
+    }
   };
+
   const handleOnClickAge = () => {
-    setFilterOptions((prev) => ({ ...prev, age: !prev.age }));
+    setFilterOptions(prev => ({ ...prev, age: !prev.age }));
   };
 
-  // useEffect if data or filterOptions change, (if data and auditorium is false show all)
-  useEffect(() => {
-    if (!data) return;
-
-    const filtered = filteredDates.filter((screening) => {
-      return (
-        (!filterOptions.date ||
-          screening.startTime.split("T")[0] === filterOptions.date) &&
-        (!filterOptions.auditorium ||
-          screening.auditoriumName === filterOptions.auditorium) &&
-        (!filterOptions.age || Number(screening.info.ageLimit) < 15)
-      );
-    });
-
-    setFilteredData(filtered);
-  }, [data, filterOptions]);
+ 
+  const filteredData = useMemo(() => {
+    const base = upcoming;
+    return base.filter(s =>
+      (!filterOptions.date || s.startTime.split("T")[0] === filterOptions.date) &&
+      (!filterOptions.auditorium || s.auditoriumName === filterOptions.auditorium) &&
+      (!filterOptions.age || Number(s.info.ageLimit) < 15)
+    );
+  }, [upcoming, filterOptions]);
 
   return (
     <Container fluid className=" container-lg">
@@ -96,22 +98,28 @@ export default function AllMoviesPage() {
             </p>
           </Col>
         </Row>
+
         <Row className="mx-sm-5">
           <Col xs="4" md="auto">
             <FilterDropdown
               label="Välj ett datum"
-              onClick={handleOnClickDate}
               options={dateOptions}
-              className="date-opt"
+              onClick={handleOnClickDate}
+              allLabel="Alla datum"
+              selectedLabel={selectedDateLabel}  
             />
           </Col>
+
           <Col xs="4" md="auto">
             <FilterDropdown
-              label="Välj en salong"
-              onClick={handleOnClickAuditorium}
+              label="Alla salonger"
               options={auditoriumOptions}
+              onClick={handleOnClickAuditorium}
+              allLabel="Alla salonger"
+              selectedLabel={selectedAudLabel}
             />
           </Col>
+
           <Col xs="3" md="auto" className="d-flex align-items-end">
             <FilterBtn
               btnName={filterOptions.age ? ["Över 15"] : ["Under 15"]}
@@ -119,9 +127,10 @@ export default function AllMoviesPage() {
             />
           </Col>
         </Row>
+
         {error && <p>Något gick fel: {error}</p>}
         {isLoading && <p>Loading...</p>}
-        {data && <AllMoviesList movies={filteredData ?? data} />}
+        {data && <AllMoviesList movies={filteredData} />}
       </main>
     </Container>
   );

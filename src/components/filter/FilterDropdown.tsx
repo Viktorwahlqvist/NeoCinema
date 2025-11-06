@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import FilterBtn from "./FilterBtn";
 import "./filter-dropdown.scss";
 
-interface Option {
-  label: string;
-  value: string;
-}
+interface Option { label: string; value: string; }
 
 interface SelectProps {
-  label: string;
+  label: string;                   
   options: Option[];
+  onClick: (value: string) => void;  
   className?: string;
-  onClick: (value: string) => void;
+  selectedLabel?: string;            // What is shown on the button
+  allLabel?: string;                 // Example "all dates"
 }
 
 export default function FilterDropdown({
@@ -19,39 +18,61 @@ export default function FilterDropdown({
   options,
   onClick,
   className,
+  selectedLabel,
+  allLabel,
 }: SelectProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
-  const handleClickBtn = () => {
-    setIsOpen(!isOpen);
-  };
+  const toggle = () => setOpen(v => !v);
+  const choose = (value: string) => { setOpen(false); onClick(value); };
 
-  const handleClickSelect = (value: string) => {
-    setIsOpen(false);
-    onClick(value);
-  };
+  // Close when clicking outside or ESC
+  useEffect(() => {
+    const onDown = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
 
   return (
-    <section className="filter-container">
+    <div className="filter-dd" ref={ref}>
       <FilterBtn
-        btnName={[label]}
-        className="filter-btn"
+        btnName={[selectedLabel || label]}
+        className="filter-dd__trigger"
         aria-label={label}
-        onClick={handleClickBtn}
+        onClick={toggle}
       />
 
-      {isOpen && (
-        <section className="option-container">
-          {options.map((option) => (
-            <FilterBtn
-              key={option.value}
-              btnName={[option.label]}
-              className={`options-dropdown ${className}`}
-              onClick={() => handleClickSelect(option.value)}
-            />
+      {open && (
+        <div className="filter-dd__menu" role="listbox" aria-label={label}>
+          {allLabel && (
+            <button
+              type="button"
+              className={`overall-button filter-dd__item ${className || ""}`}
+              onClick={() => choose("")}
+            >
+              {allLabel}
+            </button>
+          )}
+          {options.map(opt => (
+            <button
+              key={opt.value}
+              type="button"
+              className={`overall-button filter-dd__item ${className || ""}`}
+              onClick={() => choose(opt.value)}
+            >
+              {opt.label}
+            </button>
           ))}
-        </section>
+        </div>
       )}
-    </section>
+    </div>
   );
 }

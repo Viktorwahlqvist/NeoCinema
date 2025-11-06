@@ -1,44 +1,25 @@
 @use "../../styles/variables" as *;
 
-.filter-container {
+/* Minimal – påverkar inte andra knappar. */
+.filter-dd {
   position: relative;
-  margin-top: 2rem;
   display: inline-block;
+}
 
-  .filter-btn {
-    margin: 0;
-    box-shadow: $glow-soft;
+.filter-dd__menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 100;
+  min-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-    &:hover { box-shadow: $dropdown-hover; }
-  }
-
-  .option-container {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 100;
-    padding: 0;
-    margin: 1rem 0 0 0;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-
-    .options-dropdown {
-      margin: 0;
-      animation: 0.4s fadeSlideDown ease-in-out forwards;
-      border: $border-width $border-style $border-color; 
-      box-shadow: $glow-soft;
-
-      &:hover { box-shadow: $dropdown-hover; }
-    }
-
-.options-dropdown.date-opt {
-  width: 170px;                      
-  box-sizing: border-box;
-  text-align: center;
+.filter-dd__item {
+  margin: 0;
   white-space: nowrap;
-  border: $border-width $border-style rgba($border-color, 0.4);
   box-shadow: $glow-soft;
 
   &:hover {
@@ -46,15 +27,21 @@
   }
 }
 
-@media (max-width: 575.98px) {
-  .options-dropdown.date-opt {
-    width: 170px;
-  }
-}
-  }
-}
+.overall-button {
+  cursor: pointer;
+  color: $color-text;
+  font-family: $font-family-heading;
+  padding: 0.5rem 1.25rem;
+  border-radius: $border-radius;
+  border: $border-width $border-style $color-button;
+  background-color: $color-button;
+  box-shadow: $glow-strong;
 
-@keyframes fadeSlideDown {
-  0% { opacity: 0; transform: translateY(-10px); }
-  100% { opacity: 1; transform: translateY(0); }
+  width: 180px; /* 🔹 Enhetlig bredd */
+  text-align: center;
+  display: inline-block;
+
+  &:hover {
+    box-shadow: $button-hover;
+  }
 }

@@ -1,11 +1,11 @@
 @use "../../styles/variables" as *;
 
-/* Minimal – påverkar inte andra knappar. */
 .filter-dd {
   position: relative;
   display: inline-block;
 }
 
+/* Dropdown-menyn */
 .filter-dd__menu {
   position: absolute;
   top: calc(100% + 10px);
@@ -27,21 +27,16 @@
   }
 }
 
-.overall-button {
-  cursor: pointer;
-  color: $color-text;
-  font-family: $font-family-heading;
-  padding: 0.5rem 1.25rem;
-  border-radius: $border-radius;
-  border: $border-width $border-style $color-button;
-  background-color: $color-button;
-  box-shadow: $glow-strong;
+/* 🔹 Begränsa styling till bara knappar inuti FilterDropdown */
+.filter-dd .overall-button {
+  width: 180px; /* standardbredd */
+  transition: width 0.2s ease;
 
-  width: 180px; /* 🔹 Enhetlig bredd */
-  text-align: center;
-  display: inline-block;
+  @media (max-width: 768px) {
+    width: 150px;
+  }
 
-  &:hover {
-    box-shadow: $button-hover;
+  @media (max-width: 480px) {
+    width: 130px;
   }
 }

@@ -17,3 +17,19 @@ export type Booking = {
   tickets: TicketLine[];
   seatNumbers: string[]; 
 };
+
+export interface Seat {
+  seatId: number;
+  row_num: number;
+  seat_num: number;
+  seatStatus: "available" | "booked";
+  auditoriumName: string;
+  screeningId: number;
+  start_time: string;
+}
+export interface User {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+}

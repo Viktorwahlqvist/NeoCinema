@@ -5,22 +5,9 @@ import TicketSelector from "../components/TicketSelector";
 import "./PagesStyle/BookingPage.scss";
 import { useAuth } from "../AuthContext";
 import SeatSSE from "../components/SeatSSE";
+import {Seat, User} from "../types/Booking";
+import { formatScreeningTime } from "../utils/date";
 
-interface Seat {
-  seatId: number;
-  row_num: number;
-  seat_num: number;
-  seatStatus: "available" | "booked";
-  auditoriumName: string;
-  screeningId: number;
-  start_time: string;
-}
-interface User {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-}
 
 /* --------------  ADJACENT-SEAT HELPER -------------- */
 function findAdjacentSeats(
@@ -246,7 +233,7 @@ export default function BookingPage() {
             <div className="heading-box">
               <h2 className="neon-text">
                 {screening[0].auditoriumName} –{" "}
-                {new Date(screening[0].startTime).toLocaleString()}
+                {formatScreeningTime(screening[0].startTime)}
               </h2>
             </div>
           )}

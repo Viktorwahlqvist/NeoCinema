@@ -4,6 +4,7 @@ import { jsPDF } from "jspdf";
 import { getMovieImage } from "../utils/getMovieImage";
 import "../styles/BookingConfirmation.scss";
 import { Booking } from "../types/Booking"
+import { formatScreeningTime} from "../utils/date";
 
 
 export default function BookingConfirmation() {
@@ -51,18 +52,8 @@ export default function BookingConfirmation() {
     doc.text(`Film: ${booking.movieTitle}`, x_position, y_position);
     y_position += line_height;
     // Format screening time, remove seconds for clarity
-    const screeningDate = new Date(booking.screeningTime);
-    const dateOptions: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    };
-    const formattedScreeningTime = screeningDate.toLocaleString(
-      "sv-SE",
-      dateOptions
-    );
+
+    const formattedScreeningTime = formatScreeningTime(booking.screeningTime);
     doc.text(`Tid: ${formattedScreeningTime}`, x_position, y_position);
     y_position += line_height;
 

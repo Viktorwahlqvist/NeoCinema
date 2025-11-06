@@ -127,13 +127,13 @@ router.post("/bookings", async (req, res) => {
     await connection.commit();
 
     // Broadcast to sse cliets (with correct screening)
-    for (const s of seats) {
+       const seatIds = seatsRows.map(row => row.seatId);
       broadcastSeatUpdate({
-        seatId: s.seatId,
+        seatIds : seats.map(s => s.seatId),
         status: "booked",
         screeningId: Number(screeningId),
       });
-    }
+    
 
     res.status(201).json({
       message: "Booking created",
@@ -312,13 +312,13 @@ router.delete("/:bookingId", requireAuth, async (req, res) => {
     await connection.commit();
 
     // Broadcast to sse cliets (with correct screening)
-    for (const row of seatRows) {
+     const seatIds: number[] = seatRows.map(row => row.seatId);
       broadcastSeatUpdate({
-        seatId: row.seatId,
+        seatIds,
         status: "available",
         screeningId: bookingRows[0].screeningIdExists,
       });
-    }
+    
     console.log("== AVBOKNING LYCKADES! -> SKICKAR 200 ==");
     res.status(200).json({ message: "Bokningen har avbokats" });
   } catch (e) {

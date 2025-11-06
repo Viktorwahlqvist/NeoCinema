@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request } from "express";
 import { db } from "../db.js";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import randomNumber from "../utils/randomNumber.js";
@@ -7,6 +7,16 @@ import { broadcastSeatUpdate } from "../services/sseRoute.js";
 import "express-session";
 
 const router = express.Router();
+
+
+interface AuthenticatedRequest extends Request {
+  session: Request["session"] & {
+    user?: {
+      id: number;
+      email: string;
+    };
+  };
+}
 
 type Seat = RowDataPacket & {
   seatId: number;
@@ -18,9 +28,10 @@ type Seat = RowDataPacket & {
 type SeatInput = { seatId: number; ticketType: number };
 
 /* ----------  POST /bookings  ---------- */
-router.post("/bookings", async (req, res) => {
+router.post("/bookings", async (req: AuthenticatedRequest, res) => {
   const { screeningId, seats, guestEmail } = req.body;
   const userId = req.session.user?.id || null;
+
 
   if (!screeningId || !seats || !Array.isArray(seats) || seats.length === 0) {
     return res.status(400).json({ message: "Missing screeningId or seats" });
@@ -151,21 +162,27 @@ router.post("/bookings", async (req, res) => {
     if (connection) connection.release();
   }
 });
+/* ----------  DELETE /bookings/:id Required Auth ---------- */
+const requireAuth = (req: any, res: any, next: any) => {
+  if (!req.session.user) {
+    return res.status(401).json({ error: "Du är inte inloggad" });
+  }
+  next();
+};
 
 /* ----------  GET /api/bookings?userId=XX  ---------- */
-router.get("/", async (req, res) => {
-  const userId = Number(req.query.userId);
-  if (!userId) return res.status(400).json({ message: "userId required" });
+router.get("/", requireAuth, async (req: AuthenticatedRequest, res) => {
+  const userId = req.session.user?.id;
+  if (!userId) return res.status(401).json({ message: "Du är inte inloggad" });
+
 
   try {
     const [rows] = await db.query<RowDataPacket[]>(
-      `SELECT b.id               AS bookingId,
-              b.bookingNumber,
-              b.date,
-              m.title            AS movieTitle,
-              s.start_time       AS screeningTime,
-              a.name             AS auditoriumName,
-              SUM(t.price)       AS totalPrice
+      `SELECT b.id AS bookingId, b.bookingNumber, b.date,
+              m.title AS movieTitle,
+              s.start_time AS screeningTime,
+              a.name AS auditoriumName,
+              SUM(t.price) AS totalPrice
          FROM bookings b
          JOIN screenings s ON s.id = b.screeningId
          JOIN movies m ON m.id = s.movie_id
@@ -184,13 +201,20 @@ router.get("/", async (req, res) => {
   }
 });
 
+
+
 /* ----------  GET /bookings/:id  ---------- */
-router.get("/:bookingId", async (req, res) => {
+router.get("/:bookingId", requireAuth, async (req: AuthenticatedRequest, res) => {
   const { bookingId } = req.params;
+  const sessionUser = req.session.user;
+
+
   try {
     const [rows] = await db.query<RowDataPacket[]>(
       `SELECT b.id AS bookingId, b.bookingNumber, b.date,
-              m.title AS movieTitle, s.start_time AS screeningTime, a.name AS auditoriumName,
+              b.userId,
+              m.title AS movieTitle, s.start_time AS screeningTime,
+              a.name AS auditoriumName,
               COALESCE(u.email, b.guestEmail) AS email,
               SUM(t.price) AS totalPrice
          FROM bookings b
@@ -204,8 +228,25 @@ router.get("/:bookingId", async (req, res) => {
         GROUP BY b.id`,
       [bookingId]
     );
-    if (!rows.length) return res.status(404).json({ message: "Not found" });
 
+    if (!rows.length) {
+      return res.status(404).json({ message: "Bokningen finns inte" });
+    }
+
+    const booking = rows[0];
+
+    // 🔒 Kontrollera att användaren äger bokningen
+    if (!sessionUser) {
+      return res.status(401).json({ error: "Du måste vara inloggad" });
+    }
+
+    if (booking.userId !== sessionUser.id) {
+      return res
+        .status(403)
+        .json({ error: "Du har inte behörighet att se denna bokning" });
+    }
+
+    // Hämta biljetterna
     const [tickets] = await db.query<RowDataPacket[]>(
       `SELECT t.ticketType, t.price, COUNT(*) AS qty
          FROM bookingXSeats bx
@@ -214,25 +255,25 @@ router.get("/:bookingId", async (req, res) => {
         GROUP BY t.id`,
       [bookingId]
     );
-    const booking = { ...rows[0], tickets };
-    res.json(booking);
-  } catch (e: any) {
+
+    res.json({
+      ...booking,
+      tickets,
+    });
+
+  } catch (e) {
     console.error(e);
     res.status(500).json({ error: "Server error" });
   }
 });
 
-/* ----------  DELETE /bookings/:id Required Auth ---------- */
-const requireAuth = (req: any, res: any, next: any) => {
-  if (!req.session.user) {
-    return res.status(401).json({ error: "Du är inte inloggad" });
-  }
-  next();
-};
 
-router.delete("/:bookingId", requireAuth, async (req, res) => {
+
+
+router.delete("/:bookingId", requireAuth, async (req: AuthenticatedRequest, res) => {
   const { bookingId } = req.params;
-  const userId = (req as any).session.user.id; // we know user is logged in due to requireAuth middleware
+  const userId = req.session.user?.id; // fungerar nu utan as any
+ // we know user is logged in due to requireAuth middleware
   let connection;
 
   try {

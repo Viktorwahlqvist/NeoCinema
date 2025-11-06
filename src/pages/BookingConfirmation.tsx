@@ -76,7 +76,7 @@ export default function BookingConfirmation() {
   <div className="confirmation-info">
   <div className="booking-text">
     <p>
-      Bokningsid: <strong>{booking.bookingNumber}</strong>
+      Bookingnumber: <strong>{booking.bookingNumber}</strong>
     </p>
     <p>
       Bekräftelse har skickats till:

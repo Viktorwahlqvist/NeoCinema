@@ -110,3 +110,9 @@
     }
   }
 }
+
+@media (max-width: 480px) {
+  .auth-page .auth-card {
+    margin-top: 12rem !important;
+  }
+}

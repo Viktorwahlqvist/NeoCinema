@@ -6,36 +6,35 @@ import "./PagesStyle/allmoviesPages.scss";
 import FilterBtn from "../components/filter/FilterBtn";
 import { Col, Container, Row } from "react-bootstrap";
 import { formatDate, getLimitedSortedDates } from "../utils/date";
+
 interface SelectedFilter {
   date: string | null;        // ISO (YYYY-MM-DD) or null = all dates
-  auditorium: string | null;  // "Neo small" | "Neo big" | null = all
-  age: boolean;               // true = under 15
+  auditorium: string | null;  // "Neo Lilla" | "Neo Stora" | null = all
+  age: number | null;         // null = alla åldrar, annars t.ex. 7/11/15
 }
 
 export default function AllMoviesPage() {
   const { data, isLoading, error } = useFetch<ScreeningsInfo[]>("/api/screeningsInfo");
-
 
   const todayISO = useMemo(() => new Date().toISOString().split("T")[0], []);
   const todayLabel = useMemo(() => formatDate(todayISO), [todayISO]);
 
   const [selectedDateLabel, setSelectedDateLabel] = useState<string>(todayLabel);
   const [selectedAudLabel, setSelectedAudLabel] = useState<string>("Alla salonger");
+  const [selectedAgeLabel, setSelectedAgeLabel] = useState("Alla åldrar");
 
-
-const [filterOptions, setFilterOptions] = useState<SelectedFilter>({
-  date: todayISO, // Shows todays date as default
-  auditorium: null,
-  age: false,
-});
-
+  const [filterOptions, setFilterOptions] = useState<SelectedFilter>({
+    date: todayISO,             // default: dagens datum
+    auditorium: null,           // alla salonger
+    age: null,                  // alla åldrar
+  });
 
   const now = new Date();
   const upcoming = (data ?? []).filter(s => new Date(s.startTime) >= now);
 
   const limitedDays = useMemo(() => {
-    const raw = upcoming.map(d => d.startTime.split("T")[0]);     
-    return getLimitedSortedDates(raw);                           
+    const raw = upcoming.map(d => d.startTime.split("T")[0]);
+    return getLimitedSortedDates(raw);
   }, [upcoming]);
 
   const dateOptions = useMemo(
@@ -48,9 +47,8 @@ const [filterOptions, setFilterOptions] = useState<SelectedFilter>({
     { label: "Neo Stora", value: "Neo Stora" },
   ];
 
- 
   const handleOnClickDate = (value: string) => {
-    if (!value) { 
+    if (!value) {
       setFilterOptions(prev => ({ ...prev, date: null }));
       setSelectedDateLabel("Alla datum");
     } else {
@@ -60,7 +58,7 @@ const [filterOptions, setFilterOptions] = useState<SelectedFilter>({
   };
 
   const handleOnClickAuditorium = (value: string) => {
-    if (!value) { 
+    if (!value) {
       setFilterOptions(prev => ({ ...prev, auditorium: null }));
       setSelectedAudLabel("Alla salonger");
     } else {
@@ -69,17 +67,22 @@ const [filterOptions, setFilterOptions] = useState<SelectedFilter>({
     }
   };
 
-  const handleOnClickAge = () => {
-    setFilterOptions(prev => ({ ...prev, age: !prev.age }));
+  const handleOnClickAge = (value: string) => {
+    if (!value) {
+      setFilterOptions(prev => ({ ...prev, age: null }));
+      setSelectedAgeLabel("Alla åldrar");
+    } else {
+      const num = Number(value);
+      setFilterOptions(prev => ({ ...prev, age: num }));
+      setSelectedAgeLabel(`${num} års gräns`);
+    }
   };
 
- 
   const filteredData = useMemo(() => {
-    const base = upcoming;
-    return base.filter(s =>
+    return upcoming.filter(s =>
       (!filterOptions.date || s.startTime.split("T")[0] === filterOptions.date) &&
       (!filterOptions.auditorium || s.auditoriumName === filterOptions.auditorium) &&
-      (!filterOptions.age || Number(s.info.ageLimit) < 15)
+      (filterOptions.age === null || Number(s.info.ageLimit) <= filterOptions.age)
     );
   }, [upcoming, filterOptions]);
 
@@ -106,7 +109,7 @@ const [filterOptions, setFilterOptions] = useState<SelectedFilter>({
               options={dateOptions}
               onClick={handleOnClickDate}
               allLabel="Alla datum"
-              selectedLabel={selectedDateLabel}  
+              selectedLabel={selectedDateLabel}
             />
           </Col>
 
@@ -121,9 +124,16 @@ const [filterOptions, setFilterOptions] = useState<SelectedFilter>({
           </Col>
 
           <Col xs="3" md="auto" className="d-flex align-items-end">
-            <FilterBtn
-              btnName={filterOptions.age ? ["Över 15"] : ["Under 15"]}
+            <FilterDropdown
+              label="Alla åldrar"
+              options={[
+                { label: "15 års gräns", value: "15" },
+                { label: "11 års gräns", value: "11" },
+                { label: "7 års gräns", value: "7" },
+              ]}
               onClick={handleOnClickAge}
+              allLabel="Alla åldrar"
+              selectedLabel={selectedAgeLabel}
             />
           </Col>
         </Row>

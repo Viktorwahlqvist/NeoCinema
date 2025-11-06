@@ -64,7 +64,7 @@ export default function AllMoviesList({ movies }: AllMoviesListPRops) {
             xs={12}
             md={2}
             lg={2}
-            className="d-flex flex-row flex-md-column gap-3 mx-md-3 my-4"
+            className="d-flex flex-row flex-md-column gap-3 my-4"
           >
             <FilterBtn
               className="flex-fill flex-md-grow-0 mx-2"

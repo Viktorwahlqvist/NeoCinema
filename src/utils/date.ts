@@ -36,9 +36,8 @@ export function formatScreeningTime(date: Date | string): string {
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
-    timeZone: 'Europe/Stockholm' // Bra att vara specifik!
+    timeZone: 'Europe/Stockholm' 
   };
   
-  // Använder sv-SE locale för formatet YYYY-MM-DD HH:MM
   return dateObj.toLocaleString("sv-SE", options);
 }

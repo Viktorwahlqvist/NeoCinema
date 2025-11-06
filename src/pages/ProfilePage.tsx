@@ -32,7 +32,7 @@ export default function ProfilePage() {
       navigate("/login", { replace: true });
       return;
     }
-
+    
     fetch("/api/users/me/bookings", { credentials: "include" })
       .then((res) => {
         if (!res.ok) throw new Error("Kunde inte hämta bokningar");

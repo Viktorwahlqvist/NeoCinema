@@ -5,6 +5,8 @@ import TicketSelector from "../components/TicketSelector";
 import "./PagesStyle/BookingPage.scss";
 import { useAuth } from "../AuthContext";
 import SeatSSE from "../components/SeatSSE";
+import Toast from 'react-bootstrap/Toast';
+import ToastContainer from "react-bootstrap/ToastContainer";
 
 interface Seat {
   seatId: number;
@@ -67,6 +69,8 @@ function findAdjacentSeats(
 export default function BookingPage() {
   const { screeningId } = useParams<{ screeningId: string }>();
   const navigate = useNavigate();
+  const [show, setShow] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   const [tickets, setTickets] = useState<
     { id: number; count: number; price?: number }[]
@@ -134,14 +138,24 @@ export default function BookingPage() {
   }, [seats, totalTickets]);
 
   // If a seat has the same seatId as the one booked , update it to booked.
-  const handleSeatUpdate = (seatId: number, status: "booked" | "available") => {
+  const handleSeatUpdate = (seatIds: number[], status: "booked" | "available") => {
     setSeats((prev) =>
-      prev.map((s) => (s.seatId === seatId ? { ...s, seatStatus: status } : s))
+      prev.map((s) => (seatIds.includes(s.seatId) ? { ...s, seatStatus: status } : s))
     );
+
+
+    setShow(true);
 
     // Remove any seats from selectedSeats that are no longer available
     if (status === "booked") {
-      setSelectedSeats((prev) => prev.filter((id) => id !== seatId));
+
+      setSelectedSeats(prev =>
+      prev.filter(s => !seatIds.includes(s))
+    );
+     
+      setToastMessage(`Plats${seatIds.length > 1 ? "er" : ""} ${seatIds.join(", ")} har precis blivit bokade!`)
+    } else {
+      setToastMessage(`Plats${seatIds.length > 1 ? "er" : ""} ${seatIds.join(", ")} har precis blivit avbokade!`)
     }
   };
 
@@ -209,6 +223,7 @@ export default function BookingPage() {
 
   return (
     <main className="booking-page text-center mb-5">
+      
       {
         <SeatSSE
           onSeatUpdate={handleSeatUpdate}
@@ -302,7 +317,15 @@ export default function BookingPage() {
             </button>
           )}
         </section>
-      </div>
+      </div> <ToastContainer position="top-end" className="p-3 toast-under-navbar">
+      <Toast onClose={() => setShow(false)} show={show} delay={3000} animation={true} autohide className="toast-styling w-auto">
+      <Toast.Header className="toast-header-styling">
+        <img src="holder.js/20x20?text=%20" className="rounded me-2" alt="" />
+        <strong className="me-auto">Notifikation</strong>
+        <small>Just nu</small>
+      </Toast.Header>
+      <Toast.Body>{toastMessage}</Toast.Body>
+    </Toast></ToastContainer>
     </main>
   );
 }

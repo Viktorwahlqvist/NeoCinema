@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 type SeatStatus = "booked" | "available";
 interface Props {
-  onSeatUpdate: (seatId: number, status: SeatStatus) => void;
+  onSeatUpdate: (seatId: number[], status: SeatStatus) => void;
   screeningId: number;
 }
 
@@ -15,12 +15,11 @@ export default function SeatSSE({ onSeatUpdate, screeningId }: Props) {
 
     // Listen for incoming SSE messages, parse the JSON string,
     eventSource.onmessage = (event) => {
-      const data: { seatId: number; status: SeatStatus } = JSON.parse(
+      const data: { seatIds: number[]; status: SeatStatus } = JSON.parse(
         event.data
       );
-
-      // and pass it as an object to our callback
-      onSeatUpdate(data.seatId, data.status);
+      
+      onSeatUpdate(data.seatIds, data.status);
     };
 
     return () => {

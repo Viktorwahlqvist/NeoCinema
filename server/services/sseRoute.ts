@@ -29,7 +29,7 @@ export function initSeatSse(app: Express) {
 
 // broadcast update to every connected users
 export function broadcastSeatUpdate(seatData: {
-  seatId: number;
+  seatIds: number[];
   status: "booked" | "available";
   screeningId: number;
 }) {

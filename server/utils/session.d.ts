@@ -6,8 +6,10 @@ declare module "express-session" {
     user?: {
       id: number;
       email: string;
+      role: "admin" | "user"; 
     };
   }
+  
 }
 
 export {};

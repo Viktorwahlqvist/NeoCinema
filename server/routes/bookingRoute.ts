@@ -1,12 +1,62 @@
-import express from "express";
+import express, { Request } from "express";
 import { db } from "../db.js";
-import { ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import {ResultSetHeader, RowDataPacket, PoolConnection,} from "mysql2/promise";
 import randomNumber from "../utils/randomNumber.js";
-import { sendEmail } from "./Mailer.js"; 
-import "../utils/session.d.js";
-import { Seat, SeatInput } from "./types.ts";
+import { sendEmail } from "./Mailer.js";
+import { broadcastSeatUpdate } from "../services/sseRoute.js"; // SSE functions
+import "../utils/session.d.js"; // Sessiion types
+import { Seat, SeatInput } from "./types.js"; 
+import { requireRole, ROLES } from "../utils/acl.js"; // Auth middleware
+import { formatScreeningTime } from "../../src/utils/date.js"; // Formatting utility
 
 const router = express.Router();
+
+// Gets all the nessary booking details for confirmation email/page
+// This has to be run inside a transaction
+async function getBookingDetails(
+  bookingId: number,
+  connection: PoolConnection
+) {
+  // Gets screening info (time, movie, auditorium)
+  const [screeningRows] = await connection.query<RowDataPacket[]>(
+    `SELECT m.title, s.start_time, a.name AS auditoriumName
+       FROM bookings b
+       JOIN screenings s ON b.screeningId = s.id
+       JOIN movies m ON m.id = s.movie_id
+       JOIN auditoriums a ON a.id = s.auditorium_id
+       WHERE b.id = ?`,
+    [bookingId]
+  );
+  const screening = screeningRows[0];
+
+  // Gets ticket summary
+  const [ticketRows] = await connection.query<RowDataPacket[]>(
+    `SELECT t.ticketType, t.price, COUNT(*) AS qty
+       FROM bookingXSeats bx
+       JOIN tickets t ON t.id = bx.ticketTypeId
+     WHERE bx.bookingId = ?
+       GROUP BY t.id`,
+    [bookingId]
+  );
+  const totalPrice = ticketRows.reduce((sum, t) => sum + t.price * t.qty, 0);
+
+  // Gets seat numbers
+  const [seatRows] = await connection.query<RowDataPacket[]>(
+    `SELECT s.row_num, s.seat_num
+       FROM bookingXSeats bx
+       JOIN seats s ON s.id = bx.seatId
+     WHERE bx.bookingId = ?
+       ORDER BY s.row_num, s.seat_num`,
+    [bookingId]
+  );
+  const seatNumbers = seatRows.map(
+    (s) => `Rad ${s.row_num}, Plats ${s.seat_num}`
+  );
+
+  return { screening, ticketRows, seatNumbers, totalPrice };
+}
+
+
 
 /* ----------  POST /bookings  ---------- */
 router.post("/bookings", async (req, res) => {
@@ -27,7 +77,7 @@ router.post("/bookings", async (req, res) => {
     connection = await db.getConnection();
     await connection.beginTransaction();
 
-    // 1. Make sure all requested seats are still available
+    // Check seat availability
     const [seatsRows] = await connection.query<Seat[] & RowDataPacket[]>(
       "SELECT * FROM seatStatusView WHERE screeningId = ?",
       [screeningId]
@@ -43,7 +93,7 @@ router.post("/bookings", async (req, res) => {
         .json({ message: "One or more seats already booked" });
     }
 
-    // 2. Create the booking
+    // Create booking
     const bookingNumber = randomNumber();
     const [bookingRes] = await connection.query<ResultSetHeader>(
       `INSERT INTO bookings (bookingNumber, userId, screeningId, date, guestEmail)
@@ -51,8 +101,6 @@ router.post("/bookings", async (req, res) => {
       [bookingNumber, userId, screeningId, userId ? null : guestEmail]
     );
     const bookingId = bookingRes.insertId;
-
-    // 3. Insert seats
     const seatValues = seats.map((s: SeatInput) => [
       bookingId,
       s.seatId,
@@ -63,112 +111,45 @@ router.post("/bookings", async (req, res) => {
       [seatValues]
     );
 
-    // ==========================================================
-    // === 4. BYGG BEKRÄFTELSE-DATA (UPPDATERAD) ================
-    // ==========================================================
+    // Gets all email data
+    const { screening, ticketRows, seatNumbers, totalPrice } =
+      await getBookingDetails(bookingId, connection);
 
-    // Hämta film/salong/tid
-    const [rows] = await connection.query<RowDataPacket[]>(
-      `SELECT m.title, s.start_time, a.name
-         FROM screenings s
-         JOIN movies m ON m.id = s.movie_id
-         JOIN auditoriums a ON a.id = s.auditorium_id
-       WHERE s.id = ?`,
-      [screeningId]
-    );
-    const screening = rows[0];
-    const formattedScreeningTime = new Date(
-      screening.start_time
-    )
-
-
-    // Hämta biljettsammanfattning (t.ex. 2x Vuxen)
-    const [ticketRows] = await connection.query<RowDataPacket[]>(
-      `SELECT t.ticketType, t.price, COUNT(*) AS qty
-         FROM bookingXSeats bx
-         JOIN tickets t ON t.id = bx.ticketTypeId
-       WHERE bx.bookingId = ?
-       GROUP BY t.id`,
-      [bookingId]
-    );
-    const totalPrice = ticketRows.reduce((sum, t) => sum + t.price * t.qty, 0);
-
-    // NYTT: Bygg HTML-listan för biljetter
+   
+    const formattedScreeningTime = formatScreeningTime(screening.start_time);
     const ticketsHtmlList = ticketRows
       .map(
-        (t) =>
+        (t: any) =>
           `<li>${t.qty} × ${t.ticketType} (Totalt: ${t.qty * t.price} kr)</li>`
       )
       .join("");
+    const seatsHtmlList = seatNumbers.map((s) => `<li>${s}</li>`).join("");
 
-    // NYTT: Hämta stolsnummer (t.ex. Rad 1, Plats 5)
-    const [seatRows] = await connection.query<RowDataPacket[]>(
-      `SELECT s.row_num, s.seat_num
-         FROM bookingXSeats bx
-         JOIN seats s ON s.id = bx.seatId
-       WHERE bx.bookingId = ?
-       ORDER BY s.row_num, s.seat_num`,
-      [bookingId]
-    );
-
-    // NYTT: Bygg HTML-listan för platser
-    const seatsHtmlList = seatRows
-      .map((s) => `<li>Rad ${s.row_num}, Plats ${s.seat_num}</li>`)
-      .join("");
-
-    // NYTT: Hämta mottagarens e-post
     let recipientEmail: string | null = null;
     if (userId) {
       const [userRows] = await connection.query<RowDataPacket[]>(
         "SELECT email FROM users WHERE id = ? LIMIT 1",
         [userId]
       );
-      if (userRows.length > 0) {
-        recipientEmail = userRows[0].email;
-      }
+      if (userRows.length > 0) recipientEmail = userRows[0].email;
     } else {
       recipientEmail = guestEmail;
     }
-
-    // ==========================================================
-    // === 5. SKICKA E-POST MED NYA MALLEN =======================
-    // ==========================================================
-    
-    // Bygg den uppdaterade HTML-mallen
+    // Build email HTML
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; line-height: 1.6;">
         <h2>Tack för din bokning!</h2>
-        <p>Här är din bekräftelse för din visning hos NeoCinema.</p>
-        
-        <hr>
-        
-        <h3>Bokningsdetaljer</h3>
-        <p><b>Bokningsnummer:</b> ${bookingNumber}</p>
-        <p><b>Film:</b> ${screening.title}</p>
-        <p><b>Salong:</b> ${screening.name}</p>
-        <p><b>Tid:</b> ${formattedScreeningTime}</p>
-        
+        <p>Bokningsnummer: <b>${bookingNumber}</b></p>
+        <p>Film: ${screening.title}</p>
+        <p>Salong: ${screening.auditoriumName}</p>
+        <p>Tid: ${formattedScreeningTime}</p>
         <h3>Biljetter</h3>
-        <ul style="list-style-type: none; padding-left: 0;">
-          ${ticketsHtmlList}
-        </ul>
-        
+        <ul style="list-style-type: none; padding-left: 0;">${ticketsHtmlList}</ul>
         <h3>Platser</h3>
-        <ul style="list-style-type: none; padding-left: 0;">
-          ${seatsHtmlList}
-        </ul>
-
+        <ul style="list-style-type: none; padding-left: 0;">${seatsHtmlList}</ul>
         <hr>
-        
-        <p style="font-size: 1.2em;">
-          <b>Totalt pris: ${totalPrice} kr</b>
-        </p>
-        
-        <p style="font-size: 0.9em; color: #555;">
-          Vi ser fram emot att se dig på bion!
-        </p>
-      </div>
-    `;
+        <p style="font-size: 1.2em;"><b>Totalt pris: ${totalPrice} kr</b></p>
+      </div>`;
 
     if (recipientEmail) {
       await sendEmail({
@@ -177,18 +158,19 @@ router.post("/bookings", async (req, res) => {
         html: emailHtml,
       });
     }
-
-    // ==========================================================
-    // === 6. GENOMFÖR TRANSAKTION OCH SKICKA SVAR ============
-    // ==========================================================
-    
     await connection.commit();
+
+    // Tells SSE clients which seats are now booked
+    broadcastSeatUpdate({
+      seatIds: seats.map((s: SeatInput) => s.seatId),
+      status: "booked",
+      screeningId: Number(screeningId),
+    });
 
     res.status(201).json({
       message: "Booking created",
       bookingId,
       bookingNumber,
-      seats: seats.map((s: SeatInput) => s.seatId),
     });
   } catch (e: any) {
     if (connection) await connection.rollback();
@@ -199,21 +181,18 @@ router.post("/bookings", async (req, res) => {
   }
 });
 
-/* ----------  GET /api/bookings?userId=XX  ---------- */
-// (Din befintliga GET-route)
-router.get("/", async (req, res) => {
-  const userId = Number(req.query.userId);
-  if (!userId) return res.status(400).json({ message: "userId required" });
+/* ----------  GET / (Hämta MINA bokningar)  ---------- */
+router.get("/", requireRole([ROLES.USER, ROLES.ADMIN]), async (req, res) => {
+  const userId = req.session.user!.id; 
 
   try {
     const [rows] = await db.query<RowDataPacket[]>(
-      `SELECT b.id            AS bookingId,
-              b.bookingNumber,
-              b.date,
-              m.title           AS movieTitle,
-              s.start_time      AS screeningTime,
-              a.name            AS auditoriumName,
-              SUM(t.price)      AS totalPrice
+      `SELECT b.id          AS bookingId,
+              b.bookingNumber, b.date,
+              m.title         AS movieTitle,
+              s.start_time    AS screeningTime,
+              a.name          AS auditoriumName,
+              SUM(t.price)    AS totalPrice
        FROM bookings b
        JOIN screenings s ON s.id = b.screeningId
        JOIN movies m ON m.id = s.movie_id
@@ -232,14 +211,15 @@ router.get("/", async (req, res) => {
   }
 });
 
-/* ----------  GET /bookings/:id (för bekräftelsesidan)  ---------- */
-// (Denna route är nu uppdaterad för att skicka 'seatNumbers' till frontend)
-router.get("/:bookingId", async (req, res) => {
+/* ----------  GET /:bookingId (Bekräftelsesida)  ---------- */
+// Security: Checks if user owns booking or is admin
+router.get("/:bookingId", requireRole([ROLES.USER, ROLES.ADMIN]), async (req, res) => {
   const { bookingId } = req.params;
+  const sessionUser = req.session.user!;
+
   try {
-    // 1. Hämta huvud-information
     const [rows] = await db.query<RowDataPacket[]>(
-      `SELECT b.id AS bookingId, b.bookingNumber, b.date,
+      `SELECT b.id AS bookingId, b.bookingNumber, b.date, b.userId,
              m.title AS movieTitle, s.start_time AS screeningTime, a.name AS auditoriumName,
              COALESCE(u.email, b.guestEmail) AS email,
              SUM(t.price) AS totalPrice
@@ -256,36 +236,37 @@ router.get("/:bookingId", async (req, res) => {
     );
     if (!rows.length) return res.status(404).json({ message: "Not found" });
 
-    // 2. Hämta biljett-sammanfattning
+    const booking = rows[0];
+
+    // Security check: Does the user own this booking OR is admin?
+    if (booking.userId !== sessionUser.id && sessionUser.role !== ROLES.ADMIN) {
+      return res
+        .status(403)
+        .json({ error: "Du har inte behörighet att se denna bokning" });
+    }
     const [tickets] = await db.query<RowDataPacket[]>(
       `SELECT t.ticketType, t.price, COUNT(*) AS qty
-       FROM bookingXSeats bx
-       JOIN tickets t ON t.id = bx.ticketTypeId
-       WHERE bx.bookingId = ?
-       GROUP BY t.id`,
+       FROM bookingXSeats bx JOIN tickets t ON t.id = bx.ticketTypeId
+       WHERE bx.bookingId = ? GROUP BY t.id`,
       [bookingId]
     );
 
-    // 3. Hämta stolsnummer
     const [seatRows] = await db.query<RowDataPacket[]>(
       `SELECT s.row_num, s.seat_num
-       FROM bookingXSeats bx
-       JOIN seats s ON s.id = bx.seatId
-       WHERE bx.bookingId = ?
-       ORDER BY s.row_num, s.seat_num`,
+       FROM bookingXSeats bx JOIN seats s ON s.id = bx.seatId
+       WHERE bx.bookingId = ? ORDER BY s.row_num, s.seat_num`,
       [bookingId]
     );
     const seatNumbers = seatRows.map(
       (seat) => `Rad ${seat.row_num}, Plats ${seat.seat_num}`
     );
 
-    // 4. Bygg och skicka svar
-    const booking = {
-      ...rows[0],
+    // Build ans send response
+    res.json({
+      ...booking,
       tickets,
       seatNumbers,
-    };
-    res.json(booking);
+    });
   } catch (e: any) {
     console.error(e);
     res.status(500).json({ error: "Server error" });
@@ -293,32 +274,22 @@ router.get("/:bookingId", async (req, res) => {
 });
 
 /* ----------  DELETE /bookings/:id  ---------- */
-// (Din befintliga middleware och DELETE-route)
-const requireAuth = (req: any, res: any, next: any) => {
-  if (!req.session.user) {
-    return res.status(401).json({ error: "Du är inte inloggad" });
-  }
-  next();
-};
-
-router.delete("/:bookingId", requireAuth, async (req, res) => {
+router.delete("/:bookingId", requireRole([ROLES.USER, ROLES.ADMIN]), async (req, res) => {
   const { bookingId } = req.params;
-  const userId = req.session.user!.id;
+  const sessionUser = req.session.user!;
   let connection;
 
   try {
     connection = await db.getConnection();
     await connection.beginTransaction();
-
     const [bookingRows] = await connection.query<RowDataPacket[]>(
       `SELECT
          b.userId,
          s.start_time,
-         s.id as screeningIdExists
+         s.id as screeningId
        FROM bookings b
-       LEFT JOIN screenings s ON b.screeningId = s.id
-       WHERE b.id = ?
-       LIMIT 1`,
+       JOIN screenings s ON b.screeningId = s.id
+       WHERE b.id = ? LIMIT 1`,
       [bookingId]
     );
 
@@ -326,23 +297,17 @@ router.delete("/:bookingId", requireAuth, async (req, res) => {
       await connection.rollback();
       return res.status(404).json({ error: "Bokningen hittades inte" });
     }
-
     const booking = bookingRows[0];
 
-    if (!booking.screeningIdExists) {
-      await connection.rollback();
-      return res
-        .status(500)
-        .json({ error: "Databasfel: Bokningen är korrupt" });
-    }
-
-    if (booking.userId !== userId) {
+    // SECURITY CHECK: Does the user own this booking OR is admin?
+    if (booking.userId !== sessionUser.id && sessionUser.role !== ROLES.ADMIN) {
       await connection.rollback();
       return res
         .status(403)
         .json({ error: "Du har inte behörighet att avboka detta" });
     }
 
+    // Time control: Can only cancel up to 2 hours before screening
     const screeningTime = new Date(booking.start_time).getTime();
     const twoHoursBefore = screeningTime - 2 * 60 * 60 * 1000;
     const now = Date.now();
@@ -354,16 +319,32 @@ router.delete("/:bookingId", requireAuth, async (req, res) => {
         .json({ error: "Tidsgränsen för avbokning har passerat (2 timmar)" });
     }
 
+    // Get seatIds before deletion
+    const [seatRows] = await connection.query<RowDataPacket[]>(
+      "SELECT seatId FROM bookingXSeats WHERE bookingId = ?",
+      [bookingId]
+    );
+
+    // Delete seats from bookingXSeats
     await connection.query<ResultSetHeader>(
       "DELETE FROM bookingXSeats WHERE bookingId = ?",
       [bookingId]
     );
 
+    // Delete booking
     await connection.query<ResultSetHeader>("DELETE FROM bookings WHERE id = ?", [
       bookingId,
     ]);
 
     await connection.commit();
+
+    // tell SSE client which seats freed up
+    const seatIds: number[] = seatRows.map((row) => row.seatId);
+    broadcastSeatUpdate({
+      seatIds,
+      status: "available",
+      screeningId: booking.screeningId,
+    });
 
     res.status(200).json({ message: "Bokningen har avbokats" });
   } catch (e) {

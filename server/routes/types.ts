@@ -1,14 +1,14 @@
-export type SeatStatus = 'available' | 'taken';
-import type { RowDataPacket } from "mysql2/promise";
 
-export interface Seat {
-  auditoriumsId: number;
-  auditoriumsName: string;
-  rowNum:       number;
-  seatNum:      number;
-  status:       SeatStatus;
-  updatedAt:    string;         
-}
+import type { RowDataPacket } from "mysql2/promise";
+      
+export type Seat = {
+  seatId: number;
+  row_num: number;
+  seat_num: number;
+  seatStatus: "available" | "booked";
+};
+
+export type SeatInput = { seatId: number; ticketType: number };
 
 export interface auditoriumsShape {
   id:        number;
@@ -45,16 +45,14 @@ export interface PriceByType extends RowDataPacket {
   subtotal_kr: number;       
 } 
 
-// src/types/Booking.ts
 
-// 1. Definiera den nästlade typen för en biljett-rad
+
 export type TicketLine = {
   ticketType: string;
   price: number;
-  qty: number; // Se till att den heter 'qty' som i din databas-respons
+  qty: number; 
 };
 
-// 2. Uppdatera din huvudsakliga Booking-typ
 export type Booking = {
   bookingId: number;
   bookingNumber: string;
@@ -63,7 +61,7 @@ export type Booking = {
   screeningTime: string;
   auditoriumName: string;
   email: string;
-  totalPrice: string | number; // Kan vara antingen
-  tickets: TicketLine[]; // <-- Använder typen ovan
-  seatNumbers: string[]; // <-- Det nya fältet för stolar
+  totalPrice: string | number; 
+  tickets: TicketLine[]; 
+  seatNumbers: string[]; 
 };

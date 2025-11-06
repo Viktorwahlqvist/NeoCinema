@@ -5,17 +5,9 @@ import randomNumber from "../utils/randomNumber.js";
 import { sendEmail } from "./Mailer.js";
 import { broadcastSeatUpdate } from "../services/sseRoute.js";
 import "../utils/session.d.js";
+import { Seat, SeatInput } from "./types.js";
 
 const router = express.Router();
-
-type Seat = RowDataPacket & {
-  seatId: number;
-  row_num: number;
-  seat_num: number;
-  seatStatus: "available" | "booked";
-};
-
-type SeatInput = { seatId: number; ticketType: number };
 
 /* ----------  POST /bookings  ---------- */
 router.post("/bookings", async (req, res) => {
@@ -36,7 +28,7 @@ router.post("/bookings", async (req, res) => {
     connection = await db.getConnection();
     await connection.beginTransaction();
 
-    const [seatsRows] = await connection.query<Seat[]>(
+    const [seatsRows] = await connection.query<Seat[] & RowDataPacket[]>(
       "SELECT * FROM seatStatusView WHERE screeningId = ?",
       [screeningId]
     );
@@ -80,6 +72,15 @@ router.post("/bookings", async (req, res) => {
       [screeningId]
     );
     const screening = rows[0];
+    const formattedScreeningTime = new Date(
+      screening.start_time
+    ).toLocaleString("sv-SE", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
     const [ticketRows] = await connection.query<RowDataPacket[]>(
       `SELECT t.ticketType, t.price, COUNT(*) AS qty
          FROM bookingXSeats bx
@@ -89,21 +90,85 @@ router.post("/bookings", async (req, res) => {
       [bookingId]
     );
     const totalPrice = ticketRows.reduce(
-      (sum: number, t: any) => sum + t.price * t.qty,
+      (sum: number, t: any) => sum + t.price * t.qty  ,
       0
     );
+    const ticketsHtmlList = ticketRows
+      .map(
+        (t) =>
+          `<li>${t.qty} × ${t.ticketType} (Totalt: ${t.qty * t.price} kr)</li>`
+      )
+      .join("");
+    const [seatRows] = await connection.query<RowDataPacket[]>(
+      `SELECT s.row_num, s.seat_num
+         FROM bookingXSeats bx
+         JOIN seats s ON s.id = bx.seatId
+       WHERE bx.bookingId = ?
+       ORDER BY s.row_num, s.seat_num`,
+      [bookingId]
+    );
+
+    // build seat list HTML
+    const seatsHtmlList = seatRows
+      .map((s) => `<li>Rad ${s.row_num}, Plats ${s.seat_num}</li>`)
+      .join("");
+
+    // gets recipient email
+    let recipientEmail: string | null = null;
+    if (userId) {
+      const [userRows] = await connection.query<RowDataPacket[]>(
+        "SELECT email FROM users WHERE id = ? LIMIT 1",
+        [userId]
+      );
+      if (userRows.length > 0) {
+        recipientEmail = userRows[0].email;
+      }
+    } else {
+      recipientEmail = guestEmail;
+    }
+    // build email HTML
     const emailHtml = `
-      <h2>Tack för din bokning!</h2>
-      <p><b>Film:</b> ${screening.title}</p>
-      <p><b>Salong:</b> ${screening.name}</p>
-      <p><b>Tid:</b> ${new Date(screening.start_time).toLocaleString(
-        "sv-SE"
-      )}</p>
-      <p><b>Bokningsnummer:</b> ${bookingNumber}</p>
-      <p><b>Totalt pris:</b> ${totalPrice} kr</p>
+      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <h2>Tack för din bokning!</h2>
+        <p>Här är din bekräftelse för din visning hos NeoCinema.</p>
+        
+        <hr>
+        
+        <h3>Bokningsdetaljer</h3>
+        <p><b>Bokningsnummer:</b> ${bookingNumber}</p>
+        <p><b>Film:</b> ${screening.title}</p>
+        <p><b>Salong:</b> ${screening.name}</p>
+        <p><b>Tid:</b> ${formattedScreeningTime}</p>
+        
+        <h3>Biljetter</h3>
+        <ul style="list-style-type: none; padding-left: 0;">
+          ${ticketsHtmlList}
+        </ul>
+        
+        <h3>Platser</h3>
+        <ul style="list-style-type: none; padding-left: 0;">
+          ${seatsHtmlList}
+        </ul>
+
+        <hr>
+        
+        <p style="font-size: 1.2em;">
+          <b>Totalt pris: ${totalPrice} kr</b>
+        </p>
+        
+        <p style="font-size: 0.9em; color: #555;">
+          Vi ser fram emot att se dig på bion!
+        </p>
+      </div>
     `;
 
-    let recipientEmail: string | null = null;
+    if (recipientEmail) {
+      await sendEmail({
+        to: recipientEmail,
+        subject: `Bekräftelse – ${screening.title} (Nr: ${bookingNumber})`,
+        html: emailHtml,
+      });
+    }
 
     if (userId) {
       const [userRows] = await connection.query<RowDataPacket[]>(

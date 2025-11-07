@@ -1,7 +1,7 @@
 @use "../../styles/variables" as *;
 
 .auth-page {
-  min-height: 100vh;
+  min-height: 66vh;
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -106,12 +106,15 @@
   padding-top: 5rem;
 }
 
+
 //for mobile
 @media (max-width: 480px) {
   .auth-page {
     padding-top: 4rem;
     padding-inline: 1rem;       
-    overflow-y: auto;          
+    overflow-y: auto;    
+   margin-top: 5rem ;
+      
   }
 
   .auth-card {

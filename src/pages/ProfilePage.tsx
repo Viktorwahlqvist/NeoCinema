@@ -177,7 +177,7 @@ export default function ProfilePage() {
 
   return (
   <div className="profile-container">
-    <h2>Hej, {user.firstName} {user.lastName}</h2>
+    <h2>Hej, {user.firstName}</h2>
     <p>E-post: {user.email}</p>
     <button className="logout-btn" onClick={logout}>Logga ut</button>
 

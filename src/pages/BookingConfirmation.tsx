@@ -118,33 +118,9 @@ export default function BookingConfirmation() {
   };
 
   return (
- <section className="booking-confirmation"> 
-  <div className="confirmation-title"> <h2 >Dina platser är bokade!</h2></div>
-
-  <div className="neon-border">
-
-  <div className="confirmation-info">
-  <div className="booking-text">
-    <p>
-      Bookingnumber: <strong>{booking.bookingNumber}</strong>
-    </p>
-    <p>
-      Bekräftelse har skickats till:
-      <br />
-      <strong>{booking.email}</strong>
-    </p>
-
-    {booking.tickets && booking.tickets.length > 0 && (
-      <div className="ticket-summary">
-        <h4>Biljetter</h4>
-        <ul>
-          {booking.tickets.map((t, index) => (
-            <li key={index}>
-              {t.quantity} × {t.ticketType} ({t.price} kr)
-            </li>
-          ))}
-        </ul>
-        <p><b>Totalt:</b> {booking.totalPrice} kr</p>
+    <section className="booking-confirmation">
+      <div className="confirmation-title">
+        <h2>Dina platser är bokade!</h2>
       </div>
 
       <div className="neon-border">

@@ -13,4 +13,13 @@
   &:hover {
     box-shadow: $button-hover;
   }
+
+  
 }
+@media (max-width: 480px){
+    .overall-button{
+      padding: 0.40rem 0.25rem 0.40rem 0.25rem;
+      max-width: 80%;
+      box-shadow: $glow-medium;
+    }
+  }

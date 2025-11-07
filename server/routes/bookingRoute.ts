@@ -7,7 +7,9 @@ import { broadcastSeatUpdate } from "../services/sseRoute.js"; // SSE functions
 import "../utils/session.d.js"; // Sessiion types
 import { Seat, SeatInput } from "./types.js"; 
 import { requireRole, ROLES } from "../utils/acl.js"; // Auth middleware
-import { formatScreeningTime } from "../../src/utils/date.js"; // Formatting utility
+import {formatScreeningTime} from "../utils/date.js"
+
+
 
 const router = express.Router();
 

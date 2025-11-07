@@ -36,18 +36,18 @@ export default function AllMoviesList({ movies }: AllMoviesListPRops) {
           </Col>
           <Col xs={12} md={3} lg={4}>
             <img
-              className="img-fluid mb-4 mb-md-0"
+              className="img-fluid mb-4 mb-md-0 text-center"
               src={movie.info.desktopImg}
-              alt=""
+              alt={`Picture of movie ${movie.title}`}
             />
           </Col>
           <Col>
             <Row className="d-flex justify-content-center text-center">
               <p>{movie.title}</p>
               <p>{movie.genres.sort().join("/")}</p>
-              {`${Math.floor(movie.info.duration / 60)}h ${
+              <p>{`${Math.floor(movie.info.duration / 60)}h ${
                 movie.info.duration % 60
-              }m`}
+              }m`}</p>
             </Row>
           </Col>
           <Col

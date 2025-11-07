@@ -5,24 +5,12 @@ import TicketSelector from "../components/TicketSelector";
 import "./PagesStyle/BookingPage.scss";
 import { useAuth } from "../AuthContext";
 import SeatSSE from "../components/SeatSSE";
+import {Seat, User} from "../types/Booking";
+import { formatScreeningTime } from "../utils/date";
 import Toast from 'react-bootstrap/Toast';
 import ToastContainer from "react-bootstrap/ToastContainer";
 
-interface Seat {
-  seatId: number;
-  row_num: number;
-  seat_num: number;
-  seatStatus: "available" | "booked";
-  auditoriumName: string;
-  screeningId: number;
-  start_time: string;
-}
-interface User {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-}
+
 
 /* --------------  ADJACENT-SEAT HELPER -------------- */
 function findAdjacentSeats(
@@ -125,17 +113,18 @@ export default function BookingPage() {
   >(`/api/screeningsInfo?screeningId=${screeningId}`, { skip: !screeningId });
 
   useEffect(() => {
-    // If user havent selected any ticket types.
+    // if user havent selected any ticket types
     if (totalTickets === 0) {
       setSelectedSeats([]);
       return;
     }
-    // If user havent selected any seats, findAdjacentSeats.
-    if (selectedSeats.length === 0) {
+
+    if (selectedSeats.length !== totalTickets) {
       const best = findAdjacentSeats(seats, totalTickets);
       setSelectedSeats(best);
     }
-  }, [seats, totalTickets]);
+  
+}, [seats, totalTickets]); 
 
   // If a seat has the same seatId as the one booked , update it to booked.
   const handleSeatUpdate = (seatIds: number[], status: "booked" | "available") => {
@@ -159,7 +148,7 @@ export default function BookingPage() {
     }
   };
 
-  // (handleSeatClick är oförändrad)
+  
   const handleSeatClick = (seatId: number, status: string) => {
     if (status === "booked" || !seats) return;
     const best = findAdjacentSeats(seats, totalTickets, seatId);
@@ -190,7 +179,7 @@ export default function BookingPage() {
         if (seatId !== undefined) seatList.push({ seatId, ticketType: t.id });
       }
     }
-    // bygg bookingData, kollar om user är inloggad eller gäst
+    // builds booking data, checks if user or guest
     const bookingData = {
       screeningId: Number(screeningId),
       seats: seatList,
@@ -260,7 +249,7 @@ export default function BookingPage() {
             <div className="heading-box">
               <h2 className="neon-text">
                 {screening[0].auditoriumName} –{" "}
-                {new Date(screening[0].startTime).toLocaleString()}
+                {formatScreeningTime(screening[0].startTime)}
               </h2>
             </div>
           )}

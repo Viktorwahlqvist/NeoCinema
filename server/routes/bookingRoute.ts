@@ -1,4 +1,4 @@
-import express, { Request } from "express";
+import express from "express";
 import { db } from "../db.js";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import randomNumber from "../utils/randomNumber.js";
@@ -9,14 +9,7 @@ import "express-session";
 const router = express.Router();
 
 
-interface AuthenticatedRequest extends Request {
-  session: Request["session"] & {
-    user?: {
-      id: number;
-      email: string;
-    };
-  };
-}
+
 
 type Seat = RowDataPacket & {
   seatId: number;
@@ -28,7 +21,7 @@ type Seat = RowDataPacket & {
 type SeatInput = { seatId: number; ticketType: number };
 
 /* ----------  POST /bookings  ---------- */
-router.post("/bookings", async (req: AuthenticatedRequest, res) => {
+router.post("/bookings", async (req, res) => {
   const { screeningId, seats, guestEmail } = req.body;
   const userId = req.session.user?.id || null;
 
@@ -171,7 +164,7 @@ const requireAuth = (req: any, res: any, next: any) => {
 };
 
 /* ----------  GET /api/bookings?userId=XX  ---------- */
-router.get("/", requireAuth, async (req: AuthenticatedRequest, res) => {
+router.get("/", requireAuth, async (req, res) => {
   const userId = req.session.user?.id;
   if (!userId) return res.status(401).json({ message: "Du är inte inloggad" });
 
@@ -204,7 +197,7 @@ router.get("/", requireAuth, async (req: AuthenticatedRequest, res) => {
 
 
 /* ----------  GET /bookings/:id  ---------- */
-router.get("/:bookingId", requireAuth, async (req: AuthenticatedRequest, res) => {
+router.get("/:bookingId", requireAuth, async (req, res) => {
   const { bookingId } = req.params;
   const sessionUser = req.session.user;
 
@@ -270,7 +263,7 @@ router.get("/:bookingId", requireAuth, async (req: AuthenticatedRequest, res) =>
 
 
 
-router.delete("/:bookingId", requireAuth, async (req: AuthenticatedRequest, res) => {
+router.delete("/:bookingId", requireAuth, async (req, res) => {
   const { bookingId } = req.params;
   const userId = req.session.user?.id; // fungerar nu utan as any
  // we know user is logged in due to requireAuth middleware

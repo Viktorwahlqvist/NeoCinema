@@ -1,3 +1,5 @@
+@use "../../styles/variables" as *;
+
 .movie-carousel {
   position: relative;
   width: 100%;
@@ -70,8 +72,10 @@
         transform: translateY(-2px);
       }
 
-      &:active {
-        transform: translateY(0);
+    &.active {
+      background: $color-hover;
+      box-shadow: $button-hover;
+            border-color: $color-hover;
       }
     }
   }

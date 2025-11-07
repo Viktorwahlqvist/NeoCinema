@@ -2,25 +2,13 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext"; 
 import "./PagesStyle/ProfilePage.scss";
-
-type User = { id: number; firstName: string; lastName: string; email: string };
-
-type Booking = {
-  bookingId: number;
-  bookingNumber: string;
-  date: string;
-  movieTitle: string;
-  screeningTime: string;
-  auditoriumName: string;
-  totalPrice: number;
-};
+import { formatScreeningTime} from "../utils/date";
+import { Booking } from "../types/Booking";
 
 export default function ProfilePage() {
   const navigate = useNavigate();
   // get user state from AuthContext
   const { user, isLoading: isAuthLoading, logout: authLogout } = useAuth();
-
-  
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true); // only for bookings
 
@@ -34,7 +22,6 @@ export default function ProfilePage() {
     error: null,
   });
 
-  
   useEffect(() => {
     // wait until Auth is done loading
     if (isAuthLoading) {
@@ -158,7 +145,7 @@ export default function ProfilePage() {
       >
         <strong>{booking.movieTitle}</strong> — {booking.auditoriumName}
         <br />
-        {new Date(booking.screeningTime).toLocaleString("sv-SE")}
+        {formatScreeningTime(booking.screeningTime)}
         <br />
         Bokningsnummer: <code>{booking.bookingNumber}</code>
         <br />
@@ -201,7 +188,7 @@ export default function ProfilePage() {
     {upcomingBookings.map((b) => (
       <div key={b.bookingId} className="booking-card">
         <strong>{b.movieTitle}</strong> — {b.auditoriumName}<br />
-        {new Date(b.screeningTime).toLocaleString("sv-SE")}<br />
+        Datum: {formatScreeningTime(b.screeningTime)}<br />
         Bokningsnummer: <code>{b.bookingNumber}</code><br />
         Totalt: {b.totalPrice} kr<br />
 
@@ -230,7 +217,7 @@ export default function ProfilePage() {
     {pastBookings.map((b) => (
       <div key={b.bookingId} className="booking-card">
         <strong>{b.movieTitle}</strong> — {b.auditoriumName}<br />
-        {new Date(b.screeningTime).toLocaleString("sv-SE")}<br />
+        Datum: {formatScreeningTime(b.screeningTime)}<br />
         Bokningsnummer: <code>{b.bookingNumber}</code><br />
         Totalt: {b.totalPrice} kr
       </div>

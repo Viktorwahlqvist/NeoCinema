@@ -1,14 +1,14 @@
-export type SeatStatus = 'available' | 'taken';
-import type { RowDataPacket } from "mysql2/promise";
 
-export interface Seat {
-  auditoriumsId: number;
-  auditoriumsName: string;
-  rowNum:       number;
-  seatNum:      number;
-  status:       SeatStatus;
-  updatedAt:    string;         
-}
+import type { RowDataPacket } from "mysql2/promise";
+      
+export type Seat = {
+  seatId: number;
+  row_num: number;
+  seat_num: number;
+  seatStatus: "available" | "booked";
+};
+
+export type SeatInput = { seatId: number; ticketType: number };
 
 export interface auditoriumsShape {
   id:        number;
@@ -44,3 +44,24 @@ export interface PriceByType extends RowDataPacket {
   qty: number;
   subtotal_kr: number;       
 } 
+
+
+
+export type TicketLine = {
+  ticketType: string;
+  price: number;
+  qty: number; 
+};
+
+export type Booking = {
+  bookingId: number;
+  bookingNumber: string;
+  date: string;
+  movieTitle: string;
+  screeningTime: string;
+  auditoriumName: string;
+  email: string;
+  totalPrice: string | number; 
+  tickets: TicketLine[]; 
+  seatNumbers: string[]; 
+};

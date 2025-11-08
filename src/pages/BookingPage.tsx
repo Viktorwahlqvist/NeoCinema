@@ -91,6 +91,7 @@ export default function BookingPage() {
   const { doFetch: postBooking } = useFetch<{
     bookingId: number;
     bookedSeats: number[];
+    bookingNumber: string;
   }>("/api/booking/bookings");
 
   const { doFetch: getPriceBreakdown } = useFetch<
@@ -189,6 +190,7 @@ export default function BookingPage() {
     try {
       const result = await postBooking(bookingData, "POST");
       const bookingId = result.bookingId;
+      const bookingNumber = result.bookingNumber;
 
       const breakdown = await getPriceBreakdown(
         `/api/priceTotals?bookingId=${bookingId}`,
@@ -199,7 +201,7 @@ export default function BookingPage() {
         (row) => `${row.quantity} × ${row.ticketType}  ${row.subTotal} kr`
       );
 
-      navigate(`/Bekräftelse/${bookingId}`);
+      navigate(`/Bekräftelse/${bookingNumber}`);
     } catch (err: any) {
       alert(`Kunde inte boka platser: ${err.message}`);
     }

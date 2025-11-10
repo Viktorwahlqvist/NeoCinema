@@ -25,6 +25,16 @@
   text-shadow: $text-glow;
 }
 
+/* Page title */
+.confirmation-title h2 {
+  text-align: center;
+  margin: 38px 0 26px;
+  font-size: 36px;
+  color: $color-stroke;
+  font-weight: 700;
+  text-shadow: $text-glow;
+}
+
 .booking-confirmation {
   min-height: 65vh;
   display: flex;
@@ -294,5 +304,224 @@ width: 90%;
     border-color: $color-hover;
   }
 }
+
+/* Container */
+.booking-confirmation {
+  padding: 0 20px;
+  color: $color-text;
 }
 
+/* Grid similar to mock 2 */
+.confirmation-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 48px;
+  max-width: 1080px;
+  margin: 0 auto 32px;
+  padding: 32px 40px 40px;
+  background: rgba(16, 20, 36, 0.92);
+  border-radius: 36px;
+  box-shadow: 0 0 0 2px rgba(151, 59, 255, 0.25), 0 40px 80px -18px rgba(0, 0, 0, 0.6);
+}
+
+.details-column {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  font-family: $font-family-heading;
+}
+
+.block-title {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #42e9ff;
+  text-shadow: 0 0 12px rgba(66, 233, 255, 0.55);
+  border-top: 1px solid #2e3c53;
+  padding-top: 10px;
+}
+
+.ticket-list,
+.seat-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 15px;
+  line-height: 1.35;
+  color: #cdd8e8;
+}
+
+.ticket-list li + li,
+.seat-list li + li {
+  margin-top: 4px;
+}
+
+.total-row {
+  margin-top: 10px;
+  font-weight: 600;
+  color: #fff;
+}
+.total-row span {
+  font-weight: 500;
+}
+
+.meta-block {
+  font-size: 14px;
+  color: #cdd8e8;
+}
+.meta-block .meta-line {
+  margin: 0 0 10px;
+}
+.meta-block .meta-line strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* QR */
+.qr-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.qr-frame {
+  width: 180px;
+  background: #fff;
+  padding: 14px;
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35), 0 0 18px rgba(66, 233, 255, 0.35);
+}
+.qr-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Poster */
+.media-column {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12px;
+}
+.poster-frame {
+  width: 100%;
+  max-width: 520px;
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 0 0 2px rgba(66, 233, 255, 0.25),
+    0 0 24px rgba(66, 233, 255, 0.5),
+    0 24px 48px -12px rgba(0, 0, 0, 0.55);
+}
+.poster-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* Buttons */
+.btn-group {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin-bottom: 60px;
+}
+.btn-glow {
+  background: #111a2d;
+  color: #fff;
+  padding: 14px 30px;
+  font-size: 15px;
+  border: 1px solid #42e9ff;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: 0 0 18px rgba(66, 233, 255, 0.45);
+  transition: 0.25s;
+}
+.btn-glow:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 0 26px rgba(66, 233, 255, 0.7);
+}
+
+/* Minimal override additions (append or merge) */
+.movie-title {
+  margin: 0 0 10px;
+  font-size: 26px;
+  font-weight: 700;
+  color: #d8c9ff;
+  text-shadow: 0 0 14px rgba(180,120,255,0.55);
+}
+
+/* Outer card */
+.confirmation-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto 32px;
+  padding: 32px 34px 40px;
+  background: rgba(16,20,36,0.92);
+  border-radius: 34px;
+  box-shadow: 0 0 0 2px rgba(151,59,255,0.25), 0 40px 80px -18px rgba(0,0,0,0.6);
+}
+
+/* Inner two-column: QR left, info right */
+.confirmation-inner {
+  display: grid;
+  grid-template-columns: 1fr 220px; // info left, QR right
+  gap: 38px;
+  align-items: start;
+}
+
+.qr-column {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.qr-frame {
+  width: 100%;
+  background: #ffffff;
+  padding: 18px 16px;
+  border-radius: 18px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.35), 0 0 18px rgba(66,233,255,0.35);
+}
+
+@media (max-width: 820px) {
+  .confirmation-inner {
+    grid-template-columns: 1fr; // stack
+    gap: 26px;
+  }
+  .qr-column {
+    align-items: center; // center QR when stacked
+  }
+  .qr-frame {
+    width: 180px;
+    padding: 14px;
+  }
+}
+
+/* Responsive */
+@media (max-width: 1080px) {
+  .confirmation-grid {
+    grid-template-columns: 1fr;
+    padding: 28px 28px 36px;
+  }
+  .media-column {
+    order: -1;
+    padding-top: 0;
+  }
+  .poster-frame {
+    max-width: 100%;
+  }
+  .details-column {
+    gap: 22px;
+  }
+  .qr-frame {
+    width: 160px;
+  }
+}
+
+}

@@ -213,110 +213,109 @@ export default function BookingPage() {
   if (!seats?.length) return <p>Inga stolar hittades.</p>;
 
   return (
-    <main className="booking-page text-center mb-5">
-      
-      {
-        <SeatSSE
-          onSeatUpdate={handleSeatUpdate}
-          screeningId={Number(screeningId)}
-        />
-      }
-      <div className="booking-layout">
-        <aside className="booking-left">
-          {screening?.[0] && (
-            <div className="movie-poster-box">
-              <img
-                src={screening[0].info?.mobileImg || "/placeholder.jpg"}
-                alt={screening[0].title}
-                className="movie-poster"
-              />
-            </div>
-          )}
+    <main className="booking-page">
+      <SeatSSE onSeatUpdate={handleSeatUpdate} screeningId={Number(screeningId)} />
 
-          <div className="ticket-section">
-            <h5 className="neon-text">Välj biljetter</h5>
-            <TicketSelector onTicketChange={setTickets} />
-          </div>
+      <div className="page-card">
+        <h2 className="neon-heading">Välj dina platser</h2>
 
-          {totalTickets > 0 && (
-            <div className="ticket-total-box mt-3">
-              <p className="text-light">Totalt pris</p>
-              <h4 className="neon-text">{totalPrice} kr</h4>
-            </div>
-          )}
-        </aside>
+        <div className="booking-layout booking-layout--neon">
+          <aside className="booking-left">
+            {screening?.[0] && (
+              <div className="movie-poster-box neon-card">
+                <img
+                  src={screening[0].info?.mobileImg || "/placeholder.jpg"}
+                  alt={screening[0].title}
+                  className="movie-poster"
+                />
+              </div>
+            )}
 
-        <section className="booking-right">
-          {screening?.[0] && (
-            <div className="heading-box">
-              <h2 className="neon-text">
-                {screening[0].auditoriumName} –{" "}
-                {formatScreeningTime(screening[0].startTime)}
-              </h2>
-            </div>
-          )}
-          <div className="screen">DUKEN</div>
-
-          {!user && totalTickets > 0 && (
-            <div className="guest-email mb-3">
-              <label className="form-label text-light">E-post</label>
-              <input
-                type="email"
-                className="form-control"
-                placeholder="namn@exempel.se"
-                value={guestEmail}
-                onChange={(e) => setGuestEmail(e.target.value)}
-              />
-            </div>
-          )}
-
-          <div className="seating-area">
-            {Object.entries(
-              seats.reduce((acc: Record<number, Seat[]>, seat) => {
-                if (!acc[seat.row_num]) acc[seat.row_num] = [];
-                acc[seat.row_num].push(seat);
-                return acc;
-              }, {})
-            )
-              .sort((a, b) => Number(a[0]) - Number(b[0]))
-              .map(([row, rowSeats]) => (
-                <div key={row} className="seat-row">
-                  {rowSeats
-                    .sort((a, b) => a.seat_num - b.seat_num)
-                    .map((seat) => (
-                      <button
-                        key={seat.seatId}
-                        className={`seat ${
-                          seat.seatStatus === "booked" ? "booked" : ""
-                        } ${
-                          selectedSeats.includes(seat.seatId) ? "selected" : ""
-                        }`}
-                        onClick={() =>
-                          handleSeatClick(seat.seatId, seat.seatStatus)
-                        }
-                      >
-                        {seat.seatId}
-                      </button>
-                    ))}
+            <div className="neon-card ticket-section">
+              <h5 className="section-title">Biljetter</h5>
+              <TicketSelector onTicketChange={setTickets} />
+              {totalTickets > 0 && (
+                <div className="ticket-total-box">
+                  <p>Totalt pris</p>
+                  <h4>{totalPrice} kr</h4>
                 </div>
-              ))}
-          </div>
+              )}
+            </div>
+          </aside>
 
-          {totalTickets > 0 && (
-            <button className="btn neon-btn mt-4" onClick={handleBooking}>
-              Boka {totalTickets} biljett(er)
-            </button>
-          )}
-        </section>
-      </div> <ToastContainer position="top-end" className="p-3 toast-under-navbar">
-      <Toast onClose={() => setShow(false)} show={show} delay={3000} animation={true} autohide className="toast-styling w-auto">
-      <Toast.Header className="toast-header-styling">
-        <img src="holder.js/20x20?text=%20" className="rounded me-2" alt="" />
-        <strong className="me-auto">Notifikation</strong>
-        <small>Just nu</small>
-      </Toast.Header>
-      <Toast.Body>{toastMessage}</Toast.Body>
-    </Toast></ToastContainer>
+          <section className="booking-right">
+            <div className="neon-card seat-card">
+              {screening?.[0] && (
+                <div className="heading-box">
+                  <h3>
+                    {screening[0].auditoriumName} – {formatScreeningTime(screening[0].startTime)}
+                  </h3>
+                </div>
+              )}
+              <div className="screen">DUKEN</div>
+
+              {!user && totalTickets > 0 && (
+                <div className="guest-email">
+                  <label className="form-label">E‑post</label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    placeholder="namn@exempel.se"
+                    value={guestEmail}
+                    onChange={(e) => setGuestEmail(e.target.value)}
+                  />
+                </div>
+              )}
+
+              <div className="seating-area">
+                {Object.entries(
+                  seats.reduce((acc: Record<number, Seat[]>, seat) => {
+                    if (!acc[seat.row_num]) acc[seat.row_num] = [];
+                    acc[seat.row_num].push(seat);
+                    return acc;
+                  }, {})
+                )
+                  .sort((a, b) => Number(a[0]) - Number(b[0]))
+                  .map(([row, rowSeats]) => (
+                    <div key={row} className="seat-row">
+                      {rowSeats
+                        .sort((a, b) => a.seat_num - b.seat_num)
+                        .map((seat) => (
+                          <button
+                            key={seat.seatId}
+                            className={`seat ${seat.seatStatus === "booked" ? "booked" : ""} ${
+                              selectedSeats.includes(seat.seatId) ? "selected" : ""
+                            }`}
+                            onClick={() => handleSeatClick(seat.seatId, seat.seatStatus)}
+                          >
+                            {seat.seatId}
+                          </button>
+                        ))}
+                    </div>
+                  ))}
+              </div>
+
+              {totalTickets > 0 && (
+                <div className="actions">
+                  <button className="btn neon-btn" onClick={handleBooking}>
+                    Boka {totalTickets} biljett(er)
+                  </button>
+                </div>
+              )}
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <ToastContainer position="top-end" className="p-3 toast-under-navbar">
+        <Toast onClose={() => setShow(false)} show={show} delay={3000} animation autohide className="toast-styling w-auto">
+          <Toast.Header className="toast-header-styling">
+            <strong className="me-auto">Notifikation</strong>
+            <small>Just nu</small>
+          </Toast.Header>
+          <Toast.Body>{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
     </main>
   );
 }

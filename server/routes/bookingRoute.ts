@@ -13,6 +13,7 @@ import { Seat, SeatInput, TicketLine } from "./types.js"; // Import central type
 import { requireRole, ROLES } from "../utils/acl.js";
 import { formatScreeningTime } from "../utils/date.js";
 
+
 const router = express.Router();
 
 // Define a specific type for the ticket summary query

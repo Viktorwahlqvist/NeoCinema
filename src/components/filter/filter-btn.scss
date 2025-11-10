@@ -13,4 +13,21 @@
   &:hover {
     box-shadow: $button-hover;
   }
+
+  &.active {
+    transform: scale(1.05);
+      box-shadow: 0 0 25px $color-hover;
+      border-color: $color-hover;
+      background: $color-hover;
+  }
 }
+
+
+
+@media (max-width: 480px){
+    .overall-button{
+      padding: 0.40rem 0.25rem 0.40rem 0.25rem;
+      max-width: 80%;
+      box-shadow: $glow-medium;
+    }
+  }

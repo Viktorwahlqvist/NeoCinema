@@ -6,7 +6,8 @@ export function getMovieImage(title: string) {
   if (name.includes("old")) return "/oldBoyDesktop.png";
   if (name.includes("tron")) return "/tronDesktop.png";
   if (name.includes("ballerina")) return "/ballerinaDesktop.png";
-  return "/vite.svg";
+  if (name.includes("inside out")) return "/insideout2Desktop.png";
+  return "/";
 }
 
 

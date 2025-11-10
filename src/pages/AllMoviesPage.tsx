@@ -102,10 +102,10 @@ export default function AllMoviesPage() {
           </Col>
         </Row>
 
-        <Row className="mx-sm-5">
+        <Row className="mx-1 mx-sm-5">
           <Col xs="4" md="auto">
             <FilterDropdown
-              label="Välj ett datum"
+            label="Välj ett datum"
               options={dateOptions}
               onClick={handleOnClickDate}
               allLabel="Alla datum"

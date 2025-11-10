@@ -300,3 +300,12 @@
     left: 0;
   }
 }
+
+@media (max-width: 400px) {
+  .seat{
+    font-size: 0.6rem;
+  }
+  .neon-text {
+    font-size: 1.5rem;
+  }
+}

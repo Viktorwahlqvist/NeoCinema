@@ -3,34 +3,32 @@ import { useParams, useNavigate } from "react-router-dom";
 import { jsPDF } from "jspdf";
 import { getMovieImage } from "../utils/getMovieImage";
 import "../styles/BookingConfirmation.scss";
-import { Booking } from "../types/Booking"
-import { formatScreeningTime} from "../utils/date";
-
+import { Booking } from "../types/Booking";
+import { formatScreeningTime } from "../utils/date";
+// import { useAuth } from "../context/AuthContext"; // <-- BORTTAGEN!
 
 export default function BookingConfirmation() {
-  const { bookingId } = useParams<{ bookingId: string }>();
+  // 1. ÄNDRAD: Använd 'bookingNumber' från URL:en
+  const { bookingNumber } = useParams<{ bookingNumber: string }>();
   const navigate = useNavigate();
   const [booking, setBooking] = useState<Booking | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  console.log(booking)
-  
+  console.log(booking);
 
-   useEffect(() => {
-    if (!bookingId) return; 
+  // 2. FÖRENKLAD useEffect: Ingen auth-koll behövs
+  useEffect(() => {
+    if (!bookingNumber) return;
 
-    fetch(`/api/booking/${bookingId}`, {
-      credentials: "include"
-    })
-      .then(async res => {
+    // 3. ÄNDRAD: Anropa den nya, offentliga API-routen
+    fetch(`/api/booking/confirmation/${bookingNumber}`)
+      .then(async (res) => {
         if (!res.ok) {
-          // Försök läsa backendens JSON-fel
           let errorMsg = `Något gick fel (${res.status})`;
           try {
             const data = await res.json();
             errorMsg = data.error || errorMsg;
           } catch {
-            // Om JSON inte finns
             errorMsg = res.statusText || errorMsg;
           }
           throw new Error(errorMsg);
@@ -41,20 +39,20 @@ export default function BookingConfirmation() {
       })
       .catch((err) => {
         console.error("Kunde inte hämta bokningsbekräftelse:", err);
-
         setError(err.message);
       });
+  }, [bookingNumber, navigate]); // <-- BORTTAGET: user, isAuthLoading
 
-  }, [bookingId, navigate]); 
-
+  // 4. FÖRENKLAD laddnings-check
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   if (!booking) return <p>Laddar bekräftelse...</p>;
 
   const handleDownloadPDF = () => {
+    // ... (din PDF-kod är perfekt och oförändrad) ...
     const doc = new jsPDF();
     const x_position = 20;
     const line_height = 9;
-    let y_position = 40; 
+    let y_position = 40;
 
     doc.setFontSize(20);
     doc.text("NeoCinema - Biobiljett", x_position, 20);
@@ -65,16 +63,14 @@ export default function BookingConfirmation() {
 
     doc.text(`Film: ${booking.movieTitle}`, x_position, y_position);
     y_position += line_height;
-    // Format screening time, remove seconds for clarity
 
     const formattedScreeningTime = formatScreeningTime(booking.screeningTime);
     doc.text(`Tid: ${formattedScreeningTime}`, x_position, y_position);
     y_position += line_height;
 
     doc.text(`Salong: ${booking.auditoriumName}`, x_position, y_position);
-    y_position += line_height * 1.5; 
+    y_position += line_height * 1.5;
 
-    // --- Tickets ---
     doc.setFontSize(12);
     doc.text("Biljetter:", x_position, y_position);
     y_position += line_height;
@@ -90,23 +86,20 @@ export default function BookingConfirmation() {
       });
     }
 
-    // positions for seats in PDF
-    y_position += 4; 
+    y_position += 4;
     doc.setFontSize(12);
     doc.text("Platser:", x_position, y_position);
     y_position += line_height;
 
     if (booking.seatNumbers && booking.seatNumbers.length > 0) {
       doc.setFontSize(10);
-      // loop through each seat and print it on its own line
       booking.seatNumbers.forEach((seat) => {
         doc.text(seat, x_position + 5, y_position);
-        y_position += line_height - 2;  //move down to next line
+        y_position += line_height - 2;
       });
     }
-  
-    
-    y_position += 4; 
+
+    y_position += 4;
     doc.setFontSize(12);
     doc.text(`Totalt pris: ${booking.totalPrice} kr`, x_position, y_position);
     y_position += line_height;
@@ -119,6 +112,7 @@ export default function BookingConfirmation() {
 
   return (
     <section className="booking-confirmation">
+      {/* ... (resten av din JSX är oförändrad) ... */}
       <div className="confirmation-title">
         <h2>Dina platser är bokade!</h2>
       </div>
@@ -127,7 +121,8 @@ export default function BookingConfirmation() {
         <div className="confirmation-info">
           <div className="booking-text">
             <p>
-              Bokningsid: <strong className="bookingNr">{booking.bookingNumber}</strong>
+              Bokningsid:{" "}
+              <strong className="bookingNr">{booking.bookingNumber}</strong>
             </p>
             <p>
               Bekräftelse har skickats till:
@@ -147,7 +142,7 @@ export default function BookingConfirmation() {
                 </ul>
               </div>
             )}
-            
+
             {booking.seatNumbers && booking.seatNumbers.length > 0 && (
               <div className="ticket-summary">
                 <h4>Platser</h4>
@@ -159,10 +154,9 @@ export default function BookingConfirmation() {
               </div>
             )}
 
-            <p style={{marginTop: "16px"}}>
+            <p style={{ marginTop: "16px" }}>
               <b>Totalt:</b> {booking.totalPrice} kr
             </p>
-
           </div>
         </div>
 

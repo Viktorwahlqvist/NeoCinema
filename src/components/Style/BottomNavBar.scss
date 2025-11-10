@@ -8,7 +8,6 @@
   box-shadow: 0 -2px 20px rgba(0, 255, 255, 0.2);
   border-top: 2px solid rgba(0, 255, 255, 0.4);
   font-family: $font-family-heading;
- 
 
   a,
   button {
@@ -33,6 +32,69 @@
   }
 }
 
+// ========== MOBILE BOTTOM NAV BEHAVIOR ==========
+/* Hidden by default (desktop) */
+.bottom-navbar-custom {
+  display: none;
+}
+
+/* Show & fix to bottom on small screens */
+@media (max-width: 700px) {
+  .bottom-navbar-custom {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1040;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 18px calc(env(safe-area-inset-bottom, 0px) + 6px);
+    height: 78px; /* slightly shorter on phones */
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    backdrop-filter: blur(10px);
+    background: rgba(10,10,26,0.92);
+  }
+
+  /* Optional: give page content bottom padding so buttons aren’t covered */
+  body {
+    padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* If you have a top desktop navbar class, hide it */
+  .desktop-navbar,
+  .main-navbar,
+  header.site-header {
+    display: none !important;
+  }
+
+  .bottom-navbar-custom a,
+  .bottom-navbar-custom button {
+    font-size: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .bottom-navbar-custom .neon-icon {
+    font-size: 1.5rem;
+  }
+}
+
+/* Ultra small tweaks */
+@media (max-width: 380px) {
+  .bottom-navbar-custom {
+    height: 72px;
+  }
+  body {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Fullscreen menu (unchanged) */
 .fullscreen-menu {
   position: fixed;
   bottom: -100%;
@@ -48,9 +110,7 @@
   z-index: 1050;
   font-family: $font-family-heading;
 
-  &.open {
-    bottom: 0;
-  }
+  &.open { bottom: 0; }
 
   .menu-content {
     display: flex;
@@ -89,5 +149,19 @@
       background: rgba(0, 255, 255, 0.1);
       transform: scale(1.05);
     }
+  }
+}
+
+/* Ensure no bottom padding on desktop */
+@media (min-width: 701px) {
+  body {
+    padding-bottom: 0 !important;
+  }
+}
+
+/* Mobile: reserve space for fixed bottom bar */
+@media (max-width: 700px) {
+  body {
+    padding-bottom: calc(78px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }

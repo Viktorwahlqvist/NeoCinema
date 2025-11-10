@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { jsPDF } from "jspdf";
-import QRCode from "qrcode";
-import { getMovieImage } from "../utils/getMovieImage";
+import * as QRCode from "qrcode";
+import "../styles/BookingConfirmation.scss";
 import { formatScreeningTime } from "../utils/date";
 import { Booking } from "../types/Booking";
-import "../styles/BookingConfirmation.scss";
+import useFetch from "../hook/useFetch";
 
 async function toDataUrl(url: string): Promise<string | null> {
   try {
@@ -134,8 +134,18 @@ async function buildPdf(booking: Booking, qrDataUrl: string | null) {
     doc.setFontSize(13);
     doc.setTextColor(colors.text);
     const valX = labelX + doc.getTextWidth(label) + 6;
-    doc.text(priceFormat(booking.totalPrice), valX, curY + 6);
 
+    // Ensure a numeric total (fallback to sum of tickets if needed)
+    const ticketsSum = (booking.tickets ?? []).reduce(
+      (sum, t) => sum + (t.qty ?? 1) * (t.price ?? 0),
+      0
+    );
+    const total =
+      typeof booking.totalPrice === "number"
+        ? booking.totalPrice
+        : Number(booking.totalPrice ?? ticketsSum);
+
+    doc.text(String(priceFormat(total)), valX, curY + 6);
     y = curY + blockGap + 6;
   }
 
@@ -200,34 +210,27 @@ async function buildPdf(booking: Booking, qrDataUrl: string | null) {
 export default function BookingConfirmation() {
   const { bookingNumber } = useParams<{ bookingNumber: string }>();
   const navigate = useNavigate();
-  const [booking, setBooking] = useState<Booking | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!bookingNumber) return;
-    fetch(`/api/booking/confirmation/${bookingNumber}`)
-      .then(async (res) => {
-        if (!res.ok) {
-          let msg = `Fel (${res.status})`;
-          try { const d = await res.json(); msg = d.error || msg; } catch {}
-          throw new Error(msg);
-        }
-        return res.json() as Promise<Booking>;
-      })
-      .then(setBooking)
-      .catch((e) => setError(e.message));
-  }, [bookingNumber]);
+  // Fetch booking data via hook (skip if no id)
+  const {
+    data: booking,
+    isLoading,
+    error,
+  } = useFetch<Booking>(
+    bookingNumber ? `/api/booking/confirmation/${bookingNumber}` : "",
+    { skip: !bookingNumber }
+  );
 
   useEffect(() => {
     if (!booking) return;
     QRCode.toDataURL(booking.bookingNumber, { errorCorrectionLevel: "L", margin: 2, scale: 6 })
-      .then(setQrDataUrl)
+      .then((url: string) => setQrDataUrl(url))
       .catch(() => {});
   }, [booking]);
 
   if (error) return <p style={{ color: "red" }}>{error}</p>;
-  if (!booking) return <p>Laddar bekräftelse...</p>;
+  if (isLoading || !booking) return <p>Laddar bekräftelse...</p>;
 
   return (
     <section className="booking-confirmation">

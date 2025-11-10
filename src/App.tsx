@@ -12,6 +12,7 @@ import { useIsMobile } from "./hook/useIsMobile";
 import ProfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import CancelBookingPage from "./pages/CancekBookingPage";
 
 function App() {
   const isMobile = useIsMobile();
@@ -24,21 +25,14 @@ function App() {
           <Route path="/movies" element={<AllMoviesPage />} />
           <Route path="/movie/:id" element={<MovieDetailPage />} />
           <Route path="/booking/:screeningId" element={<BookingPage />} />
-          
-          {/* === ÄNDRING HÄR === */}
           <Route
-            path="/Bekräftelse/:bookingNumber" // <-- ÄNDRAD till :bookingNumber
-            element={<BookingConfirmation />}    // <-- BORTTAGEN <ProtectedRoute>
-          />
-          {/* === SLUT PÅ ÄNDRING === */}
-          
+            path="/Bekräftelse/:bookingNumber" 
+            element={<BookingConfirmation />}  />      
           <Route path="/kiosk" element={<KioskPage />} />
           <Route path="/AboutUs" element={<AboutUs />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          {/* ProfilePage skyddar sig själv internt, 
-            men du KAN också svepa in den i <ProtectedRoute> 
-          */}
+          <Route path="/avboka/:token" element={<CancelBookingPage />} />
           <Route path="/profile" element={<ProfilePage />} />
         </Routes>
 

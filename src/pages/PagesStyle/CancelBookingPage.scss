@@ -1,0 +1,93 @@
+.cancel-booking-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, #0a0a0a 0%, #000 100%);
+  color: #e0e0e0;
+  text-align: center;
+  padding: 2rem;
+
+  .cancel-box {
+    background: rgba(15, 15, 15, 0.85);
+    border: 1px solid rgba(0, 234, 255, 0.8);
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.2), inset 0 0 20px rgba(0, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 100%;
+    transition: all 0.3s ease;
+
+    h2 {
+      color: #e9b3ff;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 10px #b000ff;
+    }
+
+    h3 {
+      color: #00bfff;
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 8px #00bfff;
+    }
+
+    p {
+      color: #b8b8b8;
+      margin-bottom: 1.2rem;
+      font-size: 1rem;
+    }
+
+    button {
+      border: none;
+      padding: 0.6rem 1.4rem;
+      border-radius: 6px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      transition: 0.3s;
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+
+      & + button {
+        margin-left: 10px;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+
+    .btn-confirm {
+      background: #ff003c;
+      color: #fff;
+      box-shadow: 0 0 15px rgba(255, 0, 60, 0.6);
+
+      &:hover {
+        background: #ff3366;
+        box-shadow: 0 0 25px rgba(255, 0, 60, 0.8);
+      }
+    }
+
+    .btn-cancel {
+      background: transparent;
+      border: 1px solid #00ffff;
+      color: #00ffff;
+      margin-top: 10px;
+
+      &:hover {
+        background: rgba(0, 255, 255, 0.1);
+        box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+      }
+    }
+
+    .error {
+      color: #ff3366;
+      text-shadow: 0 0 6px rgba(255, 0, 60, 0.6);
+    }
+
+    .success {
+      color: #00ff99;
+      text-shadow: 0 0 6px rgba(0, 255, 153, 0.6);
+    }
+  }
+}

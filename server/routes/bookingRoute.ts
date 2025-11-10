@@ -1,10 +1,6 @@
 import express, { Request } from "express";
 import { db } from "../db.js";
-import {
-  ResultSetHeader,
-  RowDataPacket,
-  PoolConnection,
-} from "mysql2/promise";
+import {ResultSetHeader,RowDataPacket, PoolConnection,} from "mysql2/promise";
 import randomNumber from "../utils/randomNumber.js";
 import { sendEmail } from "./Mailer.js";
 import { broadcastSeatUpdate } from "../services/sseRoute.js";
@@ -12,6 +8,7 @@ import "../utils/session.d.js"; // Loads global session types
 import { Seat, SeatInput, TicketLine } from "./types.js"; // Import central types
 import { requireRole, ROLES } from "../utils/acl.js";
 import { formatScreeningTime } from "../utils/date.js";
+import crypto from 'crypto';
 
 
 const router = express.Router();
@@ -106,14 +103,18 @@ router.post("/bookings", async (req, res) => {
         .status(400)
         .json({ message: "One or more seats already booked" });
     }
-
+    
     // 2. Create the main booking record
-    const bookingNumber = randomNumber();
-    const [bookingRes] = await connection.query<ResultSetHeader>(
-      `INSERT INTO bookings (bookingNumber, userId, screeningId, date, guestEmail)
-       VALUES (?, ?, ?, NOW(), ?)`,
-      [bookingNumber, userId, screeningId, userId ? null : guestEmail]
-    );
+   const token = crypto.randomBytes(32).toString('hex');
+   const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 timmar
+  
+  // 2. Skapa bokningen (med de nya fälten)
+  const bookingNumber = randomNumber();
+  const [bookingRes] = await connection.query<ResultSetHeader>(
+    `INSERT INTO bookings (bookingNumber, userId, screeningId, date, guestEmail, cancellation_token, cancellation_token_expires)
+     VALUES (?, ?, ?, NOW(), ?, ?, ?)`,
+    [bookingNumber, userId, screeningId, userId ? null : guestEmail, token, expires]
+  );
     const bookingId = bookingRes.insertId;
 
     // 3. Insert all booked seats into the pivot table
@@ -151,17 +152,19 @@ router.post("/bookings", async (req, res) => {
     } else {
       recipientEmail = guestEmail;
     }
+    
 
     const publicUrl = process.env.PUBLIC_URL || "http://localhost:3000"; // Fallback för utveckling
     const logoUrl = `${publicUrl}/NeoCinema.png`;
+    const cancelUrl = `${publicUrl}/avboka/${token}`;
 
-    // --- Ny, snyggare e-postmall ---
+    
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; background-color: #f4f4f4; padding: 20px; width: 100%;">
         <table width="100%" border="0" cellspacing="0" cellpadding="0">
           <tr>
             <td>
-              <table style="max-width: 600px; width: 100%; margin: 0 auto; background-color: #121212; color: #eaeaea; border-radius: 8px; overflow: hidden;">
+              <table style="max-width: 600px; width: 100%; margin: 0 auto; background-color: #121212; color: #eaeaea; border-radius: 8px; overflow: hidden; border: 2px solid #00BFFF;">
                 
                 <tr>
                   <td style="padding: 30px 40px 10px 40px; text-align: center;">
@@ -180,7 +183,7 @@ router.post("/bookings", async (req, res) => {
                       ${bookingNumber}
                     </p>
                     
-                    <hr style="border: 0; border-top: 1px solid #444444; margin: 30px 0;">
+                    <hr style="border: 0; border-top: 2px solid #00BFFF; margin: 30px 0;">
                     
                     <h3 style="color: #ffffff;">Bokningsdetaljer</h3>
                     <p style="margin: 5px 0;">
@@ -200,12 +203,18 @@ router.post("/bookings", async (req, res) => {
                       ${seatsHtmlList}
                     </ul>
                     
-                    <hr style="border: 0; border-top: 1px solid #444444; margin: 30px 0;">
+                    <hr style="border: 0; border-top: 2px solid #00BFFF; margin: 30px 0;">
                     
                     <p style="font-size: 1.3em; color: #ffffff; margin-bottom: 30px; text-align: left;">
                       <b>Totalt pris: ${totalPrice} kr</b>
                     </p>
                     
+                    <p style="text-align: center; margin: 20px 0;">
+                      <a href="${cancelUrl}" style="color: #FF5555; text-decoration: underline;">
+                        Avboka din bokning (länken är giltig i 24 timmar)
+                      </a>
+                    </p>
+                                          
                     <p style="font-size: 0.9em; color: #888888; text-align: center; margin-bottom: 0;">
                       Vi ser fram emot att se dig på bion!
                     </p>
@@ -226,10 +235,10 @@ router.post("/bookings", async (req, res) => {
       });
     }
 
-    // 6. Commit the transaction
+    // Commit the transaction
     await connection.commit();
 
-    // 7. Notify all connected SSE clients of the seat update
+    // Notify all connected SSE clients of the seat update
     broadcastSeatUpdate({
       seatIds: seats.map((s: SeatInput) => s.seatId),
       status: "booked",
@@ -320,7 +329,7 @@ router.get(
 
       const booking = rows[0];
 
-      // 2. Security Check: User must own the booking or be an admin
+      // Security Check: User must own the booking or be an admin
       if (
         booking.userId !== sessionUser.id &&
         sessionUser.role !== ROLES.ADMIN
@@ -330,13 +339,13 @@ router.get(
           .json({ error: "Du har inte behörighet att se denna bokning" });
       }
 
-      // 3. Get the rest of the details using the helper
+      // Get the rest of the details using the helper
       const { tickets, seatNumbers } = await getBookingDetails(
         Number(bookingId),
         db
       );
 
-      // 4. Build and send response
+      // Build and send response
       res.json({
         ...booking,
         tickets,
@@ -380,13 +389,12 @@ router.get("/confirmation/:bookingNumber", async (req, res) => {
     const booking = rows[0];
     const bookingId = booking.bookingId;
 
-    // 2. Get the rest of the details using the helper
+    // Get the rest of the details using the helper
     const { tickets, seatNumbers } = await getBookingDetails(
       bookingId,
       db
     );
 
-    // 3. Build and send response
     res.json({
       ...booking,
       tickets,
@@ -415,7 +423,7 @@ router.delete(
       connection = await db.getConnection();
       await connection.beginTransaction();
 
-      // 1. Get booking info, including owner ID and screening time
+      // Get booking info, including owner ID and screening time
       const [bookingRows] = await connection.query<RowDataPacket[]>(
         `SELECT
          b.userId,
@@ -433,7 +441,7 @@ router.delete(
       }
       const booking = bookingRows[0];
 
-      // 2. Security Check: User must own the booking or be an admin
+      // Security Check: User must own the booking or be an admin
       if (
         booking.userId !== sessionUser.id &&
         sessionUser.role !== ROLES.ADMIN
@@ -444,7 +452,7 @@ router.delete(
           .json({ error: "Du har inte behörighet att avboka detta" });
       }
 
-      // 3. Time-limit Check: Cannot cancel within 2 hours of screening
+      // Time-limit Check: Cannot cancel within 2 hours of screening
       const screeningTime = new Date(booking.start_time).getTime();
       const twoHoursBefore = screeningTime - 2 * 60 * 60 * 1000;
       const now = Date.now();
@@ -456,19 +464,19 @@ router.delete(
           .json({ error: "Tidsgränsen för avbokning har passerat (2 timmar)" });
       }
 
-      // 4. Get seat IDs *before* deleting, for the SSE broadcast
+      // Get seat IDs *before* deleting, for the SSE broadcast
       const [seatRows] = await connection.query<RowDataPacket[]>(
         "SELECT seatId FROM bookingXSeats WHERE bookingId = ?",
         [bookingId]
       );
 
-      // 5. Delete from pivot table first (due to foreign key constraints)
+      // Delete from pivot table first (due to foreign key constraints)
       await connection.query<ResultSetHeader>(
         "DELETE FROM bookingXSeats WHERE bookingId = ?",
         [bookingId]
       );
 
-      // 6. Delete main booking record
+      // Delete main booking record
       await connection.query<ResultSetHeader>(
         "DELETE FROM bookings WHERE id = ?",
         [bookingId]
@@ -477,7 +485,7 @@ router.delete(
       // 7. Commit transaction
       await connection.commit();
 
-      // 8. Notify all connected SSE clients of the seat update
+      // Notify all connected SSE clients of the seat update
       const seatIds: number[] = seatRows.map((row) => row.seatId);
       broadcastSeatUpdate({
         seatIds,
@@ -495,5 +503,84 @@ router.delete(
     }
   }
 );
+// Cancellation via token routes
+router.get("/cancel-details/:token", async (req, res) => {
+  const { token } = req.params;
+  
+  // Finds a booking by its cancellation token
+  const [rows] = await db.query<RowDataPacket[]>(
+    `SELECT b.id, m.title, s.start_time
+     FROM bookings b
+     JOIN screenings s ON b.screeningId = s.id
+     JOIN movies m ON m.id = s.movie_id
+     WHERE b.cancellation_token = ? AND b.cancellation_token_expires > NOW()`,
+    [token]
+  );
 
+  if (rows.length === 0) {
+    return res.status(404).json({ error: "Länken är ogiltig eller har gått ut." });
+  }
+  
+  // Return movie title and screening time - no sensitive info
+  res.json({
+    movieTitle: rows[0].title,
+    screeningTime: rows[0].start_time,
+  });
+});
+
+/**
+ * POST /api/booking/cancel
+ * Utför själva avbokningen. Offentlig.
+ */
+router.post("/cancel", async (req, res) => {
+  const { token } = req.body; // Ta emot token i body för extra säkerhet
+  let connection;
+
+  try {
+    connection = await db.getConnection();
+    await connection.beginTransaction();
+
+    // Find booking with a valid token
+    const [bookingRows] = await connection.query<RowDataPacket[]>(
+      `SELECT b.id, s.id as screeningId
+       FROM bookings b
+       JOIN screenings s ON b.screeningId = s.id
+       WHERE b.cancellation_token = ? AND b.cancellation_token_expires > NOW()
+       LIMIT 1 FOR UPDATE`, 
+      [token]
+    );
+
+    if (bookingRows.length === 0) {
+      await connection.rollback();
+      return res.status(404).json({ error: "Länken är ogiltig eller har redan använts." });
+    }
+    
+    const { id: bookingId, screeningId } = bookingRows[0];
+
+    // Get seatIds BEFORE deletion (for SSE)
+    const [seatRows] = await connection.query<RowDataPacket[]>(
+      "SELECT seatId FROM bookingXSeats WHERE bookingId = ?",
+      [bookingId]
+    );
+
+    await connection.query("DELETE FROM bookingXSeats WHERE bookingId = ?", [bookingId]);
+    await connection.query("DELETE FROM bookings WHERE id = ?", [bookingId]);
+    await connection.commit();
+    // Broadcast seat availability
+    const seatIds: number[] = seatRows.map((row) => row.seatId);
+    broadcastSeatUpdate({
+      seatIds,
+      status: "available",
+      screeningId: screeningId,
+    });
+
+    res.status(200).json({ message: "Bokningen är avbokad." });
+  } catch (e) {
+    if (connection) await connection.rollback();
+    console.error("Fel vid avbokning med token:", e);
+    res.status(500).json({ error: "Serverfel" });
+  } finally {
+    if (connection) connection.release();
+  }
+});
 export default router;

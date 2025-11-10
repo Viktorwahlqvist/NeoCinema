@@ -1,6 +1,3 @@
-// src/middleware/acl.ts
-
-// Importera typerna från Express OCH ladda våra globala tillägg
 import { Request, Response, NextFunction } from "express";
 import "express-session"; 
 
@@ -21,7 +18,7 @@ export const requireRole = (
     }
 
     // check user role
-    const userRole = req.session.user.role; // <-- Kommer nu fungera!
+    const userRole = req.session.user.role; 
     if (!allowedRoles.includes(userRole)) {
       // they are logged in but do not have the right role
       return res

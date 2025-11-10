@@ -87,23 +87,23 @@ export default function AllMoviesPage() {
   }, [upcoming, filterOptions]);
 
   return (
-    <Container fluid className=" container-lg">
+    <Container fluid className=" container-lg mt-md-5">
       <main className="all-movies-container">
-        <Row className="text-container">
+        <Row className="ms-1 ms-md-5 mb-2">
           <Row>
-            <Col xs={12} md={4} lg={4}>
-              <h1 className="all-movies-header">På bio just nu</h1>
+            <Col xs={12} md={6} lg={5}>
+              <h1 className="all-movies-header mb-2">På bio just nu</h1>
             </Col>
           </Row>
-          <Col>
-            <p className="choose-text">
+          <Col >
+            <p className="choose-text mb-4">
               Välj mellan våra två biografer och se vilka filmer som går
             </p>
           </Col>
         </Row>
 
-        <Row className="mx-1 mx-sm-5">
-          <Col xs="4" md="auto">
+        <Row className="d-flex flex-wrap gap-4 ms-md-4">
+          <Col xs={3} sm="auto" className="px-0 ms-3 ms-sm-4">
             <FilterDropdown
             label="Välj ett datum"
               options={dateOptions}
@@ -113,7 +113,7 @@ export default function AllMoviesPage() {
             />
           </Col>
 
-          <Col xs="4" md="auto">
+          <Col xs={3} sm="auto" className="px-0 ms-1 ms-sm-0">
             <FilterDropdown
               label="Alla salonger"
               options={auditoriumOptions}
@@ -123,7 +123,7 @@ export default function AllMoviesPage() {
             />
           </Col>
 
-          <Col xs="3" md="auto" className="d-flex align-items-end">
+          <Col xs={3} sm="auto" className="px-0 ms-1 ms-sm-0">
             <FilterDropdown
               label="Alla åldrar"
               options={[

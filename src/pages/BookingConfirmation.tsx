@@ -5,10 +5,9 @@ import { getMovieImage } from "../utils/getMovieImage";
 import "../styles/BookingConfirmation.scss";
 import { Booking } from "../types/Booking";
 import { formatScreeningTime } from "../utils/date";
-// import { useAuth } from "../context/AuthContext"; // <-- BORTTAGEN!
 
 export default function BookingConfirmation() {
-  // 1. ÄNDRAD: Använd 'bookingNumber' från URL:en
+  
   const { bookingNumber } = useParams<{ bookingNumber: string }>();
   const navigate = useNavigate();
   const [booking, setBooking] = useState<Booking | null>(null);
@@ -16,11 +15,11 @@ export default function BookingConfirmation() {
 
   console.log(booking);
 
-  // 2. FÖRENKLAD useEffect: Ingen auth-koll behövs
+
   useEffect(() => {
     if (!bookingNumber) return;
 
-    // 3. ÄNDRAD: Anropa den nya, offentliga API-routen
+   
     fetch(`/api/booking/confirmation/${bookingNumber}`)
       .then(async (res) => {
         if (!res.ok) {
@@ -41,14 +40,13 @@ export default function BookingConfirmation() {
         console.error("Kunde inte hämta bokningsbekräftelse:", err);
         setError(err.message);
       });
-  }, [bookingNumber, navigate]); // <-- BORTTAGET: user, isAuthLoading
+  }, [bookingNumber, navigate]); 
 
-  // 4. FÖRENKLAD laddnings-check
+  
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   if (!booking) return <p>Laddar bekräftelse...</p>;
 
   const handleDownloadPDF = () => {
-    // ... (din PDF-kod är perfekt och oförändrad) ...
     const doc = new jsPDF();
     const x_position = 20;
     const line_height = 9;
@@ -112,7 +110,6 @@ export default function BookingConfirmation() {
 
   return (
     <section className="booking-confirmation">
-      {/* ... (resten av din JSX är oförändrad) ... */}
       <div className="confirmation-title">
         <h2>Dina platser är bokade!</h2>
       </div>

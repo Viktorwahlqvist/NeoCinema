@@ -16,11 +16,9 @@ const router = express.Router();
 // Define a specific type for the ticket summary query
 type TicketRow = TicketLine & RowDataPacket;
 
-/**
- * Helper function to gather all booking details (movie, tickets, seats).
- * This helps keep the main routes DRY (Don't Repeat Yourself).
- * @param connection Can be a PoolConnection (for transactions) or the base db pool.
- */
+
+// Helper function to gather all booking details (movie, tickets, seats).
+
 async function getBookingDetails(
   bookingId: number,
   connection: PoolConnection | typeof db

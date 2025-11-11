@@ -4,6 +4,8 @@ import { useAuth } from "../AuthContext";
 import "./PagesStyle/ProfilePage.scss";
 import { formatScreeningTime} from "../utils/date";
 import { Booking } from "../types/Booking";
+import ConfirmCancelModal from "../components/ConfirmCancelModal";
+
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -21,6 +23,17 @@ export default function ProfilePage() {
     loading: false,
     error: null,
   });
+
+  const [modalState, setModalState] = useState<{
+  show: boolean;
+  bookingId: number | null;
+  bookingTitle: string | null;
+}>({
+  show: false,
+  bookingId: null,
+  bookingTitle: null,
+});
+
 
   useEffect(() => {
     // wait until Auth is done loading
@@ -63,33 +76,49 @@ export default function ProfilePage() {
     navigate("/");
   };
 
-  const handleCancel = async (bookingId: number) => {
-    if (!window.confirm("Är du säker på att du vill avboka?")) return;
+  const openCancelModal = (bookingId: number, bookingTitle: string) => {
+  setModalState({
+    show: true,
+    bookingId,
+    bookingTitle,
+  });
+};
 
-    setCancelStatus({ id: bookingId, loading: true, error: null });
 
-    try {
-      const res = await fetch(`/api/booking/${bookingId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+  const handleCancel = async () => {
+  if (!modalState.bookingId) return;
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(
-          data.error || `Avbokning misslyckades (status ${res.status})`
-        );
-      }
+  setCancelStatus({ id: modalState.bookingId, loading: true, error: null });
 
-      setBookings((currentBookings) =>
-        currentBookings.filter((b) => b.bookingId !== bookingId)
+  try {
+    const res = await fetch(`/api/booking/${modalState.bookingId}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(
+        data.error || `Avbokning misslyckades (status ${res.status})`
       );
-      setCancelStatus({ id: null, loading: false, error: null });
-    } catch (err: any) {
-      console.error(err);
-      setCancelStatus({ id: bookingId, loading: false, error: err.message });
     }
-  };
+
+    setBookings((prev) =>
+      prev.filter((b) => b.bookingId !== modalState.bookingId)
+    );
+
+    setCancelStatus({ id: null, loading: false, error: null });
+    setModalState({ show: false, bookingId: null, bookingTitle: null }); // stäng modalen
+  } catch (err: any) {
+    console.error(err);
+    setCancelStatus({
+      id: modalState.bookingId,
+      loading: false,
+      error: err.message,
+    });
+  }
+};
+
 
   const canCancel = (screeningTime: string) => {
     const screeningDate = new Date(screeningTime);
@@ -153,7 +182,7 @@ export default function ProfilePage() {
         <br />
         {isCancellable && (
           <button
-            onClick={() => handleCancel(booking.bookingId)}
+            onClick={() => openCancelModal(booking.bookingId, booking.movieTitle)}
             disabled={isThisCancelling}
             style={{
               marginTop: 8,
@@ -176,7 +205,7 @@ export default function ProfilePage() {
   };
 
   return (
-  <div className="profile-container">
+  <div className="profile-container xs-mb-5">
     <h2>Hej, {user.firstName}</h2>
     <p>E-post: {user.email}</p>
     <button className="logout-btn" onClick={logout}>Logga ut</button>
@@ -195,7 +224,8 @@ export default function ProfilePage() {
         {canCancel(b.screeningTime) && (
           <button
             className="cancel-btn"
-            onClick={() => handleCancel(b.bookingId)}
+         onClick={() => openCancelModal(b.bookingId, b.movieTitle)}
+
             disabled={cancelStatus.loading && cancelStatus.id === b.bookingId}
           >
             {cancelStatus.loading && cancelStatus.id === b.bookingId
@@ -222,6 +252,16 @@ export default function ProfilePage() {
         Totalt: {b.totalPrice} kr
       </div>
     ))}
+
+    
+<ConfirmCancelModal
+  show={modalState.show}
+  onClose={() =>
+    setModalState({ show: false, bookingId: null, bookingTitle: null })
+  }
+  onConfirm={handleCancel}
+  bookingTitle={modalState.bookingTitle || ""}
+/>
   </div>
 );
 

@@ -87,7 +87,7 @@ export default function AllMoviesPage() {
   }, [upcoming, filterOptions]);
 
   return (
-    <Container fluid className=" container-lg mt-md-5">
+    <Container fluid className=" container-lg mt-md-5 ">
       <main className="all-movies-container">
         <Row className="ms-1 ms-md-5 mb-2">
           <Row>

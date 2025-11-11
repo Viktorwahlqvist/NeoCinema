@@ -278,7 +278,8 @@ export default function BookingPage() {
   if (!seats?.length) return <p>Inga stolar hittades.</p>;
 
   return (
-    <main className="booking-page text-center mb-5">
+    <main className="booking-page text-center xs-mb-5">
+      {/* SSE listener component */}
       <SeatSSE
         onSeatUpdate={handleSeatUpdate}
         screeningId={Number(screeningId)}

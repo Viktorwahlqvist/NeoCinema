@@ -4,6 +4,8 @@
   background-color: $background-gradient;
   box-shadow: 0 0 10px $color-hover;
   border-radius: $border-radius;
+  padding-bottom: 0.5rem;
+  margin-bottom: 4rem;
 
   @media (max-width: 1180px) {
     font-size: 0.8rem;

@@ -8,7 +8,7 @@ import UpcomingMovies from "../components/UpcomingMovies";
 import { useIsMobile } from "../hook/useIsMobile";
 import { MovieCarousel } from "../components/MovieCarousel";
 import { Stack } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function chunk<T>(arr: T[], size: number): T[][] {
   const out: T[][] = [];
@@ -73,11 +73,17 @@ export default function HomePage() {
             wrap={true}
           >
             {groups.map((grp, idx) => (
-              <Carousel.Item key={grp[0].id}>
-                <div className="d-flex justify-content-center">
-                  <MovieCard movie={grp[0]} isActive={idx === activeIndex} />
-                </div>
-              </Carousel.Item>
+           <Carousel.Item key={grp[0].id}>
+           <div className="d-flex justify-content-center">
+           <Link
+          to={`/movie/${grp[0].id}`}
+            className="movie-card-link"
+            aria-label={`Öppna ${grp[0].title}`}
+           >
+           <MovieCard movie={grp[0]} isActive={idx === activeIndex} />
+           </Link>
+           </div>
+          </Carousel.Item>
             ))}
           </Carousel>
         </main>

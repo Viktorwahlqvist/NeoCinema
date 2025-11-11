@@ -386,7 +386,7 @@ export default function BookingPage() {
           )}
 
           {totalTickets > 0 && (
-            <button className="btn neon-btn mt-4" onClick={handleBooking}>
+            <button className="btn neo-btn mt-4" onClick={handleBooking}>
               Boka {totalTickets} biljett(er)
             </button>
           )}

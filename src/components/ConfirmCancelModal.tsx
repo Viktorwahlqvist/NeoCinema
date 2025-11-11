@@ -36,7 +36,6 @@ const ConfirmCancelModal: React.FC<ConfirmCancelModalProps> = ({
 
       <Modal.Footer className="confirm-cancel-footer">
         <Button
-          variant="secondary"
           onClick={onClose}
           className="cancel-btn"
         >

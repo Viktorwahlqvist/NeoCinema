@@ -10,7 +10,7 @@ export default function Trailer({ videoId, title }: TrailerProps) {
 
   return (
     <figure className="ratio ratio-16x9 trailer">
-      <iframe src={embedUrl} className="trailer-iframe" title={title} />
+      <iframe src={embedUrl} className="trailer-iframe" title={title} referrerPolicy="strict-origin-when-cross-origin" />
     </figure>
   );
 }

@@ -21,14 +21,14 @@ function findAdjacentSeats(
   n: number,
   startSeatId?: number
 ): number[] {
-  // 1. Group seats by row
+  // Group seats by row
   const rows = seats.reduce((acc: Record<number, Seat[]>, seat) => {
     if (!acc[seat.row_num]) acc[seat.row_num] = [];
     acc[seat.row_num].push(seat);
     return acc;
   }, {});
 
-  // 2. Logic for when a user clicks a specific seat
+  // Logic for when a user clicks a specific seat
   if (startSeatId) {
     const clickedSeat = seats.find((s) => s.seatId === startSeatId);
     if (!clickedSeat) return [];
@@ -63,7 +63,7 @@ function findAdjacentSeats(
     }
   }
 
-  // 3. Logic for automatic selection (find the best available block)
+  // Logic for automatic selection (find the best available block)
   for (const row of Object.values(rows)) {
     const available = row
       .filter((s) => s.seatStatus === "available")
@@ -79,11 +79,10 @@ function findAdjacentSeats(
     }
   }
 
-  // 4. If no block is found
+  
   return [];
 }
 
-// --- Component Start ---
 export default function BookingPage() {
   const { screeningId } = useParams<{ screeningId: string }>();
   const navigate = useNavigate();
@@ -118,7 +117,7 @@ useEffect(() => {
     0
   );
 
-  // 1. Fetch all seats for this screening on load
+  // Fetch all seats for this screening on load
   const {
     data: initialSeats,
     isLoading: isSeatsLoading,
@@ -133,7 +132,7 @@ useEffect(() => {
     if (initialSeats) setSeats(initialSeats);
   }, [initialSeats]);
 
-  // 2. Define API hooks
+  // Define API hooks
   const { doFetch: postBooking } = useFetch<{
     message: string;
     bookingId: number;
@@ -150,7 +149,7 @@ useEffect(() => {
     }[]
   >("/api/priceTotals", { skip: true });
 
-  // 3. Fetch peripheral screening info (poster, name, etc.)
+  // Fetch peripheral screening info (poster, name, etc.)
   const { data: screening } = useFetch<
     {
       title: string;
@@ -160,7 +159,7 @@ useEffect(() => {
     }[]
   >(`/api/screeningsInfo?screeningId=${screeningId}`, { skip: !screeningId });
 
-  // 4. Main auto-seat-selection logic
+  
   useEffect(() => {
     // Clear any previous errors when ticket count changes
     setSeatError(null);
@@ -184,7 +183,7 @@ useEffect(() => {
     }
   }, [seats, totalTickets]);
 
-  // 5. SSE Event Handler: Called by <SeatSSE> when an update is received
+  // SSE Event Handler: Called by <SeatSSE> when an update is received
   const handleSeatUpdate = (
     seatIds: number[],
     status: "booked" | "available"
@@ -215,7 +214,7 @@ useEffect(() => {
     }
   };
 
-  // 6. Manual Seat Click Handler
+  // Manual Seat Click Handler
   const handleSeatClick = (seatId: number, status: string) => {
     if (status === "booked" || !seats) return;
 
@@ -234,7 +233,7 @@ useEffect(() => {
     }
   };
 
-  // 7. Booking Submission Handler
+  // Booking Submission Handler
   const handleBooking = async () => {
     // --- Validation Guards ---
     if (!totalTickets) return alert("Välj minst en biljett!");
@@ -245,7 +244,6 @@ if (!user && !guestEmail) { setShowEmailToast(true);
   return;
 }
 
-    // --- Data Transformation ---
     // Collapse duplicate ticket types (e.g., 1x Adult + 1x Adult = 2x Adult)
     const uniqueTickets = tickets.reduce(
       (acc, cur) => {
@@ -274,16 +272,9 @@ if (!user && !guestEmail) { setShowEmailToast(true);
       guestEmail: user ? undefined : guestEmail,
     };
 
-    // --- API Call ---
     try {
       const result = await postBooking(bookingData, "POST");
-      const bookingNumber = result.bookingNumber; // Now correctly typed
-
-      // (Optional) Get price breakdown, though it's not used
-      const breakdown = await getPriceBreakdown(
-        `/api/priceTotals?bookingId=${result.bookingId}`,
-        "GET"
-      );
+      const bookingNumber = result.bookingNumber; 
       
       // Navigate to the public confirmation page
       navigate(`/Bekräftelse/${bookingNumber}`);
@@ -313,6 +304,9 @@ if (error) return showDelay ? (
   LoadingUI
 );
 
+  if (isSeatsLoading || isAuthLoading) return <p>Laddar...</p>;
+  if (error) return <p>Ett fel uppstod: {error}</p>;
+
   return (
     <main className="booking-page text-center xs-mb-5">
       {/* SSE listener component */}
@@ -322,7 +316,6 @@ if (error) return showDelay ? (
       />
       
       <div className="booking-layout">
-        {/* Left Column (Movie Info & Tickets) */}
         <aside className="booking-left">
           {screening?.[0] && (
             <div className="movie-poster-box">
@@ -347,7 +340,6 @@ if (error) return showDelay ? (
           )}
         </aside>
 
-        {/* Right Column (Seating & Booking) */}
         <section className="booking-right">
           {screening?.[0] && (
             <div className="heading-box">
@@ -405,8 +397,6 @@ if (error) return showDelay ? (
                 </div>
               ))}
           </div>
-
-          {/* Error message for seat selection */}
           {seatError && (
             <p style={{ color: "red", marginTop: "15px" }}>{seatError}</p>
           )}

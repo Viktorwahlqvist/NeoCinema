@@ -1,0 +1,164 @@
+@use "../../styles/variables" as *;
+
+// Keyframe animation for the card to fade in with a glow
+@keyframes fadeInGlow {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+    box-shadow: none;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 40px $color-hover;
+  }
+}
+
+// Main wrapper for the entire page
+.booking-confirmation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%; // Responsive width
+  max-width: 900px; // Max width for the whole component
+  margin: 4rem auto 6rem auto; // Center component with top/bottom margin
+  color: $color-text;
+}
+
+// Page title ("Dina platser är bokade!")
+.confirmation-title {
+  color: $color-stroke;
+  font-size: $font-size-heading-md;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: $spacing-lg;
+  text-shadow: $text-glow;
+}
+
+// The main card with the neon glow
+.confirmation-grid {
+  width: 100%;
+  background-color: rgba(26, 27, 46, 0.4); // Dark background
+  border-radius: 30px;
+  border: 2px solid $color-hover; // Neon-blå kant
+  box-shadow: 0 0 40px $color-hover;
+  animation: fadeInGlow 0.8s ease-in-out;
+  padding: 2rem;
+}
+
+// Movie title inside the card (e.g., "The Matrix")
+.movie-title {
+  font-family: $font-family-heading;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #ffffff; // Vit färg för filmtiteln
+  text-align: center; // Center title on mobile
+  margin-bottom: 2rem;
+  line-height: 1.3;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba($color-stroke, 0.4);
+}
+
+// The 2-column grid container (Details | QR)
+.confirmation-inner {
+  display: grid;
+  grid-template-columns: 1fr; // Mobile-first: 1 column
+  gap: 2.5rem; // Space between Details and QR code when stacked
+  width: 100%;
+
+  // Targets the <QrCodeCard> component (the 2nd child)
+  // and centers it on mobile
+  > :nth-child(2) {
+    display: flex;
+    flex-direction: column;
+    align-items: center; // Center QR code horizontally
+    justify-content: center;
+  }
+}
+
+// The left-hand column (Details)
+.details-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem; // Space between TicketList, SeatList, MetaInfo
+  font-family: $font-family-heading;
+
+  // We assume your components <TicketList>, <SeatList>, <MetaInfo>
+  // have their own internal styling (h4, ul, p, etc.)
+  // which is a good component-based approach.
+}
+
+// Container for the action buttons (Download, Back)
+.btn-group {
+  display: flex;
+  flex-direction: column; // Mobile-first: stack buttons
+  gap: $spacing-md;
+  margin-top: $spacing-lg;
+  width: 100%;
+  max-width: 350px; // Prevent buttons from being too wide on mobile
+}
+
+// Styling for the glow buttons
+.btn-glow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: $spacing-sm;
+  background-color: transparent;
+  font-family: $font-family-heading;
+  border: $border-width $border-style $color-stroke;
+  font-weight: 500;
+  font-size: $font-size-body;
+  border-radius: $border-radius;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: all $transition-speed ease;
+  box-shadow: $glow-strong;
+  color: white;
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 0 25px $color-hover;
+    transform: scale(1.05);
+    border-color: $color-hover;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+  }
+}
+
+
+
+
+@media (min-width: 650px) {
+  .confirmation-grid {
+    padding: 2.5rem 3rem; 
+  }
+
+  .movie-title {
+    text-align: left; 
+  }
+
+  
+  .confirmation-inner {
+    grid-template-columns: 1fr 200px;
+    gap: 3rem;
+
+    > :nth-child(2) {
+      justify-content: flex-start;
+      padding-top: 1rem;
+    }
+  }
+
+  .btn-group {
+    flex-direction: row;
+    max-width: none;
+  }
+
+  .btn-glow {
+    width: auto; 
+  }
+}

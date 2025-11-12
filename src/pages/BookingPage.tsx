@@ -19,7 +19,7 @@ function findAdjacentSeats(
   n: number,
   startSeatId?: number
 ): number[] {
-  // 1. Group seats by row
+  // Group seats by row
   const rows = seats.reduce((acc: Record<number, Seat[]>, seat) => {
     if (!acc[seat.row_num]) acc[seat.row_num] = [];
     acc[seat.row_num].push(seat);
@@ -275,7 +275,7 @@ export default function BookingPage() {
 
   if (isSeatsLoading || isAuthLoading) return <p>Laddar...</p>;
   if (error) return <p>Ett fel uppstod: {error}</p>;
-  if (!seats?.length) return <p>Inga stolar hittades.</p>;
+  
 
   return (
     <main className="booking-page text-center xs-mb-5">
@@ -372,7 +372,7 @@ export default function BookingPage() {
           )}
 
           {totalTickets > 0 && (
-            <button className="btn neon-btn mt-4" onClick={handleBooking}>
+            <button className="btn neo-btn mt-4" onClick={handleBooking}>
               Boka {totalTickets} biljett(er)
             </button>
           )}

@@ -227,6 +227,16 @@
   }
 }
 
+.neo-btn {
+  background: #00eaff;
+  border: none;
+  color: #000;
+  font-weight: 600;
+  padding: 0.6rem 1.4rem;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
 .neon-btn {
   background: #00eaff;
   border: none;
@@ -264,7 +274,7 @@
   }
 
   .booking-right {
-    width: 100%;
+    width: 90%;
   }
 
   .screen {
@@ -273,7 +283,7 @@
   }
 
   .seating-area {
-    width: 100%;
+    width: 100%; // ändra här flr mobile
     max-width: 100%;
     padding: 0 0.5rem;
   }
@@ -285,17 +295,22 @@
   .seat {
     width: 28px;
     height: 28px;
-    font-size: 0.7rem;
+    font-size: 0.5rem;
   }
 
-  .neon-btn {
+  .neo-btn {
     padding: 0.5rem 1rem;
     font-size: 0.9rem;
     margin-bottom: 5rem;
   }
 
+    .neon-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
   .neon-text {
-    font-size: 2rem;
+    font-size: 1rem;
     text-align: center;
     left: 0;
   }
@@ -303,9 +318,6 @@
 
 @media (max-width: 400px) {
   .seat{
-    font-size: 0.6rem;
-  }
-  .neon-text {
-    font-size: 1.5rem;
+    font-size: 0,4rem;
   }
 }

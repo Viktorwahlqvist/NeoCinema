@@ -285,7 +285,6 @@ export default function BookingPage() {
   // --- Render Logic ---
   if (isSeatsLoading || isAuthLoading) return <p>Laddar...</p>;
   if (error) return <p>Ett fel uppstod: {error}</p>;
-  if (!seats?.length) return <p>Inga stolar hittades.</p>;
 
   return (
     <main className="booking-page text-center xs-mb-5">

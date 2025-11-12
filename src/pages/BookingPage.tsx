@@ -9,6 +9,8 @@ import { Seat, User } from "../types/Booking"; // Assumes types are from central
 import { formatScreeningTime } from "../utils/date";
 import Toast from "react-bootstrap/Toast";
 import ToastContainer from "react-bootstrap/ToastContainer";
+import Spinner from "react-bootstrap/Spinner";
+import Alert from "react-bootstrap/Alert";
 
 /**
  * Finds a contiguous block of 'n' available seats.
@@ -84,10 +86,17 @@ function findAdjacentSeats(
 export default function BookingPage() {
   const { screeningId } = useParams<{ screeningId: string }>();
   const navigate = useNavigate();
+
+  const [showDelay, setShowDelay] = useState(false);
+useEffect(() => {
+  const t = setTimeout(() => setShowDelay(true), 4000);
+  return () => clearTimeout(t);
+}, []);
   
   // State for SSE toast notifications
   const [show, setShow] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [showEmailToast, setShowEmailToast] = useState(false);
 
   // Core booking state
   const [tickets, setTickets] = useState<
@@ -99,6 +108,7 @@ export default function BookingPage() {
   // Auth & Guest state
   const { user, isLoading: isAuthLoading } = useAuth();
   const [guestEmail, setGuestEmail] = useState("");
+  const [showEmailAlert, setShowEmailAlert] = useState(false);
 
   // Derived state (calculated from other state)
   const totalTickets = tickets.reduce((sum, t) => sum + t.count, 0);
@@ -230,8 +240,9 @@ export default function BookingPage() {
     if (seatError) return alert(seatError); // Check for auto-select errors
     if (selectedSeats.length < totalTickets)
       return alert("Du har valt färre stolar än antal biljetter!");
-    if (!user && !guestEmail)
-      return alert("Ange din e-post för att boka som gäst.");
+if (!user && !guestEmail) { setShowEmailToast(true);
+  return;
+}
 
     // Collapse duplicate ticket types (e.g., 1x Adult + 1x Adult = 2x Adult)
     const uniqueTickets = tickets.reduce(
@@ -273,9 +284,28 @@ export default function BookingPage() {
     }
   };
 
+  const LoadingUI = (
+  <div
+    className="d-flex flex-column align-items-center justify-content-center text-light"
+    style={{ minHeight: "60vh" }}
+  >
+    <Spinner animation="border" role="status" />
+    {showDelay && <p className="mt-3 neon-text">Laddar salong & platser...</p>}
+  </div>
+);
+
+// --- Render Logic ---
+if (isSeatsLoading || isAuthLoading) return LoadingUI;
+
+// Shows the error after 4 sec, otherwise continues to spin until the page have loaded
+if (error) return showDelay ? (
+  <div className="text-center text-danger mt-5">{String(error)}</div>
+) : (
+  LoadingUI
+);
+
   if (isSeatsLoading || isAuthLoading) return <p>Laddar...</p>;
   if (error) return <p>Ett fel uppstod: {error}</p>;
-  
 
   return (
     <main className="booking-page text-center xs-mb-5">
@@ -371,6 +401,17 @@ export default function BookingPage() {
             <p style={{ color: "red", marginTop: "15px" }}>{seatError}</p>
           )}
 
+          {showEmailAlert && (
+  <Alert
+    variant="info"
+    onClose={() => setShowEmailAlert(false)}
+    dismissible
+    className="mt-3 neon-alert text-center"
+  >
+     <strong>Ange din e-post</strong> för att boka som gäst.
+  </Alert>
+)}
+
           {totalTickets > 0 && (
             <button className="btn neo-btn mt-4" onClick={handleBooking}>
               Boka {totalTickets} biljett(er)
@@ -400,6 +441,21 @@ export default function BookingPage() {
           </Toast.Header>
           <Toast.Body>{toastMessage}</Toast.Body>
         </Toast>
+
+        <Toast
+    onClose={() => setShowEmailToast(false)}
+    show={showEmailToast}
+    delay={3000}           // autohide after 3 sec
+    animation
+    autohide
+    className="toast-styling toast-email w-auto"
+  >
+    <Toast.Header className="toast-header-styling">
+      <strong className="me-auto">E-post saknas</strong>
+      <small>Viktigt</small>
+    </Toast.Header>
+    <Toast.Body>Ange din e-post för att boka som gäst.</Toast.Body>
+  </Toast>
       </ToastContainer>
     </main>
   );

@@ -73,3 +73,8 @@ box-shadow: 0 0 15px $color-hover;
 .hstack.movie-layout__stack {
   align-items: flex-start !important;
 }
+
+.spinner-border {
+  color: #00eaff !important;
+  filter: drop-shadow(0 0 8px #00eaff);
+}

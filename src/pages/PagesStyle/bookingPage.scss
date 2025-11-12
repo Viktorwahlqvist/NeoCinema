@@ -68,6 +68,28 @@
   flex-wrap: wrap;
 }
 
+.toast-email {
+  background: rgba($color-stroke, 0.12);   
+  border: 1px solid $color-stroke;
+  color: $color-text;
+  box-shadow: $glow-strong;
+  text-shadow: $text-glow;
+  border-radius: $border-radius;
+
+  .toast-header-styling,
+  .toast-body {
+    background: inherit;
+    color: inherit;
+  }
+
+
+  .btn-close {
+    filter: invert(1);
+    opacity: 0.8;
+    &:hover { opacity: 1; }
+  }
+}
+
 .toast-under-navbar {
   position: fixed;
   z-index: 1000;

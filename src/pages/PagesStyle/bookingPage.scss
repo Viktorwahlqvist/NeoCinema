@@ -274,7 +274,7 @@
   }
 
   .booking-right {
-    width: 100%;
+    width: 90%;
   }
 
   .screen {
@@ -283,7 +283,7 @@
   }
 
   .seating-area {
-    width: 100%;
+    width: 100%; // ändra här flr mobile
     max-width: 100%;
     padding: 0 0.5rem;
   }
@@ -295,7 +295,7 @@
   .seat {
     width: 28px;
     height: 28px;
-    font-size: 0.7rem;
+    font-size: 0.5rem;
   }
 
   .neo-btn {
@@ -310,8 +310,14 @@
   }
 
   .neon-text {
-    font-size: 2rem;
+    font-size: 1rem;
     text-align: center;
     left: 0;
+  }
+}
+
+@media (max-width: 400px) {
+  .seat{
+    font-size: 0,4rem;
   }
 }

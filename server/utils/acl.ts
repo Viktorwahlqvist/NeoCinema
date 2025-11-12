@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import "express-session"; 
+import "express-session";
+import "./session.d.ts" 
 
 // knows rolles in the system
 const ROLES = {

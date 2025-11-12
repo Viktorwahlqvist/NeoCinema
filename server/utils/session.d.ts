@@ -1,3 +1,4 @@
+import e from "express";
 import "express-session";
 
 declare module "express-session" {
@@ -5,6 +6,10 @@ declare module "express-session" {
     user?: {
       id: number;
       email: string;
+      role: "admin" | "user"; 
     };
   }
+  
 }
+
+export {};

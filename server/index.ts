@@ -9,17 +9,16 @@ import session from "express-session";
 import cookieParser from "cookie-parser";
 import { screeningsRouter } from "./routes/screeningsRouter.js";
 import connectMySQL from "express-mysql-session";
+import { initSeatSse, startKeepAlive } from "./services/sseRoute.js";
 
 dotenv.config({ path: "../.env" });
 
 const app = express();
 app.use(express.json());
-app.use(cookieParser()); 
-
+app.use(cookieParser());
 
 const MySQLStore = connectMySQL(session);
 const sessionStore = new MySQLStore({}, db as any);
-
 
 app.use(
   session({
@@ -32,17 +31,23 @@ app.use(
       maxAge: (Number(process.env.SESSION_TTL_MIN) || 60) * 60 * 1000,
       httpOnly: true,
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production", 
+      secure: process.env.NODE_ENV === "production",
     },
   })
 );
+
+// Sets up the SSE route
+initSeatSse(app);
+
+// Start keep-alive
+startKeepAlive();
 
 /* ----------  routes  ---------- */
 app.use("/api/movies", moviesRouter);
 app.use("/api/users", usersRoutes);
 app.use("/api/booking", bookingRoute);
-app.use("/api", dynamiskRoute);
 app.use("/api/screenings", screeningsRouter);
+app.use("/api", dynamiskRoute);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

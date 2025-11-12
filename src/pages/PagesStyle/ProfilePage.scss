@@ -1,42 +1,114 @@
-.profile-page {
-  background: #050510;
-  color: #e0e0e0;
-  min-height: 100vh;
-  padding: 2rem 1rem;
-  text-align: center;
-}
-
-.neon-text {
-  color: #00eaff;
-  text-shadow: 0 0 5px #00eaff, 0 0 10px #00eaff, 0 0 20px #00eaff;
-}
-
-.booking-history {
-  display: grid;
-  gap: 1rem;
+.profile-container {
   max-width: 800px;
-  margin: 0 auto;
-}
-
-.booking-card {
-  background: rgba(#00eaff, 0.05);
-  border: 1px solid #00eaff;
-  border-radius: 12px;
-  padding: 1rem;
-  text-align: left;
-}
-
-.price {
-  color: #00eaff;
-  font-weight: 600;
-}
-
-.neon-btn-cancel {
-  background: #e50914;
-  border: none;
+  margin: 4rem auto;
+  padding: 2rem;
+  text-align: center;
   color: #fff;
-  font-weight: 600;
-  padding: 0.4rem 1rem;
-  border-radius: 6px;
-  transition: background 0.2s ease;
+
+  h2, h3 {
+    font-family: "Orbitron", sans-serif;
+    text-transform: uppercase;
+    color: #00eaff;
+    text-shadow: 0 0 8px #00eaff;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+  }
+
+  
+  .logout-btn {
+    margin-top: 1rem;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    background: rgba(255, 0, 122, 0.1);
+    color: #ff007a;
+    border: 1px solid #ff007a;
+    text-shadow: 0px 0px 6px #ff007a;
+    box-shadow: 0px 0px 12px rgba(255, 0, 122, 0.6);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.25s;
+
+    &:hover {
+      background: #ff007a;
+      color: #000;
+      box-shadow: 0px 0px 18px #ff007a;
+    }
+  }
+
+  .section-title {
+    margin-top: 3rem;
+    text-shadow: 0 0 6px #00eaff;
+  }
+
+  .empty-text {
+    font-size: 1rem;
+    opacity: 0.7;
+    margin-top: 0.6rem;
+  }
+
+  /* Booking Cards */
+  .booking-card {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid #00eaff;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0px 0px 12px rgba(0, 234, 255, 0.5);
+    text-align: left;
+    transition: 0.25s;
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0px 0px 16px rgba(0, 234, 255, 0.9);
+    }
+
+    strong {
+      color: #00eaff;
+      font-weight: bold;
+      text-shadow: 0 0 5px #00eaff;
+    }
+
+    code {
+      color: #ff00e1;
+      font-size: 0.9rem;
+      text-shadow: 0 0 5px #ff00e1;
+    }
+
+    .cancel-btn {
+      margin-top: 0.8rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.95rem;
+      background: transparent;
+      border: 1px solid #ff0044;
+      color: #ff0044;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.2s;
+      text-shadow: 0 0 4px #ff0044;
+      box-shadow: 0 0 6px rgba(255, 0, 68, 0.5);
+
+      &:hover:not(:disabled) {
+        background: #ff0044;
+        color: #000;
+        box-shadow: 0px 0px 14px #ff0044;
+      }
+
+      &:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+    }
+
+    .cancel-error {
+      color: #ff0044;
+      margin-top: 0.4rem;
+      font-size: 0.9rem;
+    }
+  }
 }
+
+

@@ -12,10 +12,11 @@ import { useIsMobile } from "./hook/useIsMobile";
 import ProfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+
 function App() {
   const isMobile = useIsMobile();
   return (
-    <Router>
+    <>
       {!isMobile && <NavDesk />}
       <div className="app-container">
         <Routes>
@@ -23,20 +24,27 @@ function App() {
           <Route path="/movies" element={<AllMoviesPage />} />
           <Route path="/movie/:id" element={<MovieDetailPage />} />
           <Route path="/booking/:screeningId" element={<BookingPage />} />
-          <Route path="/Bekräftelse/:bookingId" element={<BookingConfirmation />} />
+          
+          {/* === ÄNDRING HÄR === */}
+          <Route
+            path="/Bekräftelse/:bookingNumber" // <-- ÄNDRAD till :bookingNumber
+            element={<BookingConfirmation />}    // <-- BORTTAGEN <ProtectedRoute>
+          />
+          {/* === SLUT PÅ ÄNDRING === */}
+          
           <Route path="/kiosk" element={<KioskPage />} />
           <Route path="/AboutUs" element={<AboutUs />} />
-          <Route path="/kiosk" element={<KioskPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          {/* ProfilePage skyddar sig själv internt, 
+            men du KAN också svepa in den i <ProtectedRoute> 
+          */}
           <Route path="/profile" element={<ProfilePage />} />
-
         </Routes>
-        
+
         {isMobile && <BottomNavbar />}
-        
       </div>
-    </Router>
+    </>
   );
 }
 

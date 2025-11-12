@@ -59,21 +59,18 @@ export default function MovieDetailPage() {
         />
       </Stack>
 
-      <div className="container my-4">
-        <div className="row align-items-start">
-          <div className="col-lg-7 col-md-12 mb-4">
-            <DateTimeSelector
-              movieId={Number(id)}
-              limit={50}
-              onSelect={handleSelect} // 👈 Skicka callbacken
-            />
-          </div>
-
-          <div className="col-lg-5 col-md-12">
-            <MovieReviews movie={movie} />
-          </div>
-        </div>
-      </div>
+  <Stack direction="horizontal" gap={3} className="movie-layout__stack flex-column flex-lg-row my-4">
+  <div className="flex-grow-1 date-time-container">
+        <DateTimeSelector
+      movieId={Number(id)}
+      limit={50}
+      onSelect={handleSelect}
+    />
+  </div>
+  <div className="reviews-container">
+    <MovieReviews movie={movie} />
+  </div>
+</Stack>
     </div>
   );
 }

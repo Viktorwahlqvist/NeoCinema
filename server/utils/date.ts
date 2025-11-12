@@ -41,3 +41,4 @@ export function formatScreeningTime(date: Date | string): string {
   
   return dateObj.toLocaleString("sv-SE", options);
 }
+

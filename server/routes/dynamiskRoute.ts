@@ -11,7 +11,8 @@ interface TableRow {
 let tables: TableRow[] = [];
 
 // Get all tables dynamic
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
+  if (req.path === "/seats-sse") return next();
   try {
     const [rows] = await db.query(
       "SELECT table_name, table_type FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = 'fe24-5'"
@@ -32,11 +33,17 @@ router.get("/:table", async (req, res) => {
     return res.status(500).json({ error: "Not valid table" });
   }
 
-  const { sql, values } = sqlBuilder(table, filter, sort as string, limit as string, offset as string);
+  const { sql, values } = sqlBuilder(
+    table,
+    filter,
+    sort as string,
+    limit as string,
+    offset as string
+  );
 
   try {
-    console.log("SQL =", sql, "VALUES =", values); 
-    const flatValues = Array.isArray(values) ? values.flat() : values; 
+    console.log("SQL =", sql, "VALUES =", values);
+    const flatValues = Array.isArray(values) ? values.flat() : values;
     const [rows] = await db.query(sql, flatValues);
     res.status(200).json(rows);
   } catch (err) {

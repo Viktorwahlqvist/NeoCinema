@@ -13,11 +13,13 @@ import ProfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import CancelBookingPage from "./pages/CancekBookingPage";
+import CookieModal from "./components/CookieModal";
 
 function App() {
   const isMobile = useIsMobile();
   return (
     <>
+    <CookieModal/>
       {!isMobile && <NavDesk />}
       <div className="app-container">
         <Routes>

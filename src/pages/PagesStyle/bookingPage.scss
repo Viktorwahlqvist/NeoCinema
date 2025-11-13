@@ -46,6 +46,7 @@
   color: #e0e0e0;
   min-height: 100vh;
   padding: 2rem 1rem;
+  overflow-x: hidden;
 }
 .heading-box {
   text-align: center;
@@ -66,6 +67,28 @@
   align-items: flex-start;
   justify-content: center;
   flex-wrap: wrap;
+}
+
+.toast-email {
+  background: rgba($color-stroke, 0.12);   
+  border: 1px solid $color-stroke;
+  color: $color-text;
+  box-shadow: $glow-strong;
+  text-shadow: $text-glow;
+  border-radius: $border-radius;
+
+  .toast-header-styling,
+  .toast-body {
+    background: inherit;
+    color: inherit;
+  }
+
+
+  .btn-close {
+    filter: invert(1);
+    opacity: 0.8;
+    &:hover { opacity: 1; }
+  }
 }
 
 .toast-under-navbar {
@@ -274,7 +297,7 @@
   }
 
   .booking-right {
-    width: 100%;
+    width: 90%;
   }
 
   .screen {
@@ -283,7 +306,7 @@
   }
 
   .seating-area {
-    width: 100%;
+    width: 100%; // ändra här flr mobile
     max-width: 100%;
     padding: 0 0.5rem;
   }
@@ -295,7 +318,7 @@
   .seat {
     width: 28px;
     height: 28px;
-    font-size: 0.7rem;
+    font-size: 0.5rem;
   }
 
   .neo-btn {
@@ -310,8 +333,14 @@
   }
 
   .neon-text {
-    font-size: 2rem;
+    font-size: 1rem;
     text-align: center;
     left: 0;
+  }
+}
+
+@media (max-width: 400px) {
+  .seat{
+    font-size: 0,4rem;
   }
 }

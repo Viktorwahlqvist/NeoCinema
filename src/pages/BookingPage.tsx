@@ -9,6 +9,8 @@ import { Seat, User } from "../types/Booking"; // Assumes types are from central
 import { formatScreeningTime } from "../utils/date";
 import Toast from "react-bootstrap/Toast";
 import ToastContainer from "react-bootstrap/ToastContainer";
+import Spinner from "react-bootstrap/Spinner";
+import Alert from "react-bootstrap/Alert";
 
 
 const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -22,14 +24,14 @@ function findAdjacentSeats(
   n: number,
   startSeatId?: number
 ): number[] {
-  // 1. Group seats by row
+  // Group seats by row
   const rows = seats.reduce((acc: Record<number, Seat[]>, seat) => {
     if (!acc[seat.row_num]) acc[seat.row_num] = [];
     acc[seat.row_num].push(seat);
     return acc;
   }, {});
 
-  // 2. Logic for when a user clicks a specific seat
+  // Logic for when a user clicks a specific seat
   if (startSeatId) {
     const clickedSeat = seats.find((s) => s.seatId === startSeatId);
     if (!clickedSeat) return [];
@@ -64,7 +66,7 @@ function findAdjacentSeats(
     }
   }
 
-  // 3. Logic for automatic selection (find the best available block)
+  // Logic for automatic selection (find the best available block)
   for (const row of Object.values(rows)) {
     const available = row
       .filter((s) => s.seatStatus === "available")
@@ -80,18 +82,24 @@ function findAdjacentSeats(
     }
   }
 
-  // 4. If no block is found
+  
   return [];
 }
 
-// --- Component Start ---
 export default function BookingPage() {
   const { screeningId } = useParams<{ screeningId: string }>();
   const navigate = useNavigate();
+
+  const [showDelay, setShowDelay] = useState(false);
+useEffect(() => {
+  const t = setTimeout(() => setShowDelay(true), 4000);
+  return () => clearTimeout(t);
+}, []);
   
   // State for SSE toast notifications
   const [show, setShow] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
+  const [showEmailToast, setShowEmailToast] = useState(false);
 
   // Core booking state
   const [tickets, setTickets] = useState<
@@ -103,6 +111,7 @@ export default function BookingPage() {
   // Auth & Guest state
   const { user, isLoading: isAuthLoading } = useAuth();
   const [guestEmail, setGuestEmail] = useState("");
+  const [showEmailAlert, setShowEmailAlert] = useState(false);
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   const value = e.target.value;
@@ -124,7 +133,7 @@ export default function BookingPage() {
     0
   );
 
-  // 1. Fetch all seats for this screening on load
+  // Fetch all seats for this screening on load
   const {
     data: initialSeats,
     isLoading: isSeatsLoading,
@@ -139,7 +148,7 @@ export default function BookingPage() {
     if (initialSeats) setSeats(initialSeats);
   }, [initialSeats]);
 
-  // 2. Define API hooks
+  // Define API hooks
   const { doFetch: postBooking } = useFetch<{
     message: string;
     bookingId: number;
@@ -156,7 +165,7 @@ export default function BookingPage() {
     }[]
   >("/api/priceTotals", { skip: true });
 
-  // 3. Fetch peripheral screening info (poster, name, etc.)
+  // Fetch peripheral screening info (poster, name, etc.)
   const { data: screening } = useFetch<
     {
       title: string;
@@ -166,7 +175,7 @@ export default function BookingPage() {
     }[]
   >(`/api/screeningsInfo?screeningId=${screeningId}`, { skip: !screeningId });
 
-  // 4. Main auto-seat-selection logic
+  
   useEffect(() => {
     // Clear any previous errors when ticket count changes
     setSeatError(null);
@@ -190,7 +199,7 @@ export default function BookingPage() {
     }
   }, [seats, totalTickets]);
 
-  // 5. SSE Event Handler: Called by <SeatSSE> when an update is received
+  // SSE Event Handler: Called by <SeatSSE> when an update is received
   const handleSeatUpdate = (
     seatIds: number[],
     status: "booked" | "available"
@@ -221,7 +230,7 @@ export default function BookingPage() {
     }
   };
 
-  // 6. Manual Seat Click Handler
+  // Manual Seat Click Handler
   const handleSeatClick = (seatId: number, status: string) => {
     if (status === "booked" || !seats) return;
 
@@ -240,17 +249,17 @@ export default function BookingPage() {
     }
   };
 
-  // 7. Booking Submission Handler
+  // Booking Submission Handler
   const handleBooking = async () => {
     // --- Validation Guards ---
     if (!totalTickets) return alert("Välj minst en biljett!");
     if (seatError) return alert(seatError); // Check for auto-select errors
     if (selectedSeats.length < totalTickets)
       return alert("Du har valt färre stolar än antal biljetter!");
-    if (!user && !guestEmail)
-      return alert("Ange din e-post för att boka som gäst.");
+if (!user && !guestEmail) { setShowEmailToast(true);
+  return;
+}
 
-    // --- Data Transformation ---
     // Collapse duplicate ticket types (e.g., 1x Adult + 1x Adult = 2x Adult)
     const uniqueTickets = tickets.reduce(
       (acc, cur) => {
@@ -279,16 +288,9 @@ export default function BookingPage() {
       guestEmail: user ? undefined : guestEmail,
     };
 
-    // --- API Call ---
     try {
       const result = await postBooking(bookingData, "POST");
-      const bookingNumber = result.bookingNumber; // Now correctly typed
-
-      // (Optional) Get price breakdown, though it's not used
-      const breakdown = await getPriceBreakdown(
-        `/api/priceTotals?bookingId=${result.bookingId}`,
-        "GET"
-      );
+      const bookingNumber = result.bookingNumber; 
       
       // Navigate to the public confirmation page
       navigate(`/Bekräftelse/${bookingNumber}`);
@@ -298,11 +300,28 @@ export default function BookingPage() {
     }
   };
 
+  const LoadingUI = (
+  <div
+    className="d-flex flex-column align-items-center justify-content-center text-light"
+    style={{ minHeight: "60vh" }}
+  >
+    <Spinner animation="border" role="status" />
+    {showDelay && <p className="mt-3 neon-text">Laddar salong & platser...</p>}
+  </div>
+);
 
-  // --- Render Logic ---
+// --- Render Logic ---
+if (isSeatsLoading || isAuthLoading) return LoadingUI;
+
+// Shows the error after 4 sec, otherwise continues to spin until the page have loaded
+if (error) return showDelay ? (
+  <div className="text-center text-danger mt-5">{String(error)}</div>
+) : (
+  LoadingUI
+);
+
   if (isSeatsLoading || isAuthLoading) return <p>Laddar...</p>;
   if (error) return <p>Ett fel uppstod: {error}</p>;
-  if (!seats?.length) return <p>Inga stolar hittades.</p>;
 
   return (
     <main className="booking-page text-center xs-mb-5">
@@ -313,7 +332,6 @@ export default function BookingPage() {
       />
       
       <div className="booking-layout">
-        {/* Left Column (Movie Info & Tickets) */}
         <aside className="booking-left">
           {screening?.[0] && (
             <div className="movie-poster-box">
@@ -338,7 +356,6 @@ export default function BookingPage() {
           )}
         </aside>
 
-        {/* Right Column (Seating & Booking) */}
         <section className="booking-right">
           {screening?.[0] && (
             <div className="heading-box">
@@ -396,11 +413,20 @@ export default function BookingPage() {
                 </div>
               ))}
           </div>
-
-          {/* Error message for seat selection */}
           {seatError && (
             <p style={{ color: "red", marginTop: "15px" }}>{seatError}</p>
           )}
+
+          {showEmailAlert && (
+  <Alert
+    variant="info"
+    onClose={() => setShowEmailAlert(false)}
+    dismissible
+    className="mt-3 neon-alert text-center"
+  >
+     <strong>Ange din e-post</strong> för att boka som gäst.
+  </Alert>
+)}
 
           {totalTickets > 0 && (
             <button className="btn neo-btn mt-4" onClick={handleBooking}>
@@ -431,6 +457,21 @@ export default function BookingPage() {
           </Toast.Header>
           <Toast.Body>{toastMessage}</Toast.Body>
         </Toast>
+
+        <Toast
+    onClose={() => setShowEmailToast(false)}
+    show={showEmailToast}
+    delay={3000}           // autohide after 3 sec
+    animation
+    autohide
+    className="toast-styling toast-email w-auto"
+  >
+    <Toast.Header className="toast-header-styling">
+      <strong className="me-auto">E-post saknas</strong>
+      <small>Viktigt</small>
+    </Toast.Header>
+    <Toast.Body>Ange din e-post för att boka som gäst.</Toast.Body>
+  </Toast>
       </ToastContainer>
     </main>
   );

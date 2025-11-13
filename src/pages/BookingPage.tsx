@@ -10,6 +10,9 @@ import { formatScreeningTime } from "../utils/date";
 import Toast from "react-bootstrap/Toast";
 import ToastContainer from "react-bootstrap/ToastContainer";
 
+
+const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 /**
  * Finds a contiguous block of 'n' available seats.
  * If 'startSeatId' is provided, it tries to find a block adjacent to that seat.
@@ -100,6 +103,19 @@ export default function BookingPage() {
   // Auth & Guest state
   const { user, isLoading: isAuthLoading } = useAuth();
   const [guestEmail, setGuestEmail] = useState("");
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const value = e.target.value;
+
+  setGuestEmail(value);
+
+  if (!emailRegex.test(value)) {
+    setSeatError("Ogiltig e-postadress");
+  } else {
+    setSeatError(null);
+  }
+};
+
 
   // Derived state (calculated from other state)
   const totalTickets = tickets.reduce((sum, t) => sum + t.count, 0);
@@ -282,6 +298,7 @@ export default function BookingPage() {
     }
   };
 
+
   // --- Render Logic ---
   if (isSeatsLoading || isAuthLoading) return <p>Laddar...</p>;
   if (error) return <p>Ett fel uppstod: {error}</p>;
@@ -342,7 +359,7 @@ export default function BookingPage() {
                 className="form-control"
                 placeholder="namn@exempel.se"
                 value={guestEmail}
-                onChange={(e) => setGuestEmail(e.target.value)}
+                onChange={handleEmailChange}
               />
             </div>
           )}

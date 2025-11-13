@@ -28,6 +28,7 @@ export default function AllMoviesPage() {
     auditorium: null,           // alla salonger
     age: null,                  // alla åldrar
   });
+  const activeFilters: string[] = [];
 
   const now = new Date();
   const upcoming = (data ?? []).filter(s => new Date(s.startTime) >= now);
@@ -86,7 +87,7 @@ export default function AllMoviesPage() {
     );
   }, [upcoming, filterOptions]);
 
-  const activeFilters: string[] = [];
+
 
   if (selectedDateLabel !== todayLabel) activeFilters.push(selectedDateLabel);
   if (selectedAudLabel !== 'Alla salonger') activeFilters.push(selectedAudLabel);

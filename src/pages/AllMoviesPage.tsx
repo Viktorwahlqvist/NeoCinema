@@ -86,6 +86,14 @@ export default function AllMoviesPage() {
     );
   }, [upcoming, filterOptions]);
 
+  const activeFilters: string[] = [];
+
+  if (selectedDateLabel !== todayLabel) activeFilters.push(selectedDateLabel);
+  if (selectedAudLabel !== 'Alla salonger') activeFilters.push(selectedAudLabel);
+  if (selectedAgeLabel !== 'Alla åldrar') activeFilters.push(selectedAgeLabel);
+
+
+
   return (
     <Container fluid className=" container-lg mt-md-5 ">
       <main className="all-movies-container">
@@ -105,7 +113,7 @@ export default function AllMoviesPage() {
         <Row className="d-flex flex-wrap gap-4 ms-md-4">
           <Col xs={3} sm="auto" className="px-0 ms-3 ms-sm-4">
             <FilterDropdown
-            label="Välj ett datum"
+              label="Välj ett datum"
               options={dateOptions}
               onClick={handleOnClickDate}
               allLabel="Alla datum"
@@ -141,6 +149,7 @@ export default function AllMoviesPage() {
         {error && <p>Något gick fel: {error}</p>}
         {isLoading && <p>Loading...</p>}
         {data && <AllMoviesList movies={filteredData} />}
+        {activeFilters.length !== 0 && filteredData.length === 0 && (<p className=" ms-5 mt-5">{activeFilters.length > 0 ? `Det finns inga filmer som matchar din filtrering: ${activeFilters.join(", ")}` : "Det finns inga filmer att visa just nu."}</p>)}
       </main>
     </Container>
   );

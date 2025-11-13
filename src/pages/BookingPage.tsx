@@ -290,7 +290,7 @@ if (!user && !guestEmail) { setShowEmailToast(true);
     style={{ minHeight: "60vh" }}
   >
     <Spinner animation="border" role="status" />
-    {showDelay && <p className="mt-3 neon-text">Laddar salong & platser...</p>}
+    {showDelay && <p className="mt-3 neon-text-booking">Laddar salong & platser...</p>}
   </div>
 );
 
@@ -328,14 +328,14 @@ if (error) return showDelay ? (
           )}
 
           <div className="ticket-section">
-            <h5 className="neon-text">Välj biljetter</h5>
+            <h5 className="neon-text-booking">Välj biljetter</h5>
             <TicketSelector onTicketChange={setTickets} />
           </div>
 
           {totalTickets > 0 && (
             <div className="ticket-total-box mt-3">
               <p className="text-light">Totalt pris</p>
-              <h4 className="neon-text">{totalPrice} kr</h4>
+              <h4 className="neon-text-booking">{totalPrice} kr</h4>
             </div>
           )}
         </aside>
@@ -343,7 +343,7 @@ if (error) return showDelay ? (
         <section className="booking-right">
           {screening?.[0] && (
             <div className="heading-box">
-              <h2 className="neon-text">
+              <h2 className="neon-text-booking">
                 {screening[0].auditoriumName} –{" "}
                 {formatScreeningTime(screening[0].startTime)}
               </h2>

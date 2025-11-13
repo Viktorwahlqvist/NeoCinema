@@ -26,15 +26,6 @@
   }
 }
 
-.neon-text{
-  font-size: 2rem;
-  font-weight: 700;
-  color: #00eaff;
-  text-shadow: 0 0 6px #00eaff, 0 0 12px #00eaff,
-    0 0 24px rgba(0, 234, 255, 0.8);
-  letter-spacing: 1px;
-  margin-top: 100px;
-}
 
 /* ===== Genre-tag ===== */
 .genre-row {
@@ -103,6 +94,7 @@
 
 .carousel-indicators [data-bs-target] {
   background-color: #00eaff;
+  width: 26px;
 }
 
 .carousel-indicators .active {

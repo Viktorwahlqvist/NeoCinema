@@ -32,7 +32,7 @@ export default function MovieDetailPage() {
       style={{ minHeight: "60vh" }}
     >
       <Spinner animation="border" role="status" />
-      {showDelay && <p className="mt-3 neon-text">Laddar film...</p>}
+      {showDelay && <p className="mt-3 neon-text-booking">Laddar film...</p>}
     </div>
   );
 

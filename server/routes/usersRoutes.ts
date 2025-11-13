@@ -144,10 +144,8 @@ router.get("/me/bookings", requireAuth, async (req, res) => {
   }
 });
 
-/* =======================================
- * ADMIN-ONLY ROUTES
- * ======================================= */
 
+ // ADMIN-ONLY ROUTES
 router.get("/", requireRole([ROLES.ADMIN]), async (req, res) => {
   try {
     const [rows] = await db.query<RowDataPacket[]>(

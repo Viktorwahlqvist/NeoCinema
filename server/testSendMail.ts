@@ -1,4 +1,3 @@
-// OBS: justera importvägen så den pekar på din Mailer.ts
 import { sendEmail } from "./routes/Mailer.ts";
 
 await sendEmail({

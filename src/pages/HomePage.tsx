@@ -47,7 +47,7 @@ export default function HomePage() {
         <main className="container-fluid home-page">
           <section className="sticky-top header-box">
             {/* <img src="/NeoCinema.png" alt="NeoCinema loga" className="site-logo" /> */}
-            <h2 className="neon-text">{active?.title ?? ""}</h2>
+            <h2 className="neon-text-home">{active?.title ?? ""}</h2>
             <div className="genre-row">
               {active?.genres?.map((g) => (
                 <span key={g} className="genre-pill">

@@ -1,13 +1,29 @@
+@use "../../styles/variables" as *;
+
 .custom-modal .modal-content {
     background: linear-gradient(180deg, #1a1b2e 0%, #0d0d14 100%) !important;
     border: 2px solid #00ffff !important;
     border-radius: 8px;
     box-shadow: 0 0 15px #00ffff;
-    color: #ffffff;
+    color: $color-text;
     text-align: center;
-    border: none
 }
+.custom-modal .modal-dialog {
+  margin-inline: auto;
+  width: 90%;
+  max-width: 800px;
 
-.modal-body{
-  border: none !important;
+  @media (max-width:  911px) {
+    width: 70%;
+    max-width: 500px;
+  }
+  @media (max-width:  600px) {
+    
+    width: 90%;
+    max-width: 300px;
+    font-size: 0.7rem;
+    .modal-h5{
+      font-size: 1rem;
+    }
+  }
 }

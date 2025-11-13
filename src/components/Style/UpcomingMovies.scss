@@ -3,26 +3,29 @@
 .upcoming-movies {
   width: 100%;
   background: $background-gradient;
-  padding: $spacing-sm $spacing-md; // Reduced from $spacing-md to $spacing-sm
+  padding: $spacing-sm $spacing-md;
   border-top: 1px solid $color-stroke;
   backdrop-filter: blur(10px);
   z-index: 90;
+  text-align: center; 
 
   &__container {
     display: flex;
     align-items: center;
+    justify-content: center; 
     position: relative;
     width: 100%;
-    height: auto; // Let content determine height
+    height: auto;
   }
 
-  // Scrollable container for movies - limited to left side
   &__scroll-container {
     display: flex;
+    justify-content: center; 
     gap: $spacing-md;
     overflow-x: auto;
     padding-bottom: $spacing-xs;
     scroll-behavior: smooth;
+    margin: 0 auto; 
 
     // scrollbar
     &::-webkit-scrollbar {
@@ -46,17 +49,16 @@
     }
   }
 
-  // Soon™ image centered in the middle of the entire container
   &__soon {
     position: absolute;
-    left: 42%;
-    top: 48%;
+    left: 50%;     
+    top: 50%;
     transform: translate(-50%, -50%);
     z-index: 10;
   }
 
   &__soon-image {
-    width: 250px; // Adjust size as needed
+    width: 250px;
     height: auto;
     opacity: 0.9;
     transition: all $transition-speed ease;
@@ -71,14 +73,13 @@
     flex-shrink: 0;
     cursor: pointer;
     transition: transform $transition-speed ease;
-    position: relative; // Allow absolute positioning of genre text
+    position: relative;
 
     &:hover {
       transform: translateY(-3px);
     }
   }
 
-  // Rest of existing styles...
   &__poster {
     width: 6rem;
     height: 9rem;
@@ -87,7 +88,7 @@
     background-color: $color-button;
     border: $border-width $border-style transparent;
     transition: all $transition-speed ease;
-    position: relative; // Allow absolute positioning within poster
+    position: relative;
 
     &:hover {
       border-color: $color-stroke;
@@ -111,21 +112,16 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(
-      0,
-      0,
-      0,
-      0.7
-    ); // Semi-transparent background for readability
+
     text-align: center;
     padding: 4px;
-    border-radius: 0 0 $border-radius $border-radius; // Match poster border radius
+    border-radius: 0 0 $border-radius $border-radius;
   }
 
   &__genre {
     color: #ffffff;
     font-size: 0.75rem;
-    margin: 2px 0 0 0; // Add top margin since it's now second
+    margin: 2px 0 0 0;
     padding: 0;
     line-height: 1.1;
     text-align: center;
@@ -133,9 +129,8 @@
 
   &__premiere {
     color: #ffffff;
-
     font-size: 0.65rem;
-    margin: 0; // Remove top margin since it's now first
+    margin: 0;
     padding: 0;
     line-height: 1.1;
     text-align: center;
@@ -144,9 +139,11 @@
   &__title {
     color: $color-text;
     text-shadow: $text-glow;
-    font-size: 1.2rem; // Reduced from 2rem
+    font-size: 1.2rem;
     font-weight: bold;
-    margin-bottom: $spacing-sm; // Also reduced margin for better proportions
+    margin-bottom: $spacing-sm;
     letter-spacing: 0.05em;
+    width: 100%;
+    text-align: center;   
   }
 }

@@ -1,44 +1,64 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import "./style/cookingmodal.scss"
+import "./style/cookingmodal.scss";
+
+
+interface CookingConsent {
+  necessary: boolean,
+  analytics: boolean,
+  marketing: boolean;
+}
 
 export default function CookieModal() {
-  
-  // Tillfälliga useStates till vi har implementerat localstorage.
-    const [show, setShow] = useState(true);
+  const [cookieConsent, setCookieConsent] = useState<CookingConsent | null>(() => {
+    const saved = localStorage.getItem('cookieConsent');
+    return saved ? JSON.parse(saved) : null;
+  }
+  );
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
 
-   return (
-      <Modal
-      show={show}
-      onHide={handleClose}
+  const handleAllowNecessary = () => {
+    const consent = { necessary: true, analytics: false, marketing: false };
+    localStorage.setItem("cookieConsent", JSON.stringify(consent));
+    setCookieConsent(consent);
+  };
+
+  const handleAllowAll = () => {
+    const consent = { necessary: true, analytics: true, marketing: true };
+    localStorage.setItem("cookieConsent", JSON.stringify(consent));
+    setCookieConsent(consent);
+  };
+
+  return (
+    <Modal
+      show={!cookieConsent}
       centered
       className="custom-modal"
-       backdrop="static"
+      backdrop="static"
       animation={true}
     >
       <Modal.Header>
-        <section className="d-flex align-items-center justify-content-between w-100">
-          <h5 className="mb-0 ms-5">Vi använder cookies</h5>
-          <img 
-            src='/NeoCinema.png' 
-            className='neo-logo-img' 
-            alt='NeoCinema logotyp, visas längst upp till höger' 
+        <section className="d-flex align-items-center w-100">
+          <img
+            src='/NeoCinema.png'
+            className='neo-logo-img'
+            alt='NeoCinema logotyp'
           />
+          <h5 className="mb-0 ms-md-5 modal-h5">Vi använder cookies</h5>
         </section>
-</Modal.Header>
+      </Modal.Header>
 
       <Modal.Body className='modal-body'>
-        <p>Modal body text goes here.</p>
+        <ul className='list-unstyled d-flex flex-column gap-3'>
+          <li><strong>Inloggning:</strong> Säkerställa att du kan logga in (nödvändiga cookies)</li>
+          <li><strong>Statistik:</strong> Samla statistik för att förbättra tjänsten (kommer snart)</li>
+        </ul>
       </Modal.Body>
 
       <Modal.Footer>
-        {/* Tillfälig save  */}
-        <Button variant="secondary" onClick={handleClose}>Close</Button>
-        <Button variant="primary" onClick={handleClose}>Save changes</Button>
+        <Button variant="secondary" className='modal-buttons' onClick={handleAllowNecessary}>Tillåt endast nödvändiga</Button>
+        <Button variant="primary" className='modal-buttons' onClick={handleAllowAll}>Acceptera alla</Button>
       </Modal.Footer>
     </Modal>
   );

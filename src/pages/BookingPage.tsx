@@ -12,6 +12,9 @@ import ToastContainer from "react-bootstrap/ToastContainer";
 import Spinner from "react-bootstrap/Spinner";
 import Alert from "react-bootstrap/Alert";
 
+
+const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 /**
  * Finds a contiguous block of 'n' available seats.
  * If 'startSeatId' is provided, it tries to find a block adjacent to that seat.
@@ -109,6 +112,19 @@ useEffect(() => {
   const { user, isLoading: isAuthLoading } = useAuth();
   const [guestEmail, setGuestEmail] = useState("");
   const [showEmailAlert, setShowEmailAlert] = useState(false);
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const value = e.target.value;
+
+  setGuestEmail(value);
+
+  if (!emailRegex.test(value)) {
+    setSeatError("Ogiltig e-postadress");
+  } else {
+    setSeatError(null);
+  }
+};
+
 
   // Derived state (calculated from other state)
   const totalTickets = tickets.reduce((sum, t) => sum + t.count, 0);
@@ -360,7 +376,7 @@ if (error) return showDelay ? (
                 className="form-control"
                 placeholder="namn@exempel.se"
                 value={guestEmail}
-                onChange={(e) => setGuestEmail(e.target.value)}
+                onChange={handleEmailChange}
               />
             </div>
           )}

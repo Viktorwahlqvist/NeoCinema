@@ -19,6 +19,7 @@ interface AllMoviesListPRops {
 export default function AllMoviesList({ movies }: AllMoviesListPRops) {
   const navigate = useNavigate();
 
+
   return (
     <>
       {movies.map((movie, index) => (
@@ -47,9 +48,8 @@ export default function AllMoviesList({ movies }: AllMoviesListPRops) {
             <Row className="d-flex justify-content-center text-center info-text-styling">
               <p>{movie.title}</p>
               <p>{movie.genres.sort().join("/")}</p>
-              <p>{`${Math.floor(movie.info.duration / 60)}h ${
-                movie.info.duration % 60
-              }m`}</p>
+              <p>{`${Math.floor(movie.info.duration / 60)}h ${movie.info.duration % 60
+                }m`}</p>
             </Row>
           </Col>
           <Col
@@ -65,7 +65,7 @@ export default function AllMoviesList({ movies }: AllMoviesListPRops) {
           <Col
             xs={12}
             md="auto"
-            
+
             className="d-flex flex-row flex-md-column gap-3 my-4 mx-md-3 mx-lg-0 gap-4"
           >
             <FilterBtn

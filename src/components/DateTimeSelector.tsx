@@ -1,148 +1,141 @@
 import React, { useEffect, useMemo, useState } from "react";
-
-type Screening = {
-  screening_id: number;
-  movie_id: number;
-  auditorium: string;
-  start_time: string;
-};
+import { Screening, Props } from "../types/screening";
 
 
-type Props = {
-  movieId: number;
-  limit?: number; // valfritt, default 50
-  onSelect?: (screening: Screening) => void; // valfritt callback när tid väljs
-};
-
-// Hjälpare: gör en stabil YYYY-MM-DD-nyckel i lokal tid (Stockholm)
+// Helper: create a stable YYYY-MM-DD key in local (Stockholm) time
 function dateKeyLocal(date: Date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+  return date.toISOString().split("T")[0];
 }
 
 export default function DateTimeSelector({ movieId, limit = 50, onSelect }: Props) {
   const [screenings, setScreenings] = useState<Screening[]>([]);
   const [selectedDateKey, setSelectedDateKey] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
+  // Fetch screenings when movieId or limit changes
   useEffect(() => {
-    let alive = true;
-    async function run() {
-      setLoading(true);
-      setErr(null);
+    const controller = new AbortController();
+
+    async function fetchScreenings() {
       try {
-        // Viktigt: din router är /api/movieScreenings/:movieId?limit=...
-const res = await fetch(`/api/screenings/${movieId}?limit=${limit}`);
+        setLoading(true);
+        setError(null);
+
+        const res = await fetch(`/api/screenings/${movieId}?limit=${limit}`, {
+          signal: controller.signal,
+        });
+
         if (!res.ok) throw new Error("Kunde inte hämta visningar");
+
         const data: Screening[] = await res.json();
-        if (!alive) return;
         setScreenings(data);
       } catch (e: any) {
-        if (!alive) return;
-        setErr(e?.message ?? "Något gick fel");
+        if (e.name !== "AbortError") {
+          setError(e?.message ?? "Något gick fel");
+        }
       } finally {
-        if (alive) setLoading(false);
+        setLoading(false);
       }
     }
-    run();
-    return () => {
-      alive = false;
-    };
+
+    fetchScreenings();
+
+    return () => controller.abort();
   }, [movieId, limit]);
 
+    // Extract unique dates within the next 7 days
   const uniqueDateKeys = useMemo(() => {
-  const keys = new Set<string>();
-  screenings.forEach((s) => {
-    const date = new Date(s.start_time);
     const now = new Date();
+    const keys = new Set<string>();
 
-    // Visa bara kommande 7 dagar (ändra "7" om du vill)
-    const diffDays = (date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
-    if (diffDays >= 0 && diffDays <= 7) {
-      keys.add(dateKeyLocal(date));
-    }
-  });
+    // only shows the uppcomming 7 days
+    screenings.forEach((s) => {
+      const date = new Date(s.start_time);
+      const diffDays = (date.getTime() - now.getTime()) / 86400000;
 
-  return Array.from(keys).sort();
-}, [screenings]);
+      if (diffDays >= 0 && diffDays <= 7) {
+        keys.add(dateKeyLocal(date));
+      }
+    });
 
+    return [...keys].sort();
+  }, [screenings]);
 
-  // Filtrera visningar för valt datum
+  // Screenings that match the currently selected date
   const timesForSelectedDate = useMemo(() => {
     if (!selectedDateKey) return [];
+
     return screenings
       .filter((s) => dateKeyLocal(new Date(s.start_time)) === selectedDateKey)
       .sort((a, b) => +new Date(a.start_time) - +new Date(b.start_time));
   }, [screenings, selectedDateKey]);
 
+  // UI fallbacks
   if (loading) return <div className="date-time-selector loading text-light">Laddar visningar…</div>;
-  if (err) return <div className="date-time-selector error alert alert-danger">{err}</div>;
+  if (error) return <div className="date-time-selector error alert alert-danger">{error}</div>;
   if (screenings.length === 0) return <div className="date-time-selector text-light">Inga visningar hittades.</div>;
 
   return (
-  <section className="date-time-selector">
-    {/* Datumväljare */}
-    <div className="selector-box mb-3">
-      <h3 className="heading mb-4">Välj datum</h3>
+    <section className="date-time-selector">
 
-      <div className="dates-grid d-flex flex-wrap gap-3">
-        {uniqueDateKeys.map((key) => {
-          const label = new Date(key + "T12:00:00").toLocaleDateString("sv-SE", {
-            weekday: "short",
-            day: "2-digit",
-            month: "short",
-          });
-          const active = selectedDateKey === key;
+   {/* Date selection UI */}
+      <div className="selector-box mb-3">
+        <h3 className="heading mb-4">Välj datum</h3>
 
-          return (
-            <button
-              key={key}
-              type="button"
-              className={`date-btn ${active ? "active" : ""}`}
-              onClick={() => setSelectedDateKey(key)}
-            >
-              {label}
-            </button>
-          );
-        })}
+        <div className="dates-grid d-flex flex-wrap gap-3">
+          {uniqueDateKeys.map((key) => {
+            const label = new Date(key + "T12:00:00").toLocaleDateString("sv-SE", {
+              weekday: "short",
+              day: "2-digit",
+              month: "short",
+            });
+
+            return (
+              <button
+                key={key}
+                type="button"
+                className={`date-btn ${selectedDateKey === key ? "active" : ""}`}
+                onClick={() => setSelectedDateKey(key)}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
 
-    {/* Tidsväljare */}
-    {selectedDateKey && (
-      <div className="selector-box">
-        <h4 className="heading-sm mb-4">Välj sal</h4>
+    {/* Time selection UI */}
+      {selectedDateKey && (
+        <div className="selector-box">
+          <h4 className="heading-sm mb-4">Välj sal</h4>
 
-        {timesForSelectedDate.length === 0 ? (
-          <div className="no-times">Inga tider för valt datum.</div>
-        ) : (
-          <div className="times-grid d-flex flex-wrap gap-3">
-            {timesForSelectedDate.map((s) => {
-              const local = new Date(s.start_time);
-              const timeLabel = local.toLocaleTimeString("sv-SE", {
-                hour: "2-digit",
-                minute: "2-digit",
-              });
+          {timesForSelectedDate.length === 0 ? (
+            <div className="no-times">Inga tider för valt datum.</div>
+          ) : (
+            <div className="times-grid d-flex flex-wrap gap-3">
+              {timesForSelectedDate.map((s) => {
+                const timeLabel = new Date(s.start_time).toLocaleTimeString("sv-SE", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
 
-              return (
-                <button
-                  key={s.screening_id}
-                  type="button"
-                  className="time-btn"
-                  onClick={() => onSelect?.(s)}
-                >
-                  <div className="time">{timeLabel}</div>
-                  <div className="auditorium">{s.auditorium}</div>
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    )}
-  </section>
-);
+                return (
+                  <button
+                    key={s.screening_id}
+                    type="button"
+                    className="time-btn"
+                    onClick={() => onSelect?.(s)}
+                  >
+                    <div className="time">{timeLabel}</div>
+                    <div className="auditorium">{s.auditorium}</div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+    </section>
+  );
 }

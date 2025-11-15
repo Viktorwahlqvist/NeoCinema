@@ -16,27 +16,26 @@ export async function sendEmail({
   html?: string;
   attachments?: any[]; 
 }) {
+ // Check if required environment variables exist
   if (!email || !appPassword) {
-    console.error("❌ Saknas miljövariabler för Gmail.");
+    console.error("Missing environment variables for Gmail.");
     return;
   }
 
+  // Create a transporter using Gmail service and app password
   const transporter = nodemailer.createTransport({
     service: "Gmail",
     auth: { user: email, pass: appPassword },
   });
 
-  try {
-    const info = await transporter.sendMail({
-      from: `"Neocinema AB" <${email}>`,
-      to,
-      subject,
-      text,
-      html,
-      attachments, 
-    });
-    console.log(`✅ Mejlet skickades till ${to}: ${info.messageId}`);
-  } catch (error) {
-    console.error("❌ Fel vid mejlutskick:", error);
-  }
+  // Send the actual email with the provided data
+  const info = await transporter.sendMail({
+    from: `"Neocinema AB" <${email}>`,
+    to,
+    subject,
+    text,
+    html,
+    attachments,
+  });
 }
+

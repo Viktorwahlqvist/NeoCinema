@@ -18,7 +18,7 @@ export async function sendEmail({
 }) {
  // Check if required environment variables exist
   if (!email || !appPassword) {
-    console.error("Missing environment variables for Gmail.");
+    console.error("Saknas miljövariabler för Gmail.");
     return;
   }
 

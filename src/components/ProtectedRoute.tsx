@@ -10,7 +10,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, isLoading } = useAuth();
   const location = useLocation();
 
-  //  Vänta medan AuthContext kontrollerar sessionen
+// Wait while AuthContext checks the session
   if (isLoading) {
     return (
       <div style={{ color: "white", textAlign: "center", marginTop: "3rem" }}>
@@ -19,11 +19,11 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  // Om användaren inte är inloggad → skicka till login
+  // If the user is not logged in → redirect to login
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Om användaren är inloggad → visa sidan
+  // If the user is logged in → show the page
   return <>{children}</>;
 }

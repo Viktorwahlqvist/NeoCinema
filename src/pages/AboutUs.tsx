@@ -1,6 +1,7 @@
 import React from "react";
 import "./PagesStyle/OmNeo.scss";
 import { Flag, GeoAlt, Map } from "react-bootstrap-icons";
+import CookiePolicy from "../components/CookiePolicy";
 
 const address = 'Biogatan 1, 123 45 Småstad';
 const mapsUrl = `https://www.google.com/maps?q=${encodeURIComponent(address)}`;
@@ -56,26 +57,27 @@ export default function AboutUs() {
             </section>
           </div>
           <aside className="omneo-icons omneo-icons--bare" aria-label="Dekorativa ikoner">
-  <Flag className="omneo-icon" />
-  <GeoAlt className="omneo-icon" />
+            <Flag className="omneo-icon" />
+            <GeoAlt className="omneo-icon" />
 
-  {/* Klickbar Map-ikon */}
-  <a
-    href={mapsUrl}
-    target="_blank"
-    rel="noopener noreferrer"
-    aria-label={`Öppna Google Maps: ${address}`}
-    className="omneo-iconLink"
-    title="Öppna i Google Maps"
-  >
-    <Map className="omneo-icon" />
-  </a>
-</aside>
+            {/* Klickbar Map-ikon */}
+            <a
+              href={mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Öppna Google Maps: ${address}`}
+              className="omneo-iconLink"
+              title="Öppna i Google Maps"
+            >
+              <Map className="omneo-icon" />
+            </a>
+          </aside>
 
 
-         
+
         </div>
       </main>
+      <CookiePolicy />
     </div>
   );
 }

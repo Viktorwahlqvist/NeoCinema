@@ -441,7 +441,7 @@ if (error) return showDelay ? (
         <Toast
           onClose={() => setShow(false)}
           show={show}
-          delay={3000}
+          delay={5000}
           animation={true}
           autohide
           className="toast-styling w-auto"
@@ -461,7 +461,7 @@ if (error) return showDelay ? (
         <Toast
     onClose={() => setShowEmailToast(false)}
     show={showEmailToast}
-    delay={3000}           // autohide after 3 sec
+    delay={5000}           // autohide after 3 sec
     animation
     autohide
     className="toast-styling toast-email w-auto"

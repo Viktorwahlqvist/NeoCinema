@@ -320,14 +320,14 @@ export default function BookingPage() {
           )}
 
           <div className="ticket-section">
-            <h5 className="neon-text">Välj biljetter</h5>
+            <h5 className="neo-text">Välj biljetter</h5>
             <TicketSelector onTicketChange={setTickets} />
           </div>
 
           {totalTickets > 0 && (
             <div className="ticket-total-box mt-3">
               <p className="text-light">Totalt pris</p>
-              <h4 className="neon-text">{totalPrice} kr</h4>
+              <h4 className="neo-text">{totalPrice} kr</h4>
             </div>
           )}
         </aside>
@@ -335,7 +335,7 @@ export default function BookingPage() {
         <section className="booking-right">
           {screening?.[0] && (
             <div className="heading-box">
-              <h2 className="neon-text">
+              <h2 className="neo-text">
                 {screening[0].auditoriumName} –{" "}
                 {formatScreeningTime(screening[0].startTime)}
               </h2>

@@ -344,3 +344,18 @@
     font-size: 0,4rem;
   }
 }
+
+.neo-btn--disabledEmail {
+  background: #a80000 !important;   // röd
+  border: none !important;
+  color: #fff !important;
+  opacity: 0.7;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transition: background 0.3s ease, opacity 0.3s ease;
+}
+
+.neo-btn--disabledEmail:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}

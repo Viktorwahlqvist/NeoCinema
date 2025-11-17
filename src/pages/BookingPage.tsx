@@ -5,13 +5,11 @@ import TicketSelector from "../components/TicketSelector";
 import "./PagesStyle/BookingPage.scss";
 import { useAuth } from "../AuthContext";
 import SeatSSE from "../components/SeatSSE";
-import { Seat, User } from "../types/Booking"; // Assumes types are from central file
+import { Seat, User } from "../types/Booking";
 import { formatScreeningTime } from "../utils/date";
 import Toast from "react-bootstrap/Toast";
 import ToastContainer from "react-bootstrap/ToastContainer";
 import Spinner from "react-bootstrap/Spinner";
-import Alert from "react-bootstrap/Alert";
-
 
 const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -57,7 +55,7 @@ function findAdjacentSeats(
 
     // Try to find 'n' seats to the left (including the clicked one)
     const leftStart = Math.max(0, index - n + 1);
-    const left = rowSeats.slice(leftStart, index + 1); // Select 'n' seats ending at 'index'
+    const left = rowSeats.slice(leftStart, index + 1);
     const isContiguousLeft = left.every(
       (s, j, arr) => j === 0 || s.seat_num === arr[j - 1].seat_num + 1
     );
@@ -74,7 +72,6 @@ function findAdjacentSeats(
 
     for (let i = 0; i <= available.length - n; i++) {
       const segment = available.slice(i, i + n);
-      // Check if all seats in the segment are contiguous (seat_num 5, 6, 7...)
       const contiguous = segment.every(
         (s, j, arr) => j === 0 || s.seat_num === arr[j - 1].seat_num + 1
       );
@@ -82,7 +79,6 @@ function findAdjacentSeats(
     }
   }
 
-  
   return [];
 }
 
@@ -91,15 +87,14 @@ export default function BookingPage() {
   const navigate = useNavigate();
 
   const [showDelay, setShowDelay] = useState(false);
-useEffect(() => {
-  const t = setTimeout(() => setShowDelay(true), 4000);
-  return () => clearTimeout(t);
-}, []);
-  
+  useEffect(() => {
+    const t = setTimeout(() => setShowDelay(true), 4000);
+    return () => clearTimeout(t);
+  }, []);
+
   // State for SSE toast notifications
   const [show, setShow] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
-  const [showEmailToast, setShowEmailToast] = useState(false);
 
   // Core booking state
   const [tickets, setTickets] = useState<
@@ -111,44 +106,33 @@ useEffect(() => {
   // Auth & Guest state
   const { user, isLoading: isAuthLoading } = useAuth();
   const [guestEmail, setGuestEmail] = useState("");
-  const [showEmailAlert, setShowEmailAlert] = useState(false);
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const value = e.target.value;
+    const value = e.target.value;
+    setGuestEmail(value);
+  };
 
-  setGuestEmail(value);
-
-  if (!emailRegex.test(value)) {
-    setSeatError("Ogiltig e-postadress");
-  } else {
-    setSeatError(null);
-  }
-};
-
-
-  // Derived state (calculated from other state)
+  // Derived state
   const totalTickets = tickets.reduce((sum, t) => sum + t.count, 0);
   const totalPrice = tickets.reduce(
     (sum, t) => sum + t.count * (t.price ?? 0),
     0
   );
 
-  // Fetch all seats for this screening on load
+  // Fetch seats for this screening
   const {
     data: initialSeats,
     isLoading: isSeatsLoading,
     error,
   } = useFetch<Seat[]>(`/api/seatStatusView?screeningId=${screeningId}`);
 
-  // This is the "live" state for seats, updated by SSE
   const [seats, setSeats] = useState<Seat[]>([]);
 
-  // When initial seats are loaded, populate the live 'seats' state
   useEffect(() => {
     if (initialSeats) setSeats(initialSeats);
   }, [initialSeats]);
 
-  // Define API hooks
+  // Booking API hooks
   const { doFetch: postBooking } = useFetch<{
     message: string;
     bookingId: number;
@@ -165,7 +149,7 @@ useEffect(() => {
     }[]
   >("/api/priceTotals", { skip: true });
 
-  // Fetch peripheral screening info (poster, name, etc.)
+  // Screening info for poster, name, etc.
   const { data: screening } = useFetch<
     {
       title: string;
@@ -175,9 +159,8 @@ useEffect(() => {
     }[]
   >(`/api/screeningsInfo?screeningId=${screeningId}`, { skip: !screeningId });
 
-  
+  // Auto-seat-selection
   useEffect(() => {
-    // Clear any previous errors when ticket count changes
     setSeatError(null);
 
     if (totalTickets === 0) {
@@ -185,12 +168,10 @@ useEffect(() => {
       return;
     }
 
-    // Only run if the number of tickets doesn't match the selected seats
     if (selectedSeats.length !== totalTickets) {
       const best = findAdjacentSeats(seats, totalTickets);
-      setSelectedSeats(best); // This will be [] if nothing is found
+      setSelectedSeats(best);
 
-      // If the search failed, and seats have loaded, set an error
       if (best.length === 0 && seats.length > 0) {
         setSeatError(
           `Kunde tyvärr inte hitta ${totalTickets} sammanhängande platser. Prova ett färre antal eller dela upp din bokning.`
@@ -199,22 +180,20 @@ useEffect(() => {
     }
   }, [seats, totalTickets]);
 
-  // SSE Event Handler: Called by <SeatSSE> when an update is received
+  // SSE seat updates
   const handleSeatUpdate = (
     seatIds: number[],
     status: "booked" | "available"
   ) => {
-    // Update the live 'seats' state
     setSeats((prev) =>
       prev.map((s) =>
         seatIds.includes(s.seatId) ? { ...s, seatStatus: status } : s
       )
     );
 
-    setShow(true); // Show the toast notification
+    setShow(true);
 
     if (status === "booked") {
-      // If a seat became booked, remove it from our current selection
       setSelectedSeats((prev) => prev.filter((s) => !seatIds.includes(s)));
       setToastMessage(
         `Plats${seatIds.length > 1 ? "er" : ""} ${seatIds.join(
@@ -230,37 +209,30 @@ useEffect(() => {
     }
   };
 
-  // Manual Seat Click Handler
+  // Manual seat click
   const handleSeatClick = (seatId: number, status: string) => {
     if (status === "booked" || !seats) return;
 
-    // Clear any errors when the user takes manual control
     setSeatError(null);
 
     const best = findAdjacentSeats(seats, totalTickets, seatId);
     if (best.length === totalTickets) {
       setSelectedSeats(best);
     } else {
-      // If the click didn't result in a valid selection
       setSeatError(
         `Kunde inte hitta ${totalTickets} platser i rad från den valda platsen.`
       );
-      setSelectedSeats([]); // Clear selection
+      setSelectedSeats([]);
     }
   };
 
-  // Booking Submission Handler
+  // Booking submission
   const handleBooking = async () => {
-    // --- Validation Guards ---
     if (!totalTickets) return alert("Välj minst en biljett!");
-    if (seatError) return alert(seatError); // Check for auto-select errors
+    if (seatError) return alert(seatError);
     if (selectedSeats.length < totalTickets)
       return alert("Du har valt färre stolar än antal biljetter!");
-if (!user && !guestEmail) { setShowEmailToast(true);
-  return;
-}
 
-    // Collapse duplicate ticket types (e.g., 1x Adult + 1x Adult = 2x Adult)
     const uniqueTickets = tickets.reduce(
       (acc, cur) => {
         const found = acc.find((t) => t.id === cur.id);
@@ -271,7 +243,6 @@ if (!user && !guestEmail) { setShowEmailToast(true);
       [] as { id: number; count: number }[]
     );
 
-    // Map selected seats to their corresponding ticket types
     const seatList: { seatId: number; ticketType: number }[] = [];
     const seatQueue = [...selectedSeats];
     for (const t of uniqueTickets) {
@@ -281,7 +252,6 @@ if (!user && !guestEmail) { setShowEmailToast(true);
       }
     }
 
-    // Build the final payload for the API
     const bookingData = {
       screeningId: Number(screeningId),
       seats: seatList,
@@ -290,47 +260,53 @@ if (!user && !guestEmail) { setShowEmailToast(true);
 
     try {
       const result = await postBooking(bookingData, "POST");
-      const bookingNumber = result.bookingNumber; 
-      
-      // Navigate to the public confirmation page
+      const bookingNumber = result.bookingNumber;
+
+      await getPriceBreakdown(
+        `/api/priceTotals?bookingId=${result.bookingId}`,
+        "GET"
+      );
+
       navigate(`/Bekräftelse/${bookingNumber}`);
-      
     } catch (err: any) {
       alert(`Kunde inte boka platser: ${err.message}`);
     }
   };
 
+  // ---- Loading + error with spinner ----
   const LoadingUI = (
-  <div
-    className="d-flex flex-column align-items-center justify-content-center text-light"
-    style={{ minHeight: "60vh" }}
-  >
-    <Spinner animation="border" role="status" />
-    {showDelay && <p className="mt-3 neon-text">Laddar salong & platser...</p>}
-  </div>
-);
+    <div
+      className="d-flex flex-column align-items-center justify-content-center text-light"
+      style={{ minHeight: "60vh" }}
+    >
+      <Spinner animation="border" role="status" />
+      {showDelay && (
+        <p className="mt-3 neon-text">Laddar salong & platser...</p>
+      )}
+    </div>
+  );
 
-// --- Render Logic ---
-if (isSeatsLoading || isAuthLoading) return LoadingUI;
+  if (isSeatsLoading || isAuthLoading) return LoadingUI;
 
-// Shows the error after 4 sec, otherwise continues to spin until the page have loaded
-if (error) return showDelay ? (
-  <div className="text-center text-danger mt-5">{String(error)}</div>
-) : (
-  LoadingUI
-);
+  if (error)
+    return showDelay ? (
+      <div className="text-center text-danger mt-5">{String(error)}</div>
+    ) : (
+      LoadingUI
+    );
 
-  if (isSeatsLoading || isAuthLoading) return <p>Laddar...</p>;
-  if (error) return <p>Ett fel uppstod: {error}</p>;
+  // ---- Button disable / färg beroende på e-post ----
+  const isGuestUser = !user;
+  const isBookDisabled = isGuestUser && guestEmail.trim() === "";
+  const isInvalidEmail = isGuestUser && guestEmail.trim() !== "" && !emailRegex.test(guestEmail);
 
   return (
     <main className="booking-page text-center xs-mb-5">
-      {/* SSE listener component */}
       <SeatSSE
         onSeatUpdate={handleSeatUpdate}
         screeningId={Number(screeningId)}
       />
-      
+
       <div className="booking-layout">
         <aside className="booking-left">
           {screening?.[0] && (
@@ -367,7 +343,7 @@ if (error) return showDelay ? (
           )}
           <div className="screen">DUKEN</div>
 
-          {/* Guest email field (only shown if logged out) */}
+          {/* Gäst-email (bara om utloggad och har valt biljetter) */}
           {!user && totalTickets > 0 && (
             <div className="guest-email mb-3">
               <label className="form-label text-light">E-post</label>
@@ -413,23 +389,19 @@ if (error) return showDelay ? (
                 </div>
               ))}
           </div>
+
           {seatError && (
             <p style={{ color: "red", marginTop: "15px" }}>{seatError}</p>
           )}
 
-          {showEmailAlert && (
-  <Alert
-    variant="info"
-    onClose={() => setShowEmailAlert(false)}
-    dismissible
-    className="mt-3 neon-alert text-center"
-  >
-     <strong>Ange din e-post</strong> för att boka som gäst.
-  </Alert>
-)}
-
           {totalTickets > 0 && (
-            <button className="btn neo-btn mt-4" onClick={handleBooking}>
+            <button
+              className={`btn neo-btn mt-4 ${
+                isBookDisabled || isInvalidEmail ? "neo-btn--disabledEmail" : ""
+              }`}
+              onClick={handleBooking}
+              disabled={isBookDisabled || isInvalidEmail}
+            >
               Boka {totalTickets} biljett(er)
             </button>
           )}
@@ -457,21 +429,6 @@ if (error) return showDelay ? (
           </Toast.Header>
           <Toast.Body>{toastMessage}</Toast.Body>
         </Toast>
-
-        <Toast
-    onClose={() => setShowEmailToast(false)}
-    show={showEmailToast}
-    delay={5000}           // autohide after 3 sec
-    animation
-    autohide
-    className="toast-styling toast-email w-auto"
-  >
-    <Toast.Header className="toast-header-styling">
-      <strong className="me-auto">E-post saknas</strong>
-      <small>Viktigt</small>
-    </Toast.Header>
-    <Toast.Body>Ange din e-post för att boka som gäst.</Toast.Body>
-  </Toast>
       </ToastContainer>
     </main>
   );

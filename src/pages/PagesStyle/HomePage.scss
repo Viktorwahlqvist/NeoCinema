@@ -26,6 +26,14 @@
   }
 }
 
+.neon-text{
+  font-size: 2rem;
+  font-weight: 700;
+  color: #00eaff;
+  text-shadow: 0 0 6px #00eaff, 0 0 12px #00eaff,
+    0 0 24px rgba(0, 234, 255, 0.8);
+  letter-spacing: 1px;
+}
 
 /* ===== Genre-tag ===== */
 .genre-row {
@@ -114,7 +122,7 @@
     color: #00eaff;
     text-shadow: 0 0 6px #00eaff, 0 0 12px #00eaff,
     0 0 24px rgba(0, 234, 255, 0.8);
-    letter-spacing: 1px;
-    margin-top: 100px;
+  letter-spacing: 1px;
+  margin-top: 50px;
   }
 }

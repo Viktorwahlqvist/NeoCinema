@@ -75,7 +75,7 @@ export default function AllMoviesPage() {
     } else {
       const num = Number(value);
       setFilterOptions(prev => ({ ...prev, age: num }));
-      setSelectedAgeLabel(`${num} års gräns`);
+      setSelectedAgeLabel(`${num}-årsgräns`);
     }
   };
 
@@ -136,9 +136,9 @@ export default function AllMoviesPage() {
             <FilterDropdown
               label="Alla åldrar"
               options={[
-                { label: "15 års gräns", value: "15" },
-                { label: "11 års gräns", value: "11" },
-                { label: "7 års gräns", value: "7" },
+                { label: "15-årsgräns", value: "15" },
+                { label: "11-årsgräns", value: "11" },
+                { label: "7-årsgräns", value: "7" },
               ]}
               onClick={handleOnClickAge}
               allLabel="Alla åldrar"

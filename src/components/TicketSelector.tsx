@@ -9,43 +9,43 @@ interface Ticket {
 }
 
 interface Props {
-  onTicketChange: (selected: { id: number; count: number }[]) => void;
+  onTicketChange: (selected: { id: number; count: number; }[]) => void;
 }
 
 export default function TicketSelector({ onTicketChange }: Props) {
   const { data: tickets, isLoading, error } = useFetch<Ticket[]>("/api/tickets");
-  const [selected, setSelected] = useState<{ id: number; count: number }[]>([]);
+  const [selected, setSelected] = useState<{ id: number; count: number; }[]>([]);
 
   useEffect(() => {
-  if (tickets && selected.length === 0) {
-    // Förifyll två vuxenbiljetter bara första gången
-    setSelected([{ id: 3, count: 2 }]);
-  }
-}, [tickets]);
+    if (tickets && selected.length === 0) {
+      // Förifyll två vuxenbiljetter bara första gången
+      setSelected([{ id: 3, count: 2 }]);
+    }
+  }, [tickets]);
 
 
- useEffect(() => {
-  // Skapa en lista med id, count och price från aktuell state
-  const selectedWithPrice = selected.map((sel) => {
-    const ticketInfo = tickets?.find((t) => t.id === sel.id);
-    return { ...sel, price: ticketInfo?.price ?? 0 };
-  });
+  useEffect(() => {
+    // Skapa en lista med id, count och price från aktuell state
+    const selectedWithPrice = selected.map((sel) => {
+      const ticketInfo = tickets?.find((t) => t.id === sel.id);
+      return { ...sel, price: ticketInfo?.price ?? 0 };
+    });
 
-  onTicketChange(selectedWithPrice);
-}, [selected, tickets]);
+    onTicketChange(selectedWithPrice);
+  }, [selected, tickets]);
 
 
-const updateCount = (id: number, delta: number) => {
-  setSelected((prev) => {
-    const found = prev.find((t) => t.id === id);
-    if (!found) return delta > 0 ? [...prev, { id, count: delta }] : prev;
+  const updateCount = (id: number, delta: number) => {
+    setSelected((prev) => {
+      const found = prev.find((t) => t.id === id);
+      if (!found) return delta > 0 ? [...prev, { id, count: delta }] : prev;
 
-    const newCount = Math.max(0, found.count + delta);
-    return newCount > 0
-      ? prev.map((t) => (t.id === id ? { ...t, count: newCount } : t))
-      : prev.filter((t) => t.id !== id);
-  });
-};
+      const newCount = Math.max(0, found.count + delta);
+      return newCount > 0
+        ? prev.map((t) => (t.id === id ? { ...t, count: newCount } : t))
+        : prev.filter((t) => t.id !== id);
+    });
+  };
 
 
   if (isLoading) return <p>Laddar biljetter...</p>;

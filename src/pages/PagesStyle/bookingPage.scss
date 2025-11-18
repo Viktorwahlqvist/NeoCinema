@@ -42,7 +42,6 @@
 }
 
 .booking-page {
-  background: #050510;
   color: #e0e0e0;
   min-height: 100vh;
   padding: 2rem 1rem;
@@ -53,7 +52,7 @@
   margin-bottom: 1rem;
 }
 
-.neon-text-booking {
+.neo-text {
   color: #00ffff;
   font-size: 1.4rem;
   font-weight: 600;
@@ -332,7 +331,7 @@
     font-size: 0.9rem;
   }
 
-  .neon-text-booking {
+  .neo-text {
     font-size: 1rem;
     text-align: center;
     left: 0;
@@ -343,4 +342,19 @@
   .seat{
     font-size: 0,4rem;
   }
+}
+
+.neo-btn--disabledEmail {
+  background: #a80000 !important;   // röd
+  border: none !important;
+  color: #fff !important;
+  opacity: 0.7;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transition: background 0.3s ease, opacity 0.3s ease;
+}
+
+.neo-btn--disabledEmail:hover {
+  transform: none !important;
+  box-shadow: none !important;
 }

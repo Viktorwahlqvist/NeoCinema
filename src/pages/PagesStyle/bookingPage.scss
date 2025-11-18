@@ -65,6 +65,7 @@
   gap: 2rem;
   align-items: flex-start;
   justify-content: center;
+<<<<<<< HEAD
   flex-wrap: wrap;
 }
 
@@ -130,6 +131,8 @@
   height: 2px;
   background: linear-gradient(90deg, $color-hover 0%, $color-stroke 50%, $color-hover 100%);
   box-shadow: $glow-soft;
+=======
+>>>>>>> parent of bf9d997 (Ignore gmail-secret.json (local only))
 }
 
 /* LEFT : poster + ticket selector */
@@ -184,7 +187,10 @@
 
 .movie-poster {
   width: 100%;
+<<<<<<< HEAD
   height: 300px;
+=======
+>>>>>>> parent of bf9d997 (Ignore gmail-secret.json (local only))
   object-fit: cover;
 }
 

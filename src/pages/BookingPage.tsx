@@ -263,7 +263,7 @@ export default function BookingPage() {
           {screening?.[0] && (
             <div className="heading-box">
               <h2 className="neo-text">
-                {screening[0].auditoriumName} –
+                {screening[0].auditoriumName} – {" "}
                 {formatScreeningTime(screening[0].startTime)}
               </h2>
             </div>

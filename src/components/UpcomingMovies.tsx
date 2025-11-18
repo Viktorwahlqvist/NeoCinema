@@ -39,7 +39,7 @@ export default function UpcomingMovies() {
       coverArtUrl: "/169oddysey.png",
       genre: "Action",
     },
-        {
+    {
       id: 5,
       title: "DUNE 3:",
       screening: "18 DEC 2026",
@@ -53,12 +53,12 @@ export default function UpcomingMovies() {
       coverArtUrl: "/169starwars.png",
       genre: "Sci-Fi",
     },
-      
+
   ];
 
   return (
     <div className="upcoming-movies">
-      <h2 className="upcoming-movies__title">Kommande filmer</h2>
+      <h2 className="upcoming-movies__title mt-2 mb-4">Kommande filmer</h2>
 
       <div className="upcoming-movies__container">
         {/* Scrollable container for movies */}

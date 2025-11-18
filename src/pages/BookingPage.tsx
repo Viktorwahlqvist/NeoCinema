@@ -247,19 +247,7 @@ export default function BookingPage() {
       <div className="booking-layout">
         <aside className="booking-left">
           {screening?.[0] && (
-<<<<<<< HEAD
             <PosterBox mobileImg={screening?.[0].info.mobileImg} title={screening?.[0].title} />
-=======
-            <>
-              <div className="movie-poster-box">
-                <img
-                src={getMovieImage(screening[0].title)}
-                  alt={screening[0].title}
-                  className="movie-poster"
-                />
-              </div>
-            </>
->>>>>>> parent of bf9d997 (Ignore gmail-secret.json (local only))
           )}
 
           <div className="ticket-section">

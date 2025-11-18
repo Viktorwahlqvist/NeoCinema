@@ -233,8 +233,9 @@ export default function BookingPage() {
 
   // ---- Button disable / färg beroende på e-post ----
   const isGuestUser = !user;
-  const isBookDisabled = isGuestUser && guestEmail.trim() === "";
-  const isInvalidEmail = isGuestUser && guestEmail.trim() !== "" && !emailRegex.test(guestEmail);
+  const isBookDisabled = isGuestUser && guestEmail.trim() === "" || isGuestUser && guestEmail.trim() !== "" && !emailRegex.test(guestEmail) || selectedSeats.length === 0;
+
+
 
   return (
     <main className="booking-page text-center xs-mb-5">
@@ -282,7 +283,7 @@ export default function BookingPage() {
           )}
 
           {totalTickets > 0 && (
-            <BookingButton isBookDisabled={isBookDisabled} handleBooking={handleBooking} isInvalidEmail={isInvalidEmail} totalTickets={totalTickets} />
+            <BookingButton isBookDisabled={isBookDisabled} handleBooking={handleBooking} isInvalidEmail={isBookDisabled} totalTickets={totalTickets} />
           )}
         </section>
       </div>

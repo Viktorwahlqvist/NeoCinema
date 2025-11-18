@@ -5,85 +5,21 @@ import TicketSelector from "../components/TicketSelector";
 import "./PagesStyle/BookingPage.scss";
 import { useAuth } from "../AuthContext";
 import SeatSSE from "../components/SeatSSE";
-import { Seat, User } from "../types/Booking";
+import { Seat } from "../types/Booking";
 import { formatScreeningTime } from "../utils/date";
-import Toast from "react-bootstrap/Toast";
-import ToastContainer from "react-bootstrap/ToastContainer";
 import Spinner from "react-bootstrap/Spinner";
+import findAdjacentSeats from "../utils/findAdjacentSeats";
+import PosterBox from "../components/PosterBox";
+import TotalPrice from "../components/TotalPrice";
+import SeatingMap from "../components/SeatingMap";
+import NotificationToast from "../components/NotificationToast";
+import BookingButton from "../components/BookingButton";
+import GuestEmailInput from "../components/GuestEmailInput";
+import emailRegex from "../utils/emailValidate";
 
-const emailRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-/**
- * Finds a contiguous block of 'n' available seats.
- * If 'startSeatId' is provided, it tries to find a block adjacent to that seat.
- */
-function findAdjacentSeats(
-  seats: Seat[],
-  n: number,
-  startSeatId?: number
-): number[] {
-  // Group seats by row
-  const rows = seats.reduce((acc: Record<number, Seat[]>, seat) => {
-    if (!acc[seat.row_num]) acc[seat.row_num] = [];
-    acc[seat.row_num].push(seat);
-    return acc;
-  }, {});
-
-  // Logic for when a user clicks a specific seat
-  if (startSeatId) {
-    const clickedSeat = seats.find((s) => s.seatId === startSeatId);
-    if (!clickedSeat) return [];
-
-    // Filter for available seats on the *same row* as the clicked seat
-    const rowSeats = rows[clickedSeat.row_num]
-      .filter((s) => s.seatStatus === "available")
-      .sort((a, b) => a.seat_num - b.seat_num);
-
-    const index = rowSeats.findIndex((s) => s.seatId === clickedSeat.seatId);
-
-    // If the clicked seat is not available (index = -1), stop
-    if (index === -1) return [];
-
-    // Try to find 'n' seats to the right (including the clicked one)
-    const right = rowSeats.slice(index, index + n);
-    const isContiguousRight = right.every(
-      (s, j, arr) => j === 0 || s.seat_num === arr[j - 1].seat_num + 1
-    );
-    if (right.length === n && isContiguousRight) {
-      return right.map((s) => s.seatId);
-    }
-
-    // Try to find 'n' seats to the left (including the clicked one)
-    const leftStart = Math.max(0, index - n + 1);
-    const left = rowSeats.slice(leftStart, index + 1);
-    const isContiguousLeft = left.every(
-      (s, j, arr) => j === 0 || s.seat_num === arr[j - 1].seat_num + 1
-    );
-    if (left.length === n && isContiguousLeft) {
-      return left.map((s) => s.seatId);
-    }
-  }
-
-  // Logic for automatic selection (find the best available block)
-  for (const row of Object.values(rows)) {
-    const available = row
-      .filter((s) => s.seatStatus === "available")
-      .sort((a, b) => a.seat_num - b.seat_num);
-
-    for (let i = 0; i <= available.length - n; i++) {
-      const segment = available.slice(i, i + n);
-      const contiguous = segment.every(
-        (s, j, arr) => j === 0 || s.seat_num === arr[j - 1].seat_num + 1
-      );
-      if (contiguous) return segment.map((s) => s.seatId);
-    }
-  }
-
-  return [];
-}
 
 export default function BookingPage() {
-  const { screeningId } = useParams<{ screeningId: string }>();
+  const { screeningId } = useParams<{ screeningId: string; }>();
   const navigate = useNavigate();
 
   const [showDelay, setShowDelay] = useState(false);
@@ -98,7 +34,7 @@ export default function BookingPage() {
 
   // Core booking state
   const [tickets, setTickets] = useState<
-    { id: number; count: number; price?: number }[]
+    { id: number; count: number; price?: number; }[]
   >([]);
   const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
   const [seatError, setSeatError] = useState<string | null>(null);
@@ -153,7 +89,7 @@ export default function BookingPage() {
   const { data: screening } = useFetch<
     {
       title: string;
-      info: { mobileImg: string };
+      info: { mobileImg: string; };
       startTime: string;
       auditoriumName: string;
     }[]
@@ -240,10 +176,10 @@ export default function BookingPage() {
         else acc.push({ ...cur });
         return acc;
       },
-      [] as { id: number; count: number }[]
+      [] as { id: number; count: number; }[]
     );
 
-    const seatList: { seatId: number; ticketType: number }[] = [];
+    const seatList: { seatId: number; ticketType: number; }[] = [];
     const seatQueue = [...selectedSeats];
     for (const t of uniqueTickets) {
       for (let i = 0; i < t.count; i++) {
@@ -310,13 +246,7 @@ export default function BookingPage() {
       <div className="booking-layout">
         <aside className="booking-left">
           {screening?.[0] && (
-            <div className="movie-poster-box">
-              <img
-                src={screening[0].info?.mobileImg || "/placeholder.jpg"}
-                alt={screening[0].title}
-                className="movie-poster"
-              />
-            </div>
+            <PosterBox mobileImg={screening?.[0].info.mobileImg} title={screening?.[0].title} />
           )}
 
           <div className="ticket-section">
@@ -325,10 +255,7 @@ export default function BookingPage() {
           </div>
 
           {totalTickets > 0 && (
-            <div className="ticket-total-box mt-3">
-              <p className="text-light">Totalt pris</p>
-              <h4 className="neo-text">{totalPrice} kr</h4>
-            </div>
+            <TotalPrice totalPrice={totalPrice} />
           )}
         </aside>
 
@@ -336,7 +263,7 @@ export default function BookingPage() {
           {screening?.[0] && (
             <div className="heading-box">
               <h2 className="neo-text">
-                {screening[0].auditoriumName} –{" "}
+                {screening[0].auditoriumName} –
                 {formatScreeningTime(screening[0].startTime)}
               </h2>
             </div>
@@ -345,91 +272,24 @@ export default function BookingPage() {
 
           {/* Gäst-email (bara om utloggad och har valt biljetter) */}
           {!user && totalTickets > 0 && (
-            <div className="guest-email mb-3">
-              <label className="form-label text-light">E-post</label>
-              <input
-                type="email"
-                className="form-control"
-                placeholder="namn@exempel.se"
-                value={guestEmail}
-                onChange={handleEmailChange}
-              />
-            </div>
+            <GuestEmailInput guestEmail={guestEmail} handleEmailChange={handleEmailChange} />
           )}
 
           {/* Seating Map */}
-          <div className="seating-area">
-            {Object.entries(
-              seats.reduce((acc: Record<number, Seat[]>, seat) => {
-                if (!acc[seat.row_num]) acc[seat.row_num] = [];
-                acc[seat.row_num].push(seat);
-                return acc;
-              }, {})
-            )
-              .sort((a, b) => Number(a[0]) - Number(b[0]))
-              .map(([row, rowSeats]) => (
-                <div key={row} className="seat-row">
-                  {rowSeats
-                    .sort((a, b) => a.seat_num - b.seat_num)
-                    .map((seat) => (
-                      <button
-                        key={seat.seatId}
-                        className={`seat ${
-                          seat.seatStatus === "booked" ? "booked" : ""
-                        } ${
-                          selectedSeats.includes(seat.seatId) ? "selected" : ""
-                        }`}
-                        onClick={() =>
-                          handleSeatClick(seat.seatId, seat.seatStatus)
-                        }
-                      >
-                        {seat.seatId}
-                      </button>
-                    ))}
-                </div>
-              ))}
-          </div>
-
+          <SeatingMap seats={seats} selectedSeats={selectedSeats} handleSeatClick={handleSeatClick} />
           {seatError && (
             <p style={{ color: "red", marginTop: "15px" }}>{seatError}</p>
           )}
 
           {totalTickets > 0 && (
-            <button
-              className={`btn neo-btn mt-4 ${
-                isBookDisabled || isInvalidEmail ? "neo-btn--disabledEmail" : ""
-              }`}
-              onClick={handleBooking}
-              disabled={isBookDisabled || isInvalidEmail}
-            >
-              Boka {totalTickets} biljett(er)
-            </button>
+            <BookingButton isBookDisabled={isBookDisabled} handleBooking={handleBooking} isInvalidEmail={isInvalidEmail} totalTickets={totalTickets} />
           )}
         </section>
       </div>
 
       {/* Toast Notification Container */}
-      <ToastContainer position="top-end" className="p-3 toast-under-navbar">
-        <Toast
-          onClose={() => setShow(false)}
-          show={show}
-          delay={5000}
-          animation={true}
-          autohide
-          className="toast-styling w-auto"
-        >
-          <Toast.Header className="toast-header-styling">
-            <img
-              src="holder.js/20x20?text=%20"
-              className="rounded me-2"
-              alt=""
-            />
-            <strong className="me-auto">Notifikation</strong>
-            <small>Just nu</small>
-          </Toast.Header>
-          <Toast.Body>{toastMessage}</Toast.Body>
-        </Toast>
-      </ToastContainer>
+      <NotificationToast setShow={setShow} show={show} toastMessage={toastMessage} />
+
     </main>
   );
 }

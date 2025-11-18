@@ -52,7 +52,7 @@ function App() {
             <Route path="users" element={<p>All users</p>} />
           </Route>
         </Routes>
-        {isMobile && isAdminPage && <BottomNavbar />}
+        {isMobile && !isAdminPage && <BottomNavbar />}
 
       </div>
     </>

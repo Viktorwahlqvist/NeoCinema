@@ -82,6 +82,9 @@
   flex-direction: column;
   gap: 1.75rem; 
   font-family: $font-family-heading;
+  strong{
+    color: $color-hover;
+  }
 }
 
 // Container for the action buttons (Download, Back)

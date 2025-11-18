@@ -83,7 +83,6 @@ router.post("/bookings", async (req, res) => {
   }
 
   let connection: PoolConnection | undefined;
-
   try {
     connection = await db.getConnection();
     await connection.beginTransaction();

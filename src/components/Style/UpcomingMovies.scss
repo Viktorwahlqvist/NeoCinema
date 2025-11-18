@@ -1,10 +1,10 @@
 @use "../../styles/variables" as *;
-
+@use "sass:math";
 
 $section-max: 1450px; 
 $cards-count: 6;
 $cards-gap: $spacing-lg;
-$card-ratio: 16/9;
+$card-ratio: math.div(16, 9);
 
 .upcoming-movies {
   width: 100%;
@@ -17,6 +17,7 @@ $card-ratio: 16/9;
   &__title {
     max-width: $section-max;
     margin: 0 auto $spacing-sm;
+    text-shadow: $text-glow;
     text-align: center;
     font-size: clamp(1rem, 1.6vw, 1.15rem);
     font-weight: 600;
@@ -35,6 +36,7 @@ $card-ratio: 16/9;
 
  
   &__scroll-container {
+    max-width: 75vw;
     display: flex;
     width: 100%;
     gap: $cards-gap;

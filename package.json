@@ -1,6 +1,7 @@
 {
   "scripts": {
     "start": "tsx server/index.ts",
+    "build": "vite build",
     "dev": "vite",
     "test": "vitest",
     "test:ui": "vitest --ui"

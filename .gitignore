@@ -27,3 +27,5 @@ dist-ssr
 ./src/pages/LoginPage.tsx
 ./src/pages/ProfilePage.tsx
 ./src/pages/PagesStyle/ProfilePage.scss
+runner.cjs
+/dist

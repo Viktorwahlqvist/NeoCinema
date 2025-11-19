@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useFetch from "../hook/useFetch";
 import TicketSelector from "../components/TicketSelector";
-import "./PagesStyle/BookingPage.scss";
+import "./PagesStyle/bookingPage.scss";
 import { useAuth } from "../AuthContext";
 import SeatSSE from "../components/SeatSSE";
 import { Seat } from "../types/Booking";

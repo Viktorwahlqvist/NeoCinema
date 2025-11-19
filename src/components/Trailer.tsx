@@ -1,5 +1,5 @@
 import React from "react";
-import "./Style/trailer.scss";
+import "./Style/Trailer.scss";
 interface TrailerProps {
   videoId: string;
   title: string;

@@ -1,5 +1,5 @@
 import React from "react";
-import "./filter-btn.scss";
+import "./Filter-btn.scss";
 
 interface BtnInput {
   btnName: string[];

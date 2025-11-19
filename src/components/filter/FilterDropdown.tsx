@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import FilterBtn from "./FilterBtn";
-import "./filter-dropdown.scss";
+import "./Filter-dropdown.scss";
 
 interface Option { label: string; value: string; }
 

@@ -1,5 +1,5 @@
 import React from "react";
-import "./Style/moviedescription.scss";
+import "./Style/Moviedescription.scss";
 
 interface MovieDescriptionProps {
   title: string;

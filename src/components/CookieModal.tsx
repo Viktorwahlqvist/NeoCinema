@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import "./style/Cookingmodal.scss";
+import "./style/Cookiemodal.scss";
 
 
 interface CookingConsent {

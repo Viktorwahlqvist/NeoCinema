@@ -7,7 +7,7 @@ import MovieTags from "../components/MovieTags";
 import MovieDescription from "../components/MovieDescription";
 import DateTimeSelector from "../components/DateTimeSelector";
 import MovieReviews from "../components/MovieReviews";
-import "../styles/Date-time-selector.scss";
+import "../Styles/Date-time-selector.scss";
 import { Movie } from "../types/movie";
 
 export default function MovieDetailPage() {
@@ -36,7 +36,7 @@ export default function MovieDetailPage() {
     </div>
   );
 
- 
+
   if (movieLoading) return LoadingUI;
 
   if (!movie) return showDelay ? <p className="text-center mt-5 text-light">No movie found</p> : LoadingUI;

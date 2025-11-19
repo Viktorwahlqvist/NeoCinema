@@ -1,7 +1,7 @@
 import React from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import "./Style/ConfirmCancelModal.scss"
+import "./Style/ConfirmCancelModal.scss";
 
 interface ConfirmCancelModalProps {
   show: boolean;
@@ -42,7 +42,7 @@ const ConfirmCancelModal: React.FC<ConfirmCancelModalProps> = ({
           Nej
         </Button>
         <Button
-          
+
           onClick={onConfirm}
           className="confirm-btn"
         >

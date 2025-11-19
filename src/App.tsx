@@ -16,6 +16,7 @@ import CancelBookingPage from "./pages/CancekBookingPage";
 import CookieModal from "./components/CookieModal";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import AdminPage from "./pages/AdminPage";
+import AdminBookings from "./pages/AdminBookings";
 
 function App() {
   const location = useLocation();
@@ -48,7 +49,7 @@ function App() {
           }>
             <Route index element={<Navigate to="dashboard" />} />
             <Route path="dashboard" element={<p>All info</p>} />
-            <Route path="bookings" element={<p>Bokningar</p>} />
+            <Route path="bookings" element={<AdminBookings />} />
             <Route path="users" element={<p>All users</p>} />
           </Route>
         </Routes>

@@ -23,4 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 .env
+<<<<<<< HEAD
 ./server/gmail-secret.json
+=======
+runner.cjs
+/dist
+>>>>>>> 55f186f5d860bf5953c5a81fea7b801389828277

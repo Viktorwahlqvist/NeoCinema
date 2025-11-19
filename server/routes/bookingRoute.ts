@@ -68,6 +68,7 @@ async function getBookingDetails(
  * Creates a new booking for a logged-in user or a guest.
  * Runs inside a database transaction to ensure data integrity.
  */
+/* ----------  POST /bookings  ---------- */
 router.post("/bookings", async (req, res) => {
   const { screeningId, seats, guestEmail } = req.body;
   const userId = req.session.user?.id || null;
@@ -79,15 +80,22 @@ router.post("/bookings", async (req, res) => {
   if (!userId && !guestEmail) {
     return res
       .status(400)
-      .json({ message: "Guest email required when not logged in" });
+      .json({ message: "guestEmail required when not logged in" });
   }
 
-  let connection: PoolConnection | undefined;
+  let connection;
   try {
     connection = await db.getConnection();
     await connection.beginTransaction();
 
-    // Check availability
+    // Race condition, for update makes sure that other bookings for the same screening to wait before transaktions is done
+    await connection.query(
+      "SELECT id FROM screenings WHERE id = ? FOR UPDATE",
+      [screeningId]
+    );
+
+    // Check if all requested seats are still available
+   
     const [seatsRows] = await connection.query<Seat[] & RowDataPacket[]>(
       "SELECT * FROM seatStatusView WHERE screeningId = ?",
       [screeningId]
@@ -101,30 +109,26 @@ router.post("/bookings", async (req, res) => {
       await connection.rollback();
       return res
         .status(400)
-        .json({ message: "One or more seats already booked" });
+        .json({ message: "Tyvärr, en eller flera platser blev precis bokade av någon annan." });
     }
 
     // Generate Tokens & QR Code
-    // Retrieve screening info to calculate expiration
     const [screeningRows] = await connection.query<RowDataPacket[]>(
       `SELECT start_time FROM screenings WHERE id = ?`,
       [screeningId]
     );
     const screeningStartTime = new Date(screeningRows[0].start_time);
     
-    // Token expires 2 hours before the movie starts
     const expires = new Date(screeningStartTime.getTime() - 2 * 60 * 60 * 1000);
     const token = crypto.randomBytes(32).toString("hex");
     const bookingNumber = randomNumber();
 
-    // Generate QR Code Data URL
     const qrCodeDataUrl = await QRCode.toDataURL(bookingNumber, {
       color: { dark: "#000000", light: "#ffffff" },
       width: 200,
       margin: 1,
     });
 
-    // Load logo from disk
     let logoBuffer: Buffer | null = null;
     try {
       const logoPath = path.join(process.cwd(), "public", "NeoCinema.png");
@@ -148,7 +152,7 @@ router.post("/bookings", async (req, res) => {
     );
     const bookingId = bookingRes.insertId;
 
-    // 4. Insert Seats
+    // Insert Seats
     const seatValues = seats.map((s: SeatInput) => [
       bookingId,
       s.seatId,
@@ -175,7 +179,6 @@ router.post("/bookings", async (req, res) => {
       .map((s) => `<li style="margin-bottom: 5px;">${s}</li>`)
       .join("");
 
-    // Determine recipient
     let recipientEmail: string | null = null;
     if (userId) {
       const [userRows] = await connection.query<RowDataPacket[]>(
@@ -229,7 +232,7 @@ router.post("/bookings", async (req, res) => {
                     <hr style="border: 0; border-top: 2px solid #00BFFF; margin: 30px 0;">
                     <p style="font-size: 1.3em; color: #ffffff; margin-bottom: 30px;"><b>Totalt pris: ${totalPrice} kr</b></p>
                     <p style="text-align: center; margin: 20px 0;">
-                      <a href="${cancelUrl}" style="color: #FF5555; text-decoration: underline;">Avboka din bokning (Länken är gilltig max 2 timmar innan filmen börjar)</a>
+                      <a href="${cancelUrl}" style="color: #FF5555; text-decoration: underline;">Avboka din bokning (Länk gilltig max 2 timmar innan filmen går)</a>
                     </p>
                   </td>
                 </tr>
@@ -265,9 +268,10 @@ router.post("/bookings", async (req, res) => {
         attachments: attachments,
       });
     }
-
-    // Commit & Broadcast
+    // 7. Commit & Broadcast
     await connection.commit();
+  
+    // We are unlocking thrue commit before telling SSE so that next person in queue can come in
     broadcastSeatUpdate({
       seatIds: seats.map((s: SeatInput) => s.seatId),
       status: "booked",

@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../AuthContext"; 
+import { useAuth } from "../AuthContext";
 import "./Style/BottomNavBar.scss";
 
 export default function BottomNavbar() {
@@ -67,7 +67,7 @@ export default function BottomNavbar() {
         </button>
       </nav>
 
-     
+
       <div className={`fullscreen-menu ${menuOpen ? "open" : ""}`}>
         <div className="menu-content">
           <button className="close-btn" onClick={() => setMenuOpen(false)}>

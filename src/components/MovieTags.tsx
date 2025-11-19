@@ -1,5 +1,5 @@
 import React from "react";
-import "./Style/movietags.scss";
+import "./Style/Movietags.scss";
 interface TagsProps {
   actors: string[];
   ageLimit: number;

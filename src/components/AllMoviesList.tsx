@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Movie } from "../types/movie";
 import FilterBtn from "../components/filter/FilterBtn";
-import "./Style/allmovieslist.scss";
+import "./Style/Allmovieslist.scss";
 import { Col, Row } from "react-bootstrap";
 
 export interface ScreeningsInfo extends Omit<Movie, "id"> {

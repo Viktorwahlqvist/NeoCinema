@@ -1,0 +1,128 @@
+@use "../../Styles/Variables" as *;
+
+.home-page {
+  // background-color: #050510;
+  color: #e0e0e0;
+  min-height: 100vh;
+  padding-bottom: 7rem;
+  font-family: $font-family-heading;
+  overflow: hidden;
+}
+
+/* ===== Header / Titel ===== */
+.header-box {
+  text-align: center;
+  padding: 2rem 0 1rem;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), transparent);
+
+  
+  .site-logo {
+    position: absolute;
+    top: -1rem;
+    left: -0.5rem;
+    width: 100px; 
+    height: auto;
+    z-index: 10;
+  }
+}
+
+.neon-text{
+  font-size: 2rem;
+  font-weight: 700;
+  color: #00eaff;
+  text-shadow: 0 0 6px #00eaff, 0 0 12px #00eaff,
+    0 0 24px rgba(0, 234, 255, 0.8);
+  letter-spacing: 1px;
+}
+
+/* ===== Genre-tag ===== */
+.genre-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+}
+
+
+.genre-pill {
+  background: rgba(150, 0, 255, 0.2);
+  border: 1px solid #b000ff;
+  color: #e9b3ff;
+  padding: 0.35rem 0.9rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  text-shadow: 0 0 6px #b000ff;
+  transition: all 0.3s ease;
+}
+
+.genre-pill:hover {
+  background: rgba(176, 0, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+
+/* ===== Neon-button ===== */
+.neon-btn {
+  color: $color-stroke;
+  border: 2px solid;
+  background: transparent;
+  font-weight: 600;
+  padding: 0.6rem 1.5rem;
+  border-radius: 30px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 234, 255, 0.3);
+}
+
+/* ===== Carousel ===== */
+.carousel {
+  margin-top: 1.5rem;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  transform: scale(1.3); 
+  filter: invert(70%) sepia(100%) saturate(400%) hue-rotate(160deg)
+    brightness(150%) contrast(120%)
+    drop-shadow(0 0 3px #00eaff)
+    drop-shadow(0 0 5px #00bfff); 
+  transition: all 0.3s ease;
+}
+
+.carousel-control-prev-icon:hover,
+.carousel-control-next-icon:hover {
+  transform: scale(1.45);
+  filter: invert(80%) sepia(100%) saturate(600%) hue-rotate(160deg)
+    brightness(170%) contrast(125%)
+    drop-shadow(0 0 6px #66e0ff)
+    drop-shadow(0 0 12px #00bfff);
+}
+
+.carousel-indicators [data-bs-target] {
+  background-color: #00eaff;
+  width: 26px;
+}
+
+.carousel-indicators .active {
+  background-color: #b000ff;
+}
+
+.fullscreen {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  min-height: 100vh;
+}
+@media (max-width: 500px) {
+  .neon-text-home{
+    font-size: 2rem;
+    font-weight: 700;
+    color: #00eaff;
+    text-shadow: 0 0 6px #00eaff, 0 0 12px #00eaff,
+    0 0 24px rgba(0, 234, 255, 0.8);
+  letter-spacing: 1px;
+  margin-top: 50px;
+  }
+}

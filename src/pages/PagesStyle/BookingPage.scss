@@ -1,0 +1,371 @@
+@use "../../Styles/Variables" as *;
+
+
+.guest-email .form-control {
+  background: rgba(#00eaff, 0.1);
+  border: 1px solid #00eaff;
+  color: #fff;
+  border-radius: 6px;
+  padding: 0.5rem;
+  width: 100%;
+}
+
+.guest-toggle,
+.guest-email {
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ticket-total-box {
+  background: rgba(163, 73, 232, 0.1);
+  border: 2px solid #00ffff;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  margin-top: 1rem;
+  color: #fff;
+  box-shadow: 0 0 10px #00ffff80, 0 0 20px #a349e880;
+  transition: all 0.3s ease;
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #ccc;
+    font-size: 20px;
+  }
+
+  h4 {
+    margin: 0.5rem 0 0;
+    color: #00ffff;
+    font-weight: bold;
+  }
+}
+
+.booking-page {
+  color: #e0e0e0;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  overflow-x: hidden;
+}
+.heading-box {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.neo-text {
+  color: #00ffff;
+  font-size: 1.4rem;
+  font-weight: 600;
+  position: relative;
+  left: 0;
+}
+
+.booking-layout {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.toast-email {
+  background: rgba($color-stroke, 0.12);   
+  border: 1px solid $color-stroke;
+  color: $color-text;
+  box-shadow: $glow-strong;
+  text-shadow: $text-glow;
+  border-radius: $border-radius;
+
+  .toast-header-styling,
+  .toast-body {
+    background: inherit;
+    color: inherit;
+  }
+
+
+  .btn-close {
+    filter: invert(1);
+    opacity: 0.8;
+    &:hover { opacity: 1; }
+  }
+}
+
+.toast-under-navbar {
+  position: fixed;
+  z-index: 1000;
+  margin-top: 8rem;
+
+   @media (max-width: 480px) {
+    margin-top:0;
+   }
+}
+
+.toast-styling {
+  background: $background-gradient;
+  box-shadow: $glow-strong;
+  text-shadow: $text-glow;
+  color: $color-text;
+
+  
+  .toast-header-styling,
+  .toast-body {
+    background: inherit;
+    color: inherit;
+  }
+}
+
+
+.toast-header-styling {
+  position: relative;
+}
+
+
+
+.toast-header-styling::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, $color-hover 0%, $color-stroke 50%, $color-hover 100%);
+  box-shadow: $glow-soft;
+}
+
+/* LEFT : poster + ticket selector */
+.booking-left {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-left: 5rem;
+
+  .ticket-selector {
+    order: 1;
+  }
+
+  .ticket-total-box {
+    order: 2;
+  }
+
+  .btn.neon-btn {
+    order: 3;
+  }
+
+  // 📱 Mobilanpassning
+  @media (max-width: 480px) {
+    margin-left: 0;
+    align-items: center;
+    width: 100%;
+    padding: 0 1rem;
+
+    .ticket-selector {
+      order: 1;
+    }
+
+    .ticket-total-box {
+      order: 2; // Flytta över knappen
+      margin-bottom: 0.5rem;
+    }
+
+    .btn.neon-btn {
+      order: 3;
+      width: 100%;
+    }
+}
+}
+
+.movie-poster-box {
+  border: 2px solid #00eaff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(#00eaff, 0.35);
+}
+
+.movie-poster {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+}
+
+.ticket-section {
+  text-align: center;
+}
+
+/* RIGHT : seats + button */
+.booking-right {
+  flex: 1 1 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.screen {
+  width: 80%;
+  max-width: 600px;
+  height: 40px;
+  background: linear-gradient(to bottom, #00eaff, #050510);
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 15px rgba(#00eaff, 0.4);
+  text-align: center;
+  line-height: 40px;
+  color: #000;
+  font-weight: 600;
+}
+
+.seating-area {
+  width: 100%;
+  max-width: 600px;
+}
+
+.seat-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.seat {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #00eaff;
+  background: rgba(#00eaff, 0.1);
+  color: #00eaff;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &.selected {
+    background: #00eaff;
+    color: #000;
+    box-shadow: 0 0 8px #00eaff;
+  }
+  &.booked {
+    background: #444;
+    border-color: #444;
+    cursor: not-allowed;
+  }
+}
+
+.neo-btn {
+  background: #00eaff;
+  color: #000;
+  font-weight: 600;
+  padding: 0.6rem 1.4rem;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+
+  &:hover {
+ border-color: $color-stroke!important;
+}
+  
+
+}
+
+.neon-btn {
+  background: #00eaff;
+  border: none;
+  color: #000;
+  font-weight: 600;
+  padding: 0.6rem 1.4rem;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+
+ 
+}
+
+@media (max-width: 600px) {
+  .booking-page {
+    display: flex;
+    justify-content: center;
+  }
+  .ticket-total-box {
+    width: 80%;
+  }
+  .booking-layout {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .booking-left {
+    max-width: 100%;
+    padding: 0 1rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .movie-poster {
+    width: 250px;
+    height: auto;
+    max-height: 220px;
+  }
+
+  .booking-right {
+    width: 90%;
+  }
+
+  .screen {
+    width: 90%;
+    font-size: 0.9rem;
+  }
+
+  .seating-area {
+    width: 100%; // ändra här flr mobile
+    max-width: 100%;
+    padding: 0 0.5rem;
+  }
+
+  .seat-row {
+    gap: 0.25rem;
+  }
+
+  .seat {
+    width: 28px;
+    height: 28px;
+    font-size: 0.5rem;
+  }
+
+  .neo-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    margin-bottom: 5rem;
+  }
+
+    .neon-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .neo-text {
+    font-size: 1rem;
+    text-align: center;
+    left: 0;
+  }
+}
+
+@media (max-width: 400px) {
+  .seat{
+    font-size: 0,4rem;
+  }
+}
+
+.neo-btn--disabledEmail {
+  background: #a80000 !important;   // röd
+  color: #fff !important;
+    border: none !important;
+
+  opacity: 0.7;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transition: background 0.3s ease, opacity 0.3s ease;
+ 
+}
+
+.neo-btn--disabledEmail:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+

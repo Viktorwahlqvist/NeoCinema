@@ -1,0 +1,33 @@
+@use "../../Styles/Variables" as *;
+
+.overall-button {
+  cursor: pointer;
+  color: $color-text;
+  font-family: $font-family-heading;
+  padding: 0.5rem 1.25rem 0.5rem 1.25rem;
+  border-radius: $border-radius;
+  border: $border-width $border-style $color-button;
+  background-color: $color-button;
+  box-shadow: $glow-strong;
+
+  &:hover {
+    box-shadow: $button-hover;
+  }
+
+  &.active {
+    transform: scale(1.05);
+      box-shadow: 0 0 25px $color-hover;
+      border-color: $color-hover;
+      background: $color-hover;
+  }
+}
+
+
+
+@media (max-width: 670px){
+    .overall-button{
+      padding: 0.40rem 0.25rem 0.40rem 0.25rem;
+      max-width: 80%;
+      box-shadow: $glow-medium;
+    }
+  }

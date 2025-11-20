@@ -1,0 +1,15 @@
+@use "../../Styles/Variables" as *;
+.movie-title {
+  text-shadow: 0 0 15px $color-hover;
+}
+
+.description-container {
+  font-size: 1rem;
+  margin-inline: auto;
+  background: $background-gradient;
+
+  border: $border-width $border-style $border-color;
+  border-radius: $border-radius;
+  box-shadow: 0 0 15px $color-hover;
+  padding: 1rem;
+}

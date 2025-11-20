@@ -1,0 +1,53 @@
+@use "./Variables" as *;
+
+.movie-reviews {
+  font-family: $font-family-heading;
+      background: linear-gradient(180deg, #1a5573 0%, #3b007a 100%);
+
+  border: $border-width $border-style $border-color;
+  border-radius: $border-radius;
+  box-shadow: $glow-medium;
+  color: $color-stroke;
+  padding: 40px;
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+  margin-bottom: 5rem;
+  transition: all $transition-speed ease;
+  box-shadow: 0 0 15px $color-hover;
+
+
+  .card-body {
+    background: transparent;
+  }
+
+  .card-title {
+    font-size: $font-size-heading-md;
+    font-weight: 700;
+    color: $color-stroke;
+    text-shadow: $text-glow;
+    margin-bottom: $spacing-md;
+  }
+
+  .card-text {
+    font-family: "Courier New", monospace;
+    color: $color-stroke;
+    font-size: $font-size-body + 2px;
+    line-height: 1.7;
+    text-shadow: $text-glow;
+    white-space: pre-line;
+  }
+
+  // Stjärnor
+  span {
+    color: $color-stroke;
+    text-shadow: $glow-medium;
+    font-size: 28px;
+    margin: 0 2px;
+  }
+
+  &:hover {
+    box-shadow: $glow-strong;
+    transform: scale(1.01);
+  }
+}

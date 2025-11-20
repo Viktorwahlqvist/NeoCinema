@@ -4,8 +4,9 @@
     "target": "ES2023",
     "lib": ["ES2023"],
     "module": "ESNext",
-    "types": ["node"],
     "skipLibCheck": true,
+    "types": ["node", "express", "express-session"],
+    "typeRoots": ["./types", "./node_modules/@types"],
 
     /* Bundler mode */
     "moduleResolution": "bundler",

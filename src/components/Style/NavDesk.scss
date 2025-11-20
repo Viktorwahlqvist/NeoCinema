@@ -1,0 +1,56 @@
+@use "../../styles/variables" as *;
+
+.neo-navbar {
+  position: static;
+  z-index: 2000;
+  padding-block: $spacing-sm;
+}
+
+.neo-shell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.neo-logo-img {
+  width: auto;
+  max-width: 150px;
+  min-width: unset;
+  height: 100px;
+  object-fit: contain;
+  display: block;
+}
+
+.neo-menu {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: clamp($spacing-sm, 4vw, $spacing-lg);
+  position: relative;
+  padding-bottom: $spacing-sm;
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 50%; transform: translateX(-50%);
+    bottom: 0; height: 2px; width: min(90%, 740px);
+    background: linear-gradient(90deg, $color-hover 0%, $color-stroke 50%, $color-hover 100%);
+    box-shadow: $glow-soft;
+    pointer-events: none;
+  }
+}
+
+.neo-account { display: flex; align-items: center; }
+
+.neo-link {
+  display: flex; flex-direction: column; align-items: center; gap: $spacing-xs;
+  text-decoration: none; font-family: $font-family-heading; color: $color-stroke;
+  .neo-icon { font-size: 1.8rem; text-shadow: $text-glow; }
+  .neo-text { font-size: 0.95rem; }
+}
+
+@media (max-width: $breakpoint-desktop) {
+  .neo-menu { gap: $spacing-md; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .neo-menu::-webkit-scrollbar { display: none; }
+}

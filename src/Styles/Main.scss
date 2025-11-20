@@ -1,0 +1,17 @@
+@use "./Variables";
+@use "./Base.scss";
+
+:root {
+  --bs-dark: #000;
+  --bs-primary: #e50914;
+}
+
+body {
+  background-color: var(--bs-dark);
+  
+    @media (max-width: 400px) {
+    padding-bottom: 100px; 
+  }
+}
+
+

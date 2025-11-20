@@ -1,0 +1,42 @@
+@use "../../Styles/Variables" as *;
+
+.filter-dd {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown-menyn */
+.filter-dd__menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 100;
+  min-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.filter-dd__item {
+  margin: 0;
+  white-space: nowrap;
+  box-shadow: $glow-soft;
+
+  &:hover {
+    box-shadow: $dropdown-hover;
+  }
+}
+
+/* 🔹 Begränsa styling till bara knappar inuti FilterDropdown */
+.filter-dd .overall-button {
+  width: 180px; /* standardbredd */
+  transition: width 0.2s ease;
+
+  @media (max-width: 768px) {
+    width: 150px;
+  }
+
+  @media (max-width: 480px) {
+    width: 130px;
+  }
+}

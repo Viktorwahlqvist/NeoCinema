@@ -14,18 +14,16 @@
   }
 }
 
-// Main wrapper for the entire page
 .booking-confirmation {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 90%; // Responsive width
-  max-width: 900px; // Max width for the whole component
-  margin: 4rem auto 6rem auto; // Center component with top/bottom margin
+  max-width: 900px; 
+  margin: 4rem auto 6rem auto; 
   color: $color-text;
 }
 
-// Page title ("Dina platser är bokade!")
 .confirmation-title {
   color: $color-stroke;
   font-size: $font-size-heading-md;
@@ -35,7 +33,6 @@
   text-shadow: $text-glow;
 }
 
-// The main card with the neon glow
 .confirmation-grid {
   width: 100%;
   background-color: rgba(26, 27, 46, 0.4); 
@@ -46,7 +43,7 @@
   padding: 2rem;
 }
 
-// Movie title inside the card (e.g., "The Matrix")
+
 .movie-title {
   font-family: $font-family-heading;
   font-size: 1.8rem;
@@ -59,15 +56,14 @@
   border-bottom: 1px solid rgba($color-stroke, 0.4);
 }
 
-// The 2-column grid container (Details | QR)
+
 .confirmation-inner {
   display: grid;
   grid-template-columns: 1fr; // Mobile-first: 1 column
-  gap: 2.5rem; // Space between Details and QR code when stacked
+  gap: 2.5rem; 
   width: 100%;
 
-  // Targets the <QrCodeCard> component (the 2nd child)
-  // and centers it on mobile
+
   > :nth-child(2) {
     display: flex;
     flex-direction: column;
@@ -76,7 +72,7 @@
   }
 }
 
-// The left-hand column (Details)
+
 .details-column {
   display: flex;
   flex-direction: column;
@@ -87,7 +83,7 @@
   }
 }
 
-// Container for the action buttons (Download, Back)
+
 .btn-group {
   display: flex;
   flex-direction: column; // Mobile-first: stack buttons
@@ -97,7 +93,7 @@
   max-width: 350px; 
 }
 
-// Styling for the glow buttons
+
 .btn-glow {
   display: flex;
   justify-content: center;
@@ -128,9 +124,6 @@
     transform: none;
   }
 }
-
-
-
 
 @media (min-width: 650px) {
   .confirmation-grid {

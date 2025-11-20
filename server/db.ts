@@ -2,11 +2,9 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// Något med ES modules och __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Måste hitta .env-filen korrekt
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 import mysql from "mysql2/promise";

@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
 
-// Vilken skärmstorlem
-const BREAKPOINT_MOBILE = 480; // Mobil
+const BREAKPOINT_MOBILE = 480; // Mobile
 const BREAKPOINT_TABLET = 768; // tablett
 
 
-//Hook för att hålla koll ifall personen är på mobil
+// Hook so that it keeps track if person is on mobile or not
 export function useIsMobile() {
-  //True=Mobil, False=dator/tablett
   const [isMobile, setIsMobile] = useState(window.innerWidth < BREAKPOINT_TABLET);
 
   useEffect(() => {

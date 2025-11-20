@@ -58,9 +58,7 @@ export default function AboutUs() {
           </div>
           <aside className="omneo-icons omneo-icons--bare" aria-label="Dekorativa ikoner">
             <Flag className="omneo-icon" />
-            <GeoAlt className="omneo-icon" />
-
-            {/* Klickbar Map-ikon */}
+            <GeoAlt className="omneo-icon" />         
             <a
               href={mapsUrl}
               target="_blank"

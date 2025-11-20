@@ -1,8 +1,9 @@
 @use "../../Styles/Variables" as *;
 
 .neo-navbar {
-  position: static;
-  z-index: 2000;        
+  position: sticky;
+  top: 0;
+  z-index: 2000;       
   padding-block: $spacing-sm;
 }
 

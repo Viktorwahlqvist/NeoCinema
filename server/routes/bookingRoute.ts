@@ -190,8 +190,8 @@ router.post("/bookings", async (req, res) => {
       recipientEmail = guestEmail;
     }
 
-    const publicUrl = process.env.PUBLIC_URL || "http://localhost:3000";
-    const cancelUrl = `${publicUrl}/avboka/${token}`;
+      const publicUrl = process.env.PUBLIC_URL || "http://localhost:3000";
+      const cancelUrl = `${publicUrl}/avboka/${token}`;
 
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; background-color: #f4f4f4; padding: 20px; width: 100%;">

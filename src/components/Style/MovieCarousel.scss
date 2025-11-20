@@ -1,4 +1,4 @@
-@use "../../styles/variables" as *;
+@use "../../Styles/Variables" as *;
 
 .movie-carousel {
   position: relative;
@@ -24,6 +24,15 @@
     border-radius: 20px;
     filter: brightness(0.85);
   }
+
+  .neon-text{
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #00eaff;
+    text-shadow: 0 0 6px #00eaff, 0 0 12px #00eaff,
+      0 0 24px rgba(0, 234, 255, 0.8);
+    letter-spacing: 1px;
+}
 
   .carousel-caption {
     bottom: auto;

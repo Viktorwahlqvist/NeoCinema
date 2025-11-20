@@ -1,7 +1,5 @@
+import nodemailer from "nodemailer";
 
- import nodemailer from "nodemailer";
-
-// Hämta inloggningsuppgifter från miljövariabler
 const email = process.env.GMAIL_USER;
 const appPassword = process.env.GMAIL_PASS;
 
@@ -16,7 +14,7 @@ export async function sendEmail({
   subject: string;
   text?: string;
   html?: string;
-  attachments?: { filename: string; path: string }[];
+  attachments?: any[]; 
 }) {
   if (!email || !appPassword) {
     console.error("❌ Saknas miljövariabler för Gmail.");
@@ -35,7 +33,7 @@ export async function sendEmail({
       subject,
       text,
       html,
-      attachments,
+      attachments, 
     });
     console.log(`✅ Mejlet skickades till ${to}: ${info.messageId}`);
   } catch (error) {

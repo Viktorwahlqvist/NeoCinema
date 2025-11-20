@@ -13,51 +13,52 @@ export default function UpcomingMovies() {
   const upcomingMovies: UpcomingMovie[] = [
     {
       id: 1,
-      title: "Star Shrek:",
-      screening: "JAN 2028",
-      coverArtUrl: "/starShrek.jpg",
-      genre: "Sci-Fi",
+      title: "MARIO GALAXY:",
+      screening: "3 APR 2026",
+      coverArtUrl: "/169glxy.png",
+      genre: "Äventyr",
     },
     {
       id: 2,
-      title: "Zucc:",
-      screening: "FEB 2028",
-      coverArtUrl: "/zucc.png",
-      genre: "Drama",
+      title: "MANDALORIAN:",
+      screening: "22 MAJ 2026",
+      coverArtUrl: "/169mandalorian.png",
+      genre: "Sci-Fi",
     },
     {
       id: 3,
-      title: "Zoo:",
-      screening: "JUN 2028",
-      coverArtUrl: "/zoo.jpg",
-      genre: "Family",
+      title: "MASTERS OF THE UNIVERSE:",
+      screening: "5 JUN 2026",
+      coverArtUrl: "/169masters.png",
+      genre: "Sci-Fi",
     },
     {
       id: 4,
-      title: "Paddington:",
-      screening: "OKT 2028",
-      coverArtUrl: "/paddington.jpg",
+      title: "ODDYSEY:",
+      screening: "17 JUL 2026",
+      coverArtUrl: "/169oddysey.png",
       genre: "Action",
     },
     {
       id: 5,
-      title: "Attack of..:",
-      screening: "DEC 2028",
-      coverArtUrl: "/devitos.jpg",
-      genre: "Horror",
+      title: "DUNE 3:",
+      screening: "18 DEC 2026",
+      coverArtUrl: "/169dune.png",
+      genre: "Sci-Fi",
     },
     {
       id: 6,
-      title: "Blue fast:",
-      screening: "DEC 2028",
-      coverArtUrl: "/blue.jpg",
-      genre: "Action",
+      title: "STAR WARS THE NEW ORDER:",
+      screening: "TBA 2026",
+      coverArtUrl: "/169starwars.png",
+      genre: "Sci-Fi",
     },
+
   ];
 
   return (
     <div className="upcoming-movies">
-      <h2 className="upcoming-movies__title">Kommande filmer</h2>
+      <h2 className="upcoming-movies__title mt-2 mb-4">Kommande filmer</h2>
 
       <div className="upcoming-movies__container">
         {/* Scrollable container for movies */}

@@ -1,93 +1,76 @@
-@use "../../styles/variables" as *;
+@use "../../Styles/Variables" as *;
+@use "sass:math";
+
+$section-max: 1450px; 
+$cards-count: 6;
+$cards-gap: $spacing-lg;
+$card-ratio: math.div(16, 9);
 
 .upcoming-movies {
   width: 100%;
   background: $background-gradient;
-  padding: $spacing-sm $spacing-md; // Reduced from $spacing-md to $spacing-sm
+  padding: $spacing-sm $spacing-md; 
   border-top: 1px solid $color-stroke;
   backdrop-filter: blur(10px);
   z-index: 90;
+
+  &__title {
+    max-width: $section-max;
+    margin: 0 auto $spacing-sm;
+    text-shadow: $text-glow;
+    text-align: center;
+    font-size: clamp(1rem, 1.6vw, 1.15rem);
+    font-weight: 600;
+    letter-spacing: 0.6px;
+  }
 
   &__container {
     display: flex;
     align-items: center;
     position: relative;
+    max-width: $section-max;  
+    margin-inline: auto;
+    justify-content: center;
     width: 100%;
-    height: auto; // Let content determine height
   }
 
-  // Scrollable container for movies - limited to left side
+ 
   &__scroll-container {
+    max-width: 75vw;
     display: flex;
-    gap: $spacing-md;
-    overflow-x: auto;
+    width: 100%;
+    gap: $cards-gap;
+    justify-content: space-between; 
+    overflow-x: visible;           
     padding-bottom: $spacing-xs;
     scroll-behavior: smooth;
-
-    // scrollbar
-    &::-webkit-scrollbar {
-      height: 4px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: rgba(26, 27, 46, 0.5);
-      border-radius: 3px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: $color-stroke;
-      border-radius: 3px;
-      box-shadow: $glow-soft;
-
-      &:hover {
-        background: $color-hover;
-        box-shadow: $button-hover;
-      }
-    }
   }
 
-  // Soon™ image centered in the middle of the entire container
-  &__soon {
-    position: absolute;
-    left: 42%;
-    top: 48%;
-    transform: translate(-50%, -50%);
-    z-index: 10;
-  }
-
-  &__soon-image {
-    width: 250px; // Adjust size as needed
-    height: auto;
-    opacity: 0.9;
-    transition: all $transition-speed ease;
-
-    &:hover {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1.05);
-    }
-  }
 
   &__card {
-    flex-shrink: 0;
+    flex: 0 0 calc((100% - #{$cards-gap} * (#{$cards-count} - 1)) / #{$cards-count});
+    max-width: calc((100% - #{$cards-gap} * (#{$cards-count} - 1)) / #{$cards-count});
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
     cursor: pointer;
     transition: transform $transition-speed ease;
-    position: relative; // Allow absolute positioning of genre text
+    position: relative;
 
     &:hover {
       transform: translateY(-3px);
     }
   }
 
-  // Rest of existing styles...
   &__poster {
-    width: 6rem;
-    height: 9rem;
+    width: 100%;
+    aspect-ratio: $card-ratio;
     border-radius: $border-radius;
     overflow: hidden;
     background-color: $color-button;
     border: $border-width $border-style transparent;
     transition: all $transition-speed ease;
-    position: relative; // Allow absolute positioning within poster
+    position: relative;
 
     &:hover {
       border-color: $color-stroke;
@@ -107,46 +90,28 @@
   }
 
   &__info {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(
-      0,
-      0,
-      0,
-      0.7
-    ); // Semi-transparent background for readability
+    position: static;
+    background: transparent;
     text-align: center;
-    padding: 4px;
-    border-radius: 0 0 $border-radius $border-radius; // Match poster border radius
+    padding: 6px 0 0;
+  }
+
+  &__premiere {
+    color: #ffffff;
+    font-size: 0.85rem;
+    margin: 0;
+    line-height: 1.1;
+    text-align: center;
+    font-weight: 400;
+    opacity: 0.85;
   }
 
   &__genre {
     color: #ffffff;
     font-size: 0.75rem;
-    margin: 2px 0 0 0; // Add top margin since it's now second
-    padding: 0;
+    margin: 2px 0 0;
     line-height: 1.1;
     text-align: center;
-  }
-
-  &__premiere {
-    color: #ffffff;
-
-    font-size: 0.65rem;
-    margin: 0; // Remove top margin since it's now first
-    padding: 0;
-    line-height: 1.1;
-    text-align: center;
-  }
-
-  &__title {
-    color: $color-text;
-    text-shadow: $text-glow;
-    font-size: 1.2rem; // Reduced from 2rem
-    font-weight: bold;
-    margin-bottom: $spacing-sm; // Also reduced margin for better proportions
-    letter-spacing: 0.05em;
+    opacity: 0.9;
   }
 }

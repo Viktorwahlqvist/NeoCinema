@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Movie } from "../types/movie";
 import FilterBtn from "../components/filter/FilterBtn";
-import "./Style/allmovieslist.scss";
+import "./Style/Allmovieslist.scss";
 import { Col, Row } from "react-bootstrap";
 
 export interface ScreeningsInfo extends Omit<Movie, "id"> {
@@ -69,12 +69,12 @@ export default function AllMoviesList({ movies }: AllMoviesListPRops) {
             className="d-flex flex-row flex-md-column gap-3 my-4 mx-md-3 mx-lg-0 gap-4"
           >
             <FilterBtn
-              className="flex-fill flex-md-grow-0 text-nowrap w-100 ms-sm-4 ms-md-0 me-md-3"
+              className="flex-fill flex-md-grow-0 text-nowrap w-100 ms-sm-4 ms-md-0 me-md-3 ms-1"
               btnName={["Mer info"]}
               onClick={() => navigate(`/movie/${movie.movieId}`)}
             />
             <FilterBtn
-              className="flex-fill flex-md-grow-0 text-nowrap w-100 me-sm-3 me-md-0"
+              className="flex-fill flex-md-grow-0 text-nowrap w-100 me-sm-3 me-md-0 me-1"
               btnName={["Köp biljetter"]}
               onClick={() => navigate(`/booking/${movie.screeningId}`)}
             />

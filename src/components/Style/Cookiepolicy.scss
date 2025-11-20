@@ -1,0 +1,22 @@
+
+@use "../../Styles/Variables" as *;
+
+.cookiepolicy-container{
+  margin-inline: auto;
+  padding: 2rem;
+  max-width: 1120px;
+  width: 90%; 
+  background-color: $background-gradient;
+  border: 2px solid rgba(0, 255, 255, 0.35);
+  box-shadow: 0 0 22px rgba(0, 255, 255, 0.18), inset 0 0 0 1px rgba(0, 255, 255, 0.1);
+  border-radius: $border-radius;
+  margin-bottom: 4rem;
+
+  .cookiepolicy-header{
+  color: #00eaff;
+  text-shadow: $text-glow;
+  letter-spacing: 1px;
+}
+}
+
+

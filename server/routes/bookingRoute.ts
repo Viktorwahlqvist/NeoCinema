@@ -1,10 +1,6 @@
 import express, { Request } from "express";
 import { db } from "../db.js";
-import {
-  ResultSetHeader,
-  RowDataPacket,
-  PoolConnection,
-} from "mysql2/promise";
+import {ResultSetHeader, RowDataPacket,  PoolConnection,} from "mysql2/promise";
 import crypto from 'crypto';
 import randomNumber from "../utils/randomNumber.js";
 import { sendEmail } from "./Mailer.js";
@@ -13,6 +9,9 @@ import "../utils/session.d.js"; // load global session types
 import { Seat, SeatInput, TicketLine } from "./types.js"; 
 import { requireRole, ROLES } from "../utils/acl.js";
 import { formatScreeningTime } from "../utils/date.js"; 
+import QRCode from 'qrcode';
+import fs from 'fs';
+import path from 'path';
 
 const router = express.Router();
 type TicketRow = TicketLine & RowDataPacket;
@@ -64,6 +63,12 @@ async function getBookingDetails(
 /*
  * POST /bookings
  */
+/*
+ * POST /bookings
+ * Creates a new booking for a logged-in user or a guest.
+ * Runs inside a database transaction to ensure data integrity.
+ */
+/* ----------  POST /bookings  ---------- */
 router.post("/bookings", async (req, res) => {
   const { screeningId, seats, guestEmail } = req.body;
   const userId = req.session.user?.id || null;
@@ -78,11 +83,19 @@ router.post("/bookings", async (req, res) => {
       .json({ message: "guestEmail required when not logged in" });
   }
 
-  let connection: PoolConnection | undefined;
+  let connection;
   try {
     connection = await db.getConnection();
     await connection.beginTransaction();
-    //checks that the seats are empty
+
+    // Race condition, for update makes sure that other bookings for the same screening to wait before transaktions is done
+    await connection.query(
+      "SELECT id FROM screenings WHERE id = ? FOR UPDATE",
+      [screeningId]
+    );
+
+    // Check if all requested seats are still available
+   
     const [seatsRows] = await connection.query<Seat[] & RowDataPacket[]>(
       "SELECT * FROM seatStatusView WHERE screeningId = ?",
       [screeningId]
@@ -91,27 +104,55 @@ router.post("/bookings", async (req, res) => {
     const allAvailable = seats.every((wanted: SeatInput) =>
       available.some((a) => a.seatId === wanted.seatId)
     );
+
     if (!allAvailable) {
       await connection.rollback();
       return res
         .status(400)
-        .json({ message: "One or more seats already booked" });
+        .json({ message: "Tyvärr, en eller flera platser blev precis bokade av någon annan." });
     }
 
-   
-    // creates booking with cancelation token
-    const token = crypto.randomBytes(32).toString('hex');
-    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); 
-    const bookingNumber = randomNumber();
+    // Generate Tokens & QR Code
+    const [screeningRows] = await connection.query<RowDataPacket[]>(
+      `SELECT start_time FROM screenings WHERE id = ?`,
+      [screeningId]
+    );
+    const screeningStartTime = new Date(screeningRows[0].start_time);
     
+    const expires = new Date(screeningStartTime.getTime() - 2 * 60 * 60 * 1000);
+    const token = crypto.randomBytes(32).toString("hex");
+    const bookingNumber = randomNumber();
+
+    const qrCodeDataUrl = await QRCode.toDataURL(bookingNumber, {
+      color: { dark: "#000000", light: "#ffffff" },
+      width: 200,
+      margin: 1,
+    });
+
+    let logoBuffer: Buffer | null = null;
+    try {
+      const logoPath = path.join(process.cwd(), "public", "NeoCinema.png");
+      logoBuffer = fs.readFileSync(logoPath);
+    } catch (err) {
+      console.warn("Could not load email logo:", err);
+    }
+
+    // Insert Booking
     const [bookingRes] = await connection.query<ResultSetHeader>(
       `INSERT INTO bookings (bookingNumber, userId, screeningId, date, guestEmail, cancellation_token, cancellation_token_expires)
        VALUES (?, ?, ?, NOW(), ?, ?, ?)`,
-      [bookingNumber, userId, screeningId, userId ? null : guestEmail, token, expires]
+      [
+        bookingNumber,
+        userId,
+        screeningId,
+        userId ? null : guestEmail,
+        token,
+        expires,
+      ]
     );
     const bookingId = bookingRes.insertId;
 
-    // saves seats
+    // Insert Seats
     const seatValues = seats.map((s: SeatInput) => [
       bookingId,
       s.seatId,
@@ -122,19 +163,21 @@ router.post("/bookings", async (req, res) => {
       [seatValues]
     );
 
-    // Gets all the email data
+    // Get Details for Email
     const { screening, tickets, seatNumbers, totalPrice } =
       await getBookingDetails(bookingId, connection);
 
-    // Build and send email
+    // Construct Email
     const formattedScreeningTime = formatScreeningTime(screening.start_time);
     const ticketsHtmlList = tickets
       .map(
         (t: TicketRow) =>
-          `<li>${t.qty} × ${t.ticketType} (Totalt: ${t.qty * t.price} kr)</li>`
+          `<li style="margin-bottom: 5px;">${t.qty} × ${t.ticketType} (Totalt: ${t.qty * t.price} kr)</li>`
       )
       .join("");
-    const seatsHtmlList = seatNumbers.map((s) => `<li>${s}</li>`).join("");
+    const seatsHtmlList = seatNumbers
+      .map((s) => `<li style="margin-bottom: 5px;">${s}</li>`)
+      .join("");
 
     let recipientEmail: string | null = null;
     if (userId) {
@@ -146,69 +189,50 @@ router.post("/bookings", async (req, res) => {
     } else {
       recipientEmail = guestEmail;
     }
-    // url will be the website url when live
+
     const publicUrl = process.env.PUBLIC_URL || "http://localhost:3000";
-    const logoUrl = `${publicUrl}/NeoCinema.png`;
     const cancelUrl = `${publicUrl}/avboka/${token}`;
-    // email structure
+
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; background-color: #f4f4f4; padding: 20px; width: 100%;">
         <table width="100%" border="0" cellspacing="0" cellpadding="0">
           <tr>
             <td>
               <table style="max-width: 600px; width: 100%; margin: 0 auto; background-color: #121212; color: #eaeaea; border-radius: 8px; overflow: hidden; border: 2px solid #00BFFF;">
-                
                 <tr>
                   <td style="padding: 30px 40px 10px 40px; text-align: center;">
-                    <img src="${logoUrl}" alt="NeoCinema Logotyp" style="width: 200px; max-width: 90%; height: auto;">
+                    <img src="cid:logo" alt="NeoCinema" style="width: 200px; max-width: 90%; height: auto;">
                   </td>
                 </tr>
-
                 <tr>
                   <td style="padding: 20px 40px 40px 40px;">
-                    <h2 style="color: #ffffff; margin-top: 0;">Tack för din bokning!</h2>
-                    <p>Här är din bekräftelse för din visning hos NeoCinema.</p>
-                    <br>
-                    
-                    <p style="font-size: 1.1em; margin-bottom: 5px;">Bokningsnummer:</p>
-                    <p style="font-size: 2em; color: #BF00FF; margin: 0; font-weight: bold; letter-spacing: 1px;">
-                      ${bookingNumber}
-                    </p>
-                    
+                    <h2 style="color: #ffffff; margin-top: 0; text-align: center;">Tack för din bokning!</h2>
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-top: 20px;">
+                      <tr>
+                        <td valign="top" width="60%" style="padding-right: 15px;">
+                           <p style="font-size: 1em; margin-bottom: 5px; margin-top: 0; color: #aaa;">Bokningsnummer:</p>
+                           <p style="font-size: 1.4em; color: #BF00FF; margin: 0 0 20px 0; font-weight: bold; letter-spacing: 1px;">${bookingNumber}</p>
+                           <p style="margin: 5px 0;"><b>Film:</b> <span style="color: #00BFFF;">${screening.title}</span></p>
+                           <p style="margin: 5px 0;"><b>Salong:</b> ${screening.auditoriumName}</p>
+                           <p style="margin: 5px 0;"><b>Tid:</b> ${formattedScreeningTime}</p>
+                        </td>
+                        <td valign="top" width="40%" style="text-align: center;">
+                          <div style="background: #ffffff; padding: 10px; border-radius: 8px; display: inline-block;">
+                            <img src="cid:qrcode" alt="QR Kod" style="width: 100%; max-width: 150px; height: auto; display: block;">
+                          </div>
+                          <p style="font-size: 0.8em; color: #aaa; margin-top: 5px;">Skanna vid entrén</p>
+                        </td>
+                      </tr>
+                    </table>
                     <hr style="border: 0; border-top: 2px solid #00BFFF; margin: 30px 0;">
-                    
-                    <h3 style="color: #ffffff;">Bokningsdetaljer</h3>
-                    <p style="margin: 5px 0;">
-                      <b>Film:</b> 
-                      <span style="color: #00BFFF; font-weight: bold;">${screening.title}</span>
-                    </p>
-                    <p style="margin: 5px 0;"><b>Salong:</b> ${screening.auditoriumName}</p>
-                    <p style="margin: 5px 0;"><b>Tid:</b> ${formattedScreeningTime}</p>
-                    
-                    <h3 style="color: #ffffff; margin-top: 25px;">Biljetter</h3>
-                    <ul style="list-style-type: none; padding-left: 10px; margin: 0;">
-                      ${ticketsHtmlList}
-                    </ul>
-                    
+                    <h3 style="color: #ffffff;">Biljetter</h3>
+                    <ul style="list-style-type: none; padding-left: 10px; margin: 0;">${ticketsHtmlList}</ul>
                     <h3 style="color: #ffffff; margin-top: 25px;">Platser</h3>
-                    <ul style="list-style-type: none; padding-left: 10px; margin: 0;">
-                      ${seatsHtmlList}
-                    </ul>
-                    
+                    <ul style="list-style-type: none; padding-left: 10px; margin: 0;">${seatsHtmlList}</ul>
                     <hr style="border: 0; border-top: 2px solid #00BFFF; margin: 30px 0;">
-                    
-                    <p style="font-size: 1.3em; color: #ffffff; margin-bottom: 30px; text-align: left;">
-                      <b>Totalt pris: ${totalPrice} kr</b>
-                    </p>
-                    
+                    <p style="font-size: 1.3em; color: #ffffff; margin-bottom: 30px;"><b>Totalt pris: ${totalPrice} kr</b></p>
                     <p style="text-align: center; margin: 20px 0;">
-                      <a href="${cancelUrl}" style="color: #FF5555; text-decoration: underline;">
-                        Avboka din bokning (länken är giltig i 24 timmar)
-                      </a>
-                    </p>
-                                          
-                    <p style="font-size: 0.9em; color: #888888; text-align: center; margin-bottom: 0;">
-                      Vi ser fram emot att se dig på bion!
+                      <a href="${cancelUrl}" style="color: #FF5555; text-decoration: underline;">Avboka din bokning (Länk gilltig max 2 timmar innan filmen går)</a>
                     </p>
                   </td>
                 </tr>
@@ -216,17 +240,38 @@ router.post("/bookings", async (req, res) => {
             </td>
           </tr>
         </table>
-      </div>
-    `;
+      </div>`;
 
     if (recipientEmail) {
+      const base64Data = qrCodeDataUrl.split(";base64,").pop();
+      const attachments: any[] = [
+        {
+          filename: "qrcode.png",
+          content: base64Data,
+          encoding: "base64",
+          cid: "qrcode",
+        },
+      ];
+
+      if (logoBuffer) {
+        attachments.push({
+          filename: "NeoCinema.png",
+          content: logoBuffer,
+          cid: "logo",
+        });
+      }
+
       await sendEmail({
         to: recipientEmail,
         subject: `Bekräftelse – ${screening.title} (Nr: ${bookingNumber})`,
         html: emailHtml,
+        attachments: attachments,
       });
     }
+    // 7. Commit & Broadcast
     await connection.commit();
+  
+    // We are unlocking thrue commit before telling SSE so that next person in queue can come in
     broadcastSeatUpdate({
       seatIds: seats.map((s: SeatInput) => s.seatId),
       status: "booked",
@@ -241,103 +286,12 @@ router.post("/bookings", async (req, res) => {
     });
   } catch (e: any) {
     if (connection) await connection.rollback();
+    console.error("Booking error:", e);
     res.status(500).json({ error: "Server error" });
   } finally {
     if (connection) connection.release();
   }
 });
-
-/*
- * GET /
- * Get all bookings for the *currently logged-in* user.
- * Protected: USER or ADMIN.
- */
-router.get("/", requireRole([ROLES.USER, ROLES.ADMIN]), async (req, res) => {
-  const userId = req.session.user!.id; // Get from session
-
-  try {
-    const [rows] = await db.query<RowDataPacket[]>(
-      `SELECT b.id          AS bookingId,
-              b.bookingNumber, b.date,
-              m.title         AS movieTitle,
-              s.start_time    AS screeningTime,
-              a.name          AS auditoriumName,
-              SUM(t.price)    AS totalPrice
-       FROM bookings b
-       JOIN screenings s ON s.id = b.screeningId
-       JOIN movies m ON m.id = s.movie_id
-       JOIN auditoriums a ON a.id = s.auditorium_id
-       JOIN bookingXSeats bx ON bx.bookingId = b.id
-       JOIN tickets t ON t.id = bx.ticketTypeId
-       WHERE b.userId = ?
-       GROUP BY b.id
-       ORDER BY b.date DESC`,
-      [userId]
-    );
-    res.json({ bookings: rows });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-/*
- * GET /:bookingId
- * Get a specific booking by its ID.
- * Protected: Only the USER who owns it or an ADMIN.
- */
-router.get(
-  "/:bookingId",
-  requireRole([ROLES.USER, ROLES.ADMIN]),
-  async (req, res) => {
-    const { bookingId } = req.params;
-    const sessionUser = req.session.user!;
-
-    try {
-      const [rows] = await db.query<RowDataPacket[]>(
-        `SELECT b.id AS bookingId, b.bookingNumber, b.date, b.userId,
-             m.title AS movieTitle, s.start_time AS screeningTime, a.name AS auditoriumName,
-             COALESCE(u.email, b.guestEmail) AS email,
-             SUM(t.price) AS totalPrice
-       FROM bookings b
-       LEFT JOIN users u ON u.id = b.userId
-       JOIN screenings s ON s.id = b.screeningId
-       JOIN movies m ON m.id = s.movie_id
-       JOIN auditoriums a ON a.id = s.auditorium_id
-       JOIN bookingXSeats bx ON bx.bookingId = b.id
-       JOIN tickets t ON t.id = bx.ticketTypeId
-       WHERE b.id = ?
-       GROUP BY b.id`,
-        [bookingId]
-      );
-      if (!rows.length)
-        return res.status(404).json({ message: "Not found" });
-
-      const booking = rows[0];
-      if (
-        booking.userId !== sessionUser.id &&
-        sessionUser.role !== ROLES.ADMIN
-      ) {
-        return res
-          .status(403)
-          .json({ error: "Du har inte behörighet att se denna bokning" });
-      }
-      const { tickets, seatNumbers } = await getBookingDetails(
-        Number(bookingId),
-        db
-      );
-
-      res.json({
-        ...booking,
-        tickets,
-        seatNumbers,
-      });
-    } catch (e: any) {
-      console.error(e);
-      res.status(500).json({ error: "Server error" });
-    }
-  }
-);
 
 /*
  * GET /confirmation/:bookingNumber

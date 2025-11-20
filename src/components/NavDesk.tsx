@@ -3,10 +3,10 @@ import { Navbar, Container, Nav } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 import { Film, CupHot, InfoCircle, House, Person } from "react-bootstrap-icons";
 import "./Style/NavDesk.scss";
-import { useAuth } from "../AuthContext"; 
+import { useAuth } from "../AuthContext";
 
 export default function NavDesk() {
- 
+
   const { user, isLoading } = useAuth();
   const renderAccountLink = () => {
     // show nothing while loading
@@ -17,9 +17,9 @@ export default function NavDesk() {
       return (
         <NavLink to="/profile" className="neo-link">
           {" "}
-         
+
           <Person className="neo-icon" />
-          <span className="neo-text">Konto</span> 
+          <span className="neo-text">Konto</span>
         </NavLink>
       );
     }
@@ -36,7 +36,7 @@ export default function NavDesk() {
   return (
     <Navbar className="neo-navbar" sticky="top">
       <Container fluid className="neo-shell">
-        
+
         <div className="neo-logo">
           <NavLink to="/" className="neo-logo-link">
             <img
@@ -47,7 +47,7 @@ export default function NavDesk() {
           </NavLink>
         </div>
 
-       
+
         <Nav className="neo-menu">
           <NavLink to="/" end className="neo-link">
             <House className="neo-icon" />

@@ -1,5 +1,5 @@
 /* src/pages/OmNeo.scss */
-@use '../../styles/variables' as *;
+@use '../../Styles/Variables' as *;
 
 /* ===== Bas ===== */
 .omneo-root {
@@ -77,11 +77,12 @@
 
 /* ===== Panel (neon-ram + rundade hörn) ===== */
 .omneo-content {
-  max-width: 1120px;
+   max-width: 1120px;
+  width: 90%; 
   margin: $spacing-xl auto;
   padding: $spacing-lg;
   background: $background-gradient;
-  border-radius: 24px;
+  border-radius: $border-radius;
   border: $border-width $border-style rgba($color-stroke,.35);
   /* yttre glow + tunn innerkant */
   box-shadow: 0 0 22px rgba(0,255,255,.18),
@@ -168,7 +169,7 @@
 
 /* ===== Responsiva justeringar ===== */
 @media (max-width: $breakpoint-tablet) {
-  .omneo-content { margin: $spacing-lg $spacing-md; padding: $spacing-lg $spacing-md; }
+
   .omneo-title { font-size: 28px; }
   .omneo-subtitle { font-size: 13px; }
 }
@@ -205,7 +206,7 @@
 .omneo-iconLink:hover .omneo-icon { filter: drop-shadow(0 0 6px $color-stroke); }
 
 /* 🔹 Bara för mobil/små surfplattor – påverkar inte desktop */
-@media (max-width: $breakpoint-tablet) {
+@media (max-width: 1100px) {
   .omneo-grid {
     /* text överst, ikoner under på små skärmar */
     grid-template-columns: 1fr;

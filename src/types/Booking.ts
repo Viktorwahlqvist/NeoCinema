@@ -15,7 +15,13 @@ export type Booking = {
   email: string;
   totalPrice: string | number;
   tickets: TicketLine[];
-  seatNumbers: string[]; 
+  seatNumbers: string[];
+};
+
+export type AdminBookingListType = Booking & {
+  userId: number;
+  name: string | null;
+  totalSeats: number;
 };
 
 export interface Seat {

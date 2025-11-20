@@ -1,4 +1,4 @@
-@use "../../styles/variables" as *;
+@use "../../Styles/Variables" as *;
 
 // Keyframe animation for the card to fade in with a glow
 @keyframes fadeInGlow {
@@ -82,6 +82,9 @@
   flex-direction: column;
   gap: 1.75rem; 
   font-family: $font-family-heading;
+  strong{
+    color: $color-hover;
+  }
 }
 
 // Container for the action buttons (Download, Back)

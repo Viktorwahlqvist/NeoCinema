@@ -1,5 +1,5 @@
 import React from "react";
-import "./Style/movietags.scss";
+import "./Style/Movietags.scss";
 interface TagsProps {
   actors: string[];
   ageLimit: number;
@@ -15,9 +15,8 @@ export default function MovieTags({
 }: TagsProps) {
   return (
     <ul className="ul-list-tags">
-      <li className="li-tags">{`${Math.floor(duration / 60)}h ${
-        duration % 60
-      }m`}</li>
+      <li className="li-tags">{`${Math.floor(duration / 60)}h ${duration % 60
+        }m`}</li>
       {genrer.map((g, i) => (
         <li className="li-tags" key={i}>
           {g}

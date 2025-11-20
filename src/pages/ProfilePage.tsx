@@ -108,7 +108,7 @@ export default function ProfilePage() {
       );
 
       setCancelStatus({ id: null, loading: false, error: null });
-      setModalState({ show: false, bookingId: null, bookingTitle: null }); // stäng modalen
+      setModalState({ show: false, bookingId: null, bookingTitle: null }); // close modal
     } catch (err: any) {
       console.error(err);
       setCancelStatus({
@@ -209,7 +209,7 @@ export default function ProfilePage() {
       <h2>Hej, {user.firstName}</h2>
       <p>E-post: {user.email}</p>
       <button className="logout-btn" onClick={logout}>Logga ut</button>
-      {/* Behövs stylas  */}
+      
       {user?.role === "admin" && (<button className="adminButton" onClick={() => navigate("/admin")}>Adminpanel</button>)}
 
       <h3 className="section-title">Kommande bokningar</h3>

@@ -16,16 +16,14 @@ export default function AdminProtectedRoute({ children }: AdminProtectedRoutePro
     </div>;
   }
 
-  // Om inte inloggad → login
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Om inloggad men inte admin → 404
+  
   if (user.role !== "admin") {
     return <Navigate to="/404" replace />;
   }
 
-  // Admin → visa sidan
   return <>{children}</>;
 }

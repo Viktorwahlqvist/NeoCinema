@@ -5,7 +5,6 @@
   display: inline-block;
 }
 
-/* Dropdown-menyn */
 .filter-dd__menu {
   position: absolute;
   top: calc(100% + 10px);
@@ -27,9 +26,8 @@
   }
 }
 
-/* 🔹 Begränsa styling till bara knappar inuti FilterDropdown */
 .filter-dd .overall-button {
-  width: 180px; /* standardbredd */
+  width: 180px;
   transition: width 0.2s ease;
 
   @media (max-width: 768px) {

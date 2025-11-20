@@ -1,6 +1,5 @@
 @use "../../Styles/Variables" as *;
 
-/* Sidas bakgrund + titel */
 .kioskA-root {
   min-height: 100vh;
   background: $background-gradient;
@@ -16,9 +15,7 @@
   margin: 0 0 $spacing-md;
 }
 
-/* ---------------------------
-   MOBIL INTRO BOX
---------------------------- */
+
 .kioskA-introShort {
   display: none; /* default: hidden on desktop */
 }
@@ -36,7 +33,7 @@
   box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
 }
 
-/* Huvudgrid */
+
 .kioskA-grid {
   max-width: 1200px;
   margin: 0 auto;
@@ -49,7 +46,7 @@
   }
 }
 
-/* Vänsterpanel */
+
 .kioskA-panel {
   background: $background-gradient;
   border: $border-width $border-style rgba($color-stroke, 0.35);
@@ -97,7 +94,7 @@
   }
 }
 
-/* Ikoner nederst */
+
 .kioskA-icons {
   display: flex;
   justify-content: center;
@@ -112,7 +109,7 @@
   }
 }
 
-/* Högerkolumn */
+
 .kioskA-side {
   display: grid;
   gap: $spacing-lg;
@@ -150,7 +147,7 @@
   }
 }
 
-/* Utbud */
+
 .kA-menuHead {
   display: flex;
   align-items: center;
@@ -197,9 +194,7 @@
   height: 12px;
 }
 
-/* ---------------------------
-   MODAL
---------------------------- */
+
 .kioskA-modalOverlay {
   position: fixed;
   inset: 0;
@@ -232,9 +227,7 @@
   font-family: $font-family-heading;
 }
 
-/* ---------------------------
-   MOBILE RESPONSIVE LAYOUT
---------------------------- */
+
 @media (max-width: 768px) {
   .kioskA-root {
     padding: 16px 12px 120px;
@@ -250,14 +243,14 @@
     text-align: center;
   }
 
-  /* Grid → column */
+  
   .kioskA-grid {
     display: flex !important;
     flex-direction: column !important;
     gap: 20px;
   }
 
-  /* Order */
+  
   .kioskA-side {
     order: 1;
   }

@@ -25,8 +25,6 @@ export const MovieCarousel = ({ movies }: MovieCarouselProps) => {
   };
 
 
-  console.log(filterGenre);
-
   const filteredMovies = filterGenre
     ? movies.filter((movie) => movie.genres.includes(filterGenre))
     : movies;

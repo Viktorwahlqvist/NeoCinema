@@ -104,16 +104,42 @@ export default function BookingPage() {
 
   // Booking submission
   const handleBooking = async () => {
-    if (!totalTickets) return alert("Välj minst en biljett!");
-    if (seatError) return alert(seatError);
-    if (selectedSeats.length < totalTickets) return alert("Du har valt färre stolar än antal biljetter!");
+    // Validation Guards 
+    if (!totalTickets) {
+      setToastMessage("Välj minst en biljett!");
+      setShow(true);
+      return;
+    }
+    
+    if (seatError) {
+      setToastMessage(seatError);
+      setShow(true);
+      return;
+    }
+    
+    if (selectedSeats.length < totalTickets) {
+      setToastMessage("Du har valt färre stolar än antal biljetter!");
+      setShow(true);
+      return;
+    }
 
-    const uniqueTickets = tickets.reduce((acc, cur) => {
-      const found = acc.find((t) => t.id === cur.id);
-      if (found) found.count += cur.count;
-      else acc.push({ ...cur });
-      return acc;
-    }, [] as { id: number; count: number }[]);
+    // Makes sure you have guestEmail if not logged in
+    if (!user && !guestEmail) {
+      setToastMessage("Ange din e-post för att boka som gäst.");
+      setShow(true);
+      return;
+    }
+
+    // Data Transformation 
+    const uniqueTickets = tickets.reduce(
+      (acc, cur) => {
+        const found = acc.find((t) => t.id === cur.id);
+        if (found) found.count += cur.count;
+        else acc.push({ ...cur });
+        return acc;
+      },
+      [] as { id: number; count: number }[]
+    );
 
     const seatList: { seatId: number; ticketType: number }[] = [];
     const seatQueue = [...selectedSeats];
@@ -135,11 +161,16 @@ export default function BookingPage() {
       const result = await postBooking(bookingData, "POST");
       const bookingNumber = result.bookingNumber;
 
-      await getPriceBreakdown(`/api/priceTotals?bookingId=${result.bookingId}`, "GET");
+      await getPriceBreakdown(
+        `/api/priceTotals?bookingId=${result.bookingId}`,
+        "GET"
+      );
 
       navigate(`/Bekräftelse/${bookingNumber}`);
+      
     } catch (err: any) {
-      alert(`Kunde inte boka platser: ${err.message}`);
+      setToastMessage(`Kunde inte boka platser: ${err.message}`);
+      setShow(true);
     }
   };
 

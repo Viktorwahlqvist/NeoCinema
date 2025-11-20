@@ -1,9 +1,8 @@
-@use "../../Styles/Variables" as *;
+@use "../../styles/variables" as *;
 
 .neo-navbar {
-  position: sticky;
-  top: 0;
-  z-index: 2000;       
+  position: static;
+  z-index: 2000;
   padding-block: $spacing-sm;
 }
 
@@ -14,11 +13,11 @@
 }
 
 .neo-logo-img {
-  width: auto;            
-  max-width: 150px;      
-  min-width: unset;     
-  height: 100px;           
-  object-fit: contain;   
+  width: auto;
+  max-width: 150px;
+  min-width: unset;
+  height: 100px;
+  object-fit: contain;
   display: block;
 }
 

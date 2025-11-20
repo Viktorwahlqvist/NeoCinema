@@ -5,13 +5,13 @@ import "./Styles/Main.scss";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import { AuthProvider } from "./AuthContext"; 
+import { AuthProvider } from "./AuthContext";
 import App from "./App";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <BrowserRouter>   
-      <AuthProvider>    
+    <BrowserRouter>
+      <AuthProvider>
         <App />
       </AuthProvider>
     </BrowserRouter>

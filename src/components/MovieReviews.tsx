@@ -20,19 +20,19 @@ const MovieReviews: React.FC<MovieReviewsProps> = ({ movie }) => {
     text: `${movie.title} ${reviewTemplate.text}`,
   };
 
-return (
-  <div className="movie-reviews mt-4">
-    <div className="review-card">
-      <h3 className="review-title">{review.source}</h3>
-      <p className="review-text">{review.text}</p>
-      <div className="stars">
-        {Array.from({ length: review.rating }).map((_, i) => (
-          <span key={i}>★</span>
-        ))}
+  return (
+    <div className="movie-reviews mt-4">
+      <div className="review-card">
+        <h3 className="review-title">{review.source}</h3>
+        <p className="review-text">{review.text}</p>
+        <div className="stars">
+          {Array.from({ length: review.rating }).map((_, i) => (
+            <span key={i}>★</span>
+          ))}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
 
 };
 

@@ -36,7 +36,7 @@ export default function MovieDetailPage() {
     </div>
   );
 
- 
+
   if (movieLoading) return LoadingUI;
 
   if (!movie) return showDelay ? <p className="text-center mt-5 text-light">No movie found</p> : LoadingUI;

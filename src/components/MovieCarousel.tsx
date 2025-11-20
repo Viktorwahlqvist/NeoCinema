@@ -19,10 +19,10 @@ export const MovieCarousel = ({ movies }: MovieCarouselProps) => {
     setIndex(selectedIndex);
   };
 
-const handleGenreFilter = (genre: string) => {
-  setFiltereGenre((prev) => (prev === genre ? null : genre));
-  setIndex(0);
-};
+  const handleGenreFilter = (genre: string) => {
+    setFiltereGenre((prev) => (prev === genre ? null : genre));
+    setIndex(0);
+  };
 
 
   console.log(filterGenre);
@@ -73,11 +73,11 @@ const handleGenreFilter = (genre: string) => {
       </Carousel>
 
       <div className="genre-buttons">
-<FilterBtn
-  btnName={genres}
-  onClick={handleGenreFilter}
-  activeGenre={filterGenre}
-/>
+        <FilterBtn
+          btnName={genres}
+          onClick={handleGenreFilter}
+          activeGenre={filterGenre}
+        />
       </div>
     </div>
   );

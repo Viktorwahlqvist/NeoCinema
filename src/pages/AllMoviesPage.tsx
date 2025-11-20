@@ -10,7 +10,7 @@ import { formatDate, getLimitedSortedDates } from "../utils/date";
 interface SelectedFilter {
   date: string | null;        // ISO (YYYY-MM-DD) or null = all dates
   auditorium: string | null;  // "Neo Lilla" | "Neo Stora" | null = all
-  age: number | null;         // null = alla åldrar, annars t.ex. 7/11/15
+  age: number | null;         // null = all ages, else t.ex. 7/11/15
 }
 
 export default function AllMoviesPage() {
@@ -24,9 +24,9 @@ export default function AllMoviesPage() {
   const [selectedAgeLabel, setSelectedAgeLabel] = useState("Alla åldrar");
 
   const [filterOptions, setFilterOptions] = useState<SelectedFilter>({
-    date: todayISO,             // default: dagens datum
-    auditorium: null,           // alla salonger
-    age: null,                  // alla åldrar
+    date: todayISO,             
+    auditorium: null,           
+    age: null,                  
   });
   const activeFilters: string[] = [];
 

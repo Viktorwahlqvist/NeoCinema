@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import "./PagesStyle/KioskPage.scss";
 import drink from "../assets/drink2.svg";
 import popcorn from "../assets/popcorn3.svg";
 import candy from "../assets/candy2.svg";
 
 export default function KioskPage() {
+  const [showModal, setShowModal] = useState(false);
+
   const hours = [
     { label: "Tisdag–Lördag", time: "16:30 – 22:00" },
     { label: "Söndag", time: "15:30 – 21:00" },
@@ -33,6 +35,20 @@ export default function KioskPage() {
     <div className="kioskA-root">
       <h1 className="kioskA-title">Kiosk</h1>
 
+      {/* ---- MOBIL: Kort intro ---- */}
+      <div className="kioskA-introShort">
+        <h2>Välkommen till Neon Snacks!</h2>
+        <p>
+          Upptäck popcorn, godis och snacks som höjer filmupplevelsen. Perfekt
+          inför filmen!
+        </p>
+
+        <button className="kioskA-moreBtn" onClick={() => setShowModal(true)}>
+          Läs mer
+        </button>
+      </div>
+
+      {/* ---- DESKTOP + full layout ---- */}
       <main className="kioskA-grid">
         {/* Vänster stor panel */}
         <section className="kioskA-panel">
@@ -59,27 +75,9 @@ export default function KioskPage() {
           </div>
 
           <div className="kioskA-icons">
-            <img
-              src={drink}
-              alt="Drink"
-              className="kA-icon"
-              width={80}
-              height={80}
-            />
-            <img
-              src={popcorn}
-              alt="Popcorn"
-              className="kA-icon"
-              width={80}
-              height={80}
-            />
-            <img
-              src={candy}
-              alt="Candy"
-              className="kA-icon"
-              width={80}
-              height={80}
-            />
+            <img src={drink} alt="Drink" className="kA-icon" />
+            <img src={popcorn} alt="Popcorn" className="kA-icon" />
+            <img src={candy} alt="Candy" className="kA-icon" />
           </div>
         </section>
 
@@ -99,19 +97,9 @@ export default function KioskPage() {
 
           <section className="kA-box">
             <div className="kA-menuHead">
-              <img
-                src={popcorn}
-                alt=""
-                aria-hidden
-                className="kA-icon kA-icon--small"
-              />
+              <img src={popcorn} alt="" aria-hidden className="kA-icon kA-icon--small" />
               <h3>Utbud</h3>
-              <img
-                src={drink}
-                alt=""
-                aria-hidden
-                className="kA-icon kA-icon--small"
-              />
+              <img src={drink} alt="" aria-hidden className="kA-icon kA-icon--small" />
             </div>
             <ul className="kA-menu">
               {menu.map((m, i) =>
@@ -129,6 +117,36 @@ export default function KioskPage() {
           </section>
         </aside>
       </main>
+
+      {/* ---- MODAL ---- */}
+      {showModal && (
+        <div className="kioskA-modalOverlay" onClick={() => setShowModal(false)}>
+          <div className="kioskA-modal" onClick={(e) => e.stopPropagation()}>
+            <h2>Välkommen till Neon Snacks!</h2>
+
+            <p>
+              Vi är stolta över att presentera vår helt nyöppnade kiosk –
+              fullproppad med godsaker som gör bioupplevelsen ännu bättre. Här
+              hittar du allt från klassiska popcorn och läsk till färgstarka
+              snacks och sötsaker i sann retro-anda.
+            </p>
+
+            <p>
+              Hos oss hittar du både klassiker och nya favoriter – popcorn,
+              läsk, godis och snacks som förhöjer filmupplevelsen.
+            </p>
+
+            <p>
+              Vi serverar även enklare mat som korv med bröd och andra snabba
+              rätter. Perfekt om du vill stilla hungern innan filmen börjar!
+            </p>
+
+            <button className="kioskA-closeBtn" onClick={() => setShowModal(false)}>
+              Stäng
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

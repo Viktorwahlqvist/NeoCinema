@@ -210,7 +210,7 @@ export default function ProfilePage() {
       <p>E-post: {user.email}</p>
       <button className="logout-btn" onClick={logout}>Logga ut</button>
       {/* Behövs stylas  */}
-      {user?.role === "admin" && (<button onClick={() => navigate("/admin")}>Adminpanel</button>)}
+      {user?.role === "admin" && (<button className="adminButton" onClick={() => navigate("/admin")}>Adminpanel</button>)}
 
       <h3 className="section-title">Kommande bokningar</h3>
       {upcomingBookings.length === 0 && (

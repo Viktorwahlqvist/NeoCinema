@@ -14,7 +14,6 @@ export default function MovieDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Visa text/”no movie” först efter 4s
   const [showDelay, setShowDelay] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setShowDelay(true), 4000);

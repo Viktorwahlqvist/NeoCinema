@@ -218,12 +218,11 @@ export default function BookingPage() {
 
           <div className="screen">DUKEN</div>
 
-           {/* Gäst-email (bara om utloggad och har valt biljetter) */}
+          
           {!user && totalTickets > 0 && (
             <GuestEmailInput guestEmail={guestEmail} handleEmailChange={handleEmailChange} />
           )}
 
-          {/* Seating Map */}
           <SeatingMap seats={seats} selectedSeats={selectedSeats} handleSeatClick={handleSeatClick} />
           {seatError && <p style={{ color: "red", marginTop: "15px" }}>{seatError}</p>}
 

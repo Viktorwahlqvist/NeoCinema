@@ -7,7 +7,7 @@ import { requireRole, ROLES } from "../utils/acl.js";
 
 const router = Router();
 
-/* ----------  session type ---------- */
+// session type 
 declare module "express-session" {
   interface SessionData {
     user?: {
@@ -24,12 +24,12 @@ function requireAuth(req: any, res: any, next: any) {
   next();
 }
 
-/* ----------  helpers ---------- */
+// helpers
 const isString = (v: unknown): v is string =>
   typeof v === "string" && v.trim().length > 0;
 const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 
-/* ----------  POST /users/register ---------- */
+// POST /users/register 
 router.post("/register", async (req, res) => {
   const { firstName, lastName, email, password } = req.body ?? {};
   if (!isString(email) || !isValidEmail(email))
@@ -66,7 +66,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-/* ----------  POST /users/login ---------- */
+// POST /users/login 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body ?? {};
   if (!isString(email) || !isString(password))
@@ -92,7 +92,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-/* ----------  POST /users/logout ---------- */
+//POST /users/logout
 router.post("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) return res.status(500).json({ error: "Kunde inte logga ut" });
@@ -101,7 +101,7 @@ router.post("/logout", (req, res) => {
   });
 });
 
-/* ----------  GET /users/me ---------- */
+//GET /users/me 
 router.get("/me", requireAuth, async (req, res) => {
   try {
     const [rows] = await db.query<RowDataPacket[]>(
@@ -115,7 +115,7 @@ router.get("/me", requireAuth, async (req, res) => {
   }
 });
 
-/* ----------  GET /users/me/bookings  (history) ---------- */
+// GET /users/me/bookings  (history) 
 router.get("/me/bookings", requireAuth, async (req, res) => {
   try {
     const [rows] = await db.query<RowDataPacket[]>(

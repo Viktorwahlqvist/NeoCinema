@@ -153,7 +153,7 @@
     order: 3;
   }
 
-  // 📱 Mobilanpassning
+  
   @media (max-width: 480px) {
     margin-left: 0;
     align-items: center;
@@ -165,7 +165,7 @@
     }
 
     .ticket-total-box {
-      order: 2; // Flytta över knappen
+      order: 2; 
       margin-bottom: 0.5rem;
     }
 
@@ -193,7 +193,7 @@
   text-align: center;
 }
 
-/* RIGHT : seats + button */
+
 .booking-right {
   flex: 1 1 600px;
   display: flex;
@@ -313,7 +313,7 @@
   }
 
   .seating-area {
-    width: 100%; // ändra här flr mobile
+    width: 100%; 
     max-width: 100%;
     padding: 0 0.5rem;
   }
@@ -353,7 +353,7 @@
 }
 
 .neo-btn--disabledEmail {
-  background: #a80000 !important;   // röd
+  background: #a80000 !important; 
   color: #fff !important;
     border: none !important;
 

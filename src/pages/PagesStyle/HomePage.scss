@@ -1,7 +1,6 @@
 @use "../../Styles/Variables" as *;
 
 .home-page {
-  // background-color: #050510;
   color: #e0e0e0;
   min-height: 100vh;
   padding-bottom: 7rem;
@@ -9,7 +8,7 @@
   overflow: hidden;
 }
 
-/* ===== Header / Titel ===== */
+
 .header-box {
   text-align: center;
   padding: 2rem 0 1rem;
@@ -35,7 +34,7 @@
   letter-spacing: 1px;
 }
 
-/* ===== Genre-tag ===== */
+
 .genre-row {
   display: flex;
   flex-wrap: wrap;
@@ -62,7 +61,7 @@
 }
 
 
-/* ===== Neon-button ===== */
+
 .neon-btn {
   color: $color-stroke;
   border: 2px solid;

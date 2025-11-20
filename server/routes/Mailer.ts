@@ -14,9 +14,9 @@ export async function sendEmail({
   subject: string;
   text?: string;
   html?: string;
-  attachments?: any[]; 
+  attachments?: any[];
 }) {
- // Check if required environment variables exist
+  // Check if required environment Variables exist
   if (!email || !appPassword) {
     console.error("Saknas miljövariabler för Gmail.");
     return;

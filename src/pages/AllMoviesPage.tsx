@@ -3,7 +3,6 @@ import AllMoviesList, { ScreeningsInfo } from "../components/AllMoviesList";
 import useFetch from "../hook/useFetch";
 import FilterDropdown from "../components/filter/FilterDropdown";
 import "./PagesStyle/AllmoviesPages.scss";
-import FilterBtn from "../components/filter/FilterBtn";
 import { Col, Container, Row } from "react-bootstrap";
 import { formatDate, getLimitedSortedDates } from "../utils/date";
 
@@ -24,9 +23,9 @@ export default function AllMoviesPage() {
   const [selectedAgeLabel, setSelectedAgeLabel] = useState("Alla åldrar");
 
   const [filterOptions, setFilterOptions] = useState<SelectedFilter>({
-    date: todayISO,             
-    auditorium: null,           
-    age: null,                  
+    date: todayISO,
+    auditorium: null,
+    age: null,
   });
   const activeFilters: string[] = [];
 

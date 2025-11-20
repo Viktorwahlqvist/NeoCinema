@@ -4,6 +4,8 @@ import { Movie } from "../types/movie";
 import FilterBtn from "../components/filter/FilterBtn";
 import "./Style/Allmovieslist.scss";
 import { Col, Row } from "react-bootstrap";
+import { formatScreeningTime } from "../utils/date";
+
 
 export interface ScreeningsInfo extends Omit<Movie, "id"> {
   auditoriumName: string;
@@ -33,7 +35,7 @@ export default function AllMoviesList({ movies }: AllMoviesListPRops) {
             lg={1}
             className="d-none d-md-flex justify-content-end ms-md-2"
           >
-            <p>{movie.startTime.slice(11, 16)}</p>
+            <p>{formatScreeningTime(movie.startTime).split(" ")[1]}</p>
           </Col>
           <Col xs={12} md={3} lg={4}>
             <img
@@ -59,7 +61,7 @@ export default function AllMoviesList({ movies }: AllMoviesListPRops) {
             className="text-mobil d-flex flex-column flex-md-row align-items-start align-items-md-center text-center"
           >
             <p>Salong {movie.auditoriumName}</p>
-            <p className=" d-md-none">{movie.startTime.slice(11, 16)}</p>
+            <p className=" d-md-none">{formatScreeningTime(movie.startTime).split(" ")[1]}</p>
           </Col>
 
           <Col

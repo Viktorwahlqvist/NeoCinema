@@ -1,7 +1,7 @@
 import React from "react";
 import { Card } from "react-bootstrap";
 import type { Movie, Review } from "../types/movie";
-import "../styles/MovieReviews.scss";
+import "../Styles/MovieReviews.scss";
 
 
 interface MovieReviewsProps {

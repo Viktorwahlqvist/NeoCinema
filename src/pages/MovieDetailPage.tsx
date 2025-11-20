@@ -7,7 +7,7 @@ import MovieTags from "../components/MovieTags";
 import MovieDescription from "../components/MovieDescription";
 import DateTimeSelector from "../components/DateTimeSelector";
 import MovieReviews from "../components/MovieReviews";
-import "../styles/Date-time-selector.scss";
+import "../Styles/Date-time-selector.scss";
 import { Movie } from "../types/movie";
 
 export default function MovieDetailPage() {

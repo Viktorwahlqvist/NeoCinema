@@ -1,6 +1,6 @@
 import Carousel from "react-bootstrap/Carousel";
 import type { Movie } from "../types/movie";
-import "./style/MovieCarousel.scss";
+import "./Style/MovieCarousel.scss";
 import { useState } from "react";
 import FilterBtn from "./filter/FilterBtn";
 import { Link } from "react-router-dom";

@@ -18,7 +18,20 @@
     opacity: 0.9;
   }
 
-  
+  .adminButton{
+    margin-top: 1rem;
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    background: rgba(255, 0, 122, 0.1);
+    color: #00eaff;
+    border: 1px solid #00eaff;
+    text-shadow: 0px 0px 6px #00eaff;
+    border-radius: 6px;
+    cursor: pointer;    
+    transition: 0.25s;
+
+
+  }
   .logout-btn {
     margin-top: 1rem;
     padding: 0.6rem 1.2rem;

@@ -4,9 +4,10 @@ import { Row, Col, Button, Table } from 'react-bootstrap';
 
 interface AdminBookingListProps {
   bookings: AdminBookingListType[];
+  onClick: (bookingId: number) => void;
 }
 
-export default function AdminBookingList({ bookings }: AdminBookingListProps) {
+export default function AdminBookingList({ bookings, onClick }: AdminBookingListProps) {
 
 
   return (
@@ -29,7 +30,7 @@ export default function AdminBookingList({ bookings }: AdminBookingListProps) {
                 <td>{b.name ? b.name : " - Gäst"}</td>
                 <td>{b.email}</td>
                 <td>{b.movieTitle} <br /> {`${b.screeningTime.split("T")[0]}, Kl: ${b.screeningTime.split("T")[1].slice(0, 5)}`}</td>
-                <td><Button variant='danger'>Avboka</Button></td>
+                <td><Button onClick={() => onClick(b.bookingId)} variant='danger'>Avboka</Button></td>
               </tr>
             );
           })}

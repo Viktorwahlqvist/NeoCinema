@@ -32,8 +32,7 @@ export default function BookingConfirmation() {
         <h3 className="movie-title">{data.movieTitle}</h3>
 
         <div className="confirmation-inner">
-          {/* RIGHT (desktop): QR — placed second so it sits in the right column */}
-          {/* LEFT: Details */}
+      
           <div className="details-column">
             <TicketList totalPrice={data.totalPrice as number} tickets={data.tickets}/>
             <SeatList seatNumbers={data.seatNumbers}/>

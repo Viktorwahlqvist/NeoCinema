@@ -35,7 +35,7 @@ export default function KioskPage() {
     <div className="kioskA-root">
       <h1 className="kioskA-title">Kiosk</h1>
 
-      {/* ---- MOBIL: Kort intro ---- */}
+      
       <div className="kioskA-introShort">
         <h2>Välkommen till Neon Snacks!</h2>
         <p>
@@ -48,9 +48,9 @@ export default function KioskPage() {
         </button>
       </div>
 
-      {/* ---- DESKTOP + full layout ---- */}
+     
       <main className="kioskA-grid">
-        {/* Vänster stor panel */}
+       
         <section className="kioskA-panel">
           <h2 className="kioskA-heading">Välkommen till Neon Snacks!</h2>
 
@@ -81,7 +81,7 @@ export default function KioskPage() {
           </div>
         </section>
 
-        {/* Högerkolumn */}
+       
         <aside className="kioskA-side">
           <section className="kA-box">
             <h3 className="kA-boxTitle">Öppettider</h3>
@@ -118,7 +118,6 @@ export default function KioskPage() {
         </aside>
       </main>
 
-      {/* ---- MODAL ---- */}
       {showModal && (
         <div className="kioskA-modalOverlay" onClick={() => setShowModal(false)}>
           <div className="kioskA-modal" onClick={(e) => e.stopPropagation()}>

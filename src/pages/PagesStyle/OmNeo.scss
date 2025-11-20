@@ -1,20 +1,20 @@
-/* src/pages/OmNeo.scss */
+
 @use '../../Styles/Variables' as *;
 
-/* ===== Bas ===== */
+
 .omneo-root {
   min-height: 100vh;
   background: $background-gradient;
   color: $color-text;
   font-family: $font-family-heading;
-  /* lite rymd */
+ 
   padding-bottom: $spacing-xl;
 }
 
-/* ===== HERO (mer lik din screenshot) ===== */
+
 .omneo-hero {
   position: relative;
-  height: 260px; /* lite lägre än tidigare */
+  height: 260px; 
   overflow: hidden;
   isolation: isolate;
 
@@ -22,11 +22,10 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: brightness(.44) saturate(1.05); /* mörkare så text glöder */
-    transform: translateZ(0); /* skarpare i chrome */
+    filter: brightness(.44) saturate(1.05); 
+    transform: translateZ(0); 
   }
 
-  /* lila toning och subtil cyanlinje i botten */
   &::after {
     content: '';
     position: absolute; inset: 0;
@@ -48,7 +47,7 @@
   }
 }
 
-/* Titel + undertitel – cyan + prickar ovan/under */
+
 .omneo-title {
   margin: 0 0 $spacing-xs;
   font-size: $font-size-heading-lg;
@@ -69,13 +68,13 @@
 }
 
 .omneo-subtitle {
-  font-size: 14px;  /* tajtare som i bilden */
+  font-size: 14px;  
   opacity: .9;
   max-width: 700px;
   margin-inline: auto;
 }
 
-/* ===== Panel (neon-ram + rundade hörn) ===== */
+
 .omneo-content {
    max-width: 1120px;
   width: 90%; 
@@ -84,12 +83,12 @@
   background: $background-gradient;
   border-radius: $border-radius;
   border: $border-width $border-style rgba($color-stroke,.35);
-  /* yttre glow + tunn innerkant */
+ 
   box-shadow: 0 0 22px rgba(0,255,255,.18),
               inset 0 0 0 1px rgba(0,255,255,.10);
 }
 
-/* Grid: text vänster, ikonspalt höger */
+
 .omneo-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -101,10 +100,10 @@
   }
 }
 
-/* ===== Sektioner (vänsterkolumn) ===== */
+
 .omneo-section {
   padding: $spacing-md 0;
-    text-align: left;            /* ← vänsterställ allt i sektionen */
+    text-align: left;            
 
 
   &:last-child { border-bottom: 0; }
@@ -118,14 +117,14 @@
 
   p {
     margin: 0;
-    font-size: 13.5px; /* lite mindre brödtext som i bilden */
+    font-size: 13.5px; 
     line-height: 1.55;
     opacity: .95;
-    max-width: 62ch; /* smal spalt */
+    max-width: 62ch; 
   }
 }
 
-/* Kontaktpunkter */
+
 .omneo-contact {
   list-style: none; margin: 0; padding: 0;
 
@@ -142,13 +141,13 @@
   }
 }
 
-/* ===== Ikonspalt (högerkolumn) ===== */
+
 .omneo-icons {
   display: grid;
   gap: 28px;
   justify-items: center;
   align-content: start;
-  padding-top: 6px; /* liten optisk justering */
+  padding-top: 6px; 
 }
 
 .omneo-iconBox {
@@ -167,13 +166,12 @@
   }
 }
 
-/* ===== Responsiva justeringar ===== */
+
 @media (max-width: $breakpoint-tablet) {
 
   .omneo-title { font-size: 28px; }
   .omneo-subtitle { font-size: 13px; }
 }
-/* högerkolumnens layout behålls */
 .omneo-icons {
   display: grid;
   gap: 100px;
@@ -181,34 +179,33 @@
   align-content: start;
 }
 
-/* variant utan box – samma look som din screenshot */
 .omneo-icons--bare .omneo-icon {
   width: 30px;
   height: 30px;
-  color: $color-stroke;     /* cyan */
-  stroke-width: 1.8;        /* lite tjockare linje */
+  color: $color-stroke;    
+  stroke-width: 1.8;       
 }
 
-/* om Bootstrap råkar påverka, lås storlek och färg */
+
 .omneo-icons--bare .omneo-icon svg {
   width: 30px;
   height: 30px;
 }
-/* Extra nudge: bara den första ikonen får toppmarginal */
+
 .omneo-icons .omneo-icon:first-child {
-  margin-top: $spacing-xl;  /* +64px */
+  margin-top: $spacing-xl;  
 }
 
-/* ta bort ev. tidigare box-stil */
+
 .omneo-iconBox { display: none; }
 .omneo-iconLink { display: inline-grid; }
 .omneo-iconLink .omneo-icon { cursor: pointer; }
 .omneo-iconLink:hover .omneo-icon { filter: drop-shadow(0 0 6px $color-stroke); }
 
-/* 🔹 Bara för mobil/små surfplattor – påverkar inte desktop */
+
 @media (max-width: 1100px) {
   .omneo-grid {
-    /* text överst, ikoner under på små skärmar */
+    
     grid-template-columns: 1fr;
   }
 
@@ -216,7 +213,7 @@
     display: flex;
     gap: 16px;
     justify-content: center;
-    flex-wrap: wrap;        /* om de inte får plats på en rad -> rad 2 */
+    flex-wrap: wrap;       
     padding-top: $spacing-sm;
   }
 

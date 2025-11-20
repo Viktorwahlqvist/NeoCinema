@@ -47,8 +47,7 @@ function App() {
               <AdminPage />
             </AdminProtectedRoute>
           }>
-            <Route index element={<Navigate to="dashboard" />} />
-            <Route path="dashboard" element={<p>All info</p>} />
+            <Route index element={<Navigate to="bookings" />} />
             <Route path="bookings" element={<AdminBookings />} />
             <Route path="users" element={<p>All users</p>} />
           </Route>

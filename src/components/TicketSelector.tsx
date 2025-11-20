@@ -18,14 +18,12 @@ export default function TicketSelector({ onTicketChange }: Props) {
 
   useEffect(() => {
     if (tickets && selected.length === 0) {
-      // Förifyll två vuxenbiljetter bara första gången
       setSelected([{ id: 3, count: 2 }]);
     }
   }, [tickets]);
 
 
   useEffect(() => {
-    // Skapa en lista med id, count och price från aktuell state
     const selectedWithPrice = selected.map((sel) => {
       const ticketInfo = tickets?.find((t) => t.id === sel.id);
       return { ...sel, price: ticketInfo?.price ?? 0 };

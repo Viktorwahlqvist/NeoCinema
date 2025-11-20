@@ -74,7 +74,7 @@ export default function AdminBookings() {
   return (
     <Container className='mt-4'>
 
-      <Stack direction="horizontal" gap={3} className='mb-2'>
+      <Stack direction="horizontal" gap={3} className='mb-2 flex-wrap'>
 
         <Form.Control
           type="date"

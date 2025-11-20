@@ -28,8 +28,7 @@ export function getLimitedSortedDates(dateStrings: string[]) {
 }
 
 export function formatScreeningTime(date: string): string {
-  const dateObj = new Date(date.replace("Z", ""));
-
+  const dateObj = new Date(date);
   return dateObj.toLocaleString("sv-SE", {
     year: "numeric",
     month: "2-digit",

@@ -17,7 +17,7 @@ import GuestEmailInput from "../components/GuestEmailInput";
 import { useSeatSelection, useGuestEmail } from "../hook/UseBookingLogic";
 
 export default function BookingPage() {
-  const { screeningId } = useParams<{ screeningId: string }>();
+  const { screeningId } = useParams<{ screeningId: string; }>();
   const navigate = useNavigate();
 
   const [showDelay, setShowDelay] = useState(false);
@@ -31,7 +31,7 @@ export default function BookingPage() {
   const [toastMessage, setToastMessage] = useState("");
 
   // Tickets state
-  const [tickets, setTickets] = useState<{ id: number; count: number; price?: number }[]>([]);
+  const [tickets, setTickets] = useState<{ id: number; count: number; price?: number; }[]>([]);
 
   const totalTickets = tickets.reduce((sum, t) => sum + t.count, 0);
   const totalPrice = tickets.reduce((sum, t) => sum + t.count * (t.price ?? 0), 0);
@@ -81,7 +81,7 @@ export default function BookingPage() {
   // Screening info
   const { data: screening } = useFetch<{
     title: string;
-    info: { mobileImg: string };
+    info: { mobileImg: string; };
     startTime: string;
     auditoriumName: string;
   }[]>(`/api/screeningsInfo?screeningId=${screeningId}`, { skip: !screeningId });
@@ -110,13 +110,13 @@ export default function BookingPage() {
       setShow(true);
       return;
     }
-    
+
     if (seatError) {
       setToastMessage(seatError);
       setShow(true);
       return;
     }
-    
+
     if (selectedSeats.length < totalTickets) {
       setToastMessage("Du har valt färre stolar än antal biljetter!");
       setShow(true);
@@ -138,10 +138,10 @@ export default function BookingPage() {
         else acc.push({ ...cur });
         return acc;
       },
-      [] as { id: number; count: number }[]
+      [] as { id: number; count: number; }[]
     );
 
-    const seatList: { seatId: number; ticketType: number }[] = [];
+    const seatList: { seatId: number; ticketType: number; }[] = [];
     const seatQueue = [...selectedSeats];
 
     for (const t of uniqueTickets) {
@@ -167,7 +167,7 @@ export default function BookingPage() {
       );
 
       navigate(`/Bekräftelse/${bookingNumber}`);
-      
+
     } catch (err: any) {
       setToastMessage(`Kunde inte boka platser: ${err.message}`);
       setShow(true);
@@ -218,7 +218,7 @@ export default function BookingPage() {
 
           <div className="screen">DUKEN</div>
 
-          
+
           {!user && totalTickets > 0 && (
             <GuestEmailInput guestEmail={guestEmail} handleEmailChange={handleEmailChange} />
           )}
@@ -237,7 +237,7 @@ export default function BookingPage() {
         </section>
       </div>
 
-            {/* Toast Notification Container */}
+      {/* Toast Notification Container */}
 
       <NotificationToast setShow={setShow} show={show} toastMessage={toastMessage} />
     </main>

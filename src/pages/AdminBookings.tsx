@@ -27,19 +27,25 @@ export default function AdminBookings() {
     setToastMessage("");
 
     try {
-      await fetch(`/api/booking/${bookingId}`, {
+      const response = await fetch(`/api/booking/${bookingId}`, {
         method: "DELETE",
         credentials: "include",
       });
 
-      setBookingData(prev => prev.filter(b => b.bookingId !== bookingId));
+      const data = await response.json();
 
-    } catch (err) {
-      console.error("Error deleting booking:", err);
-    } finally {
+      if (!response.ok) {
+        throw new Error(data.error || "Något gick fel vid borttagning");
+      }
+
+
+      setBookingData(prev => prev.filter(b => b.bookingId !== bookingId));
       setToastMessage(`Bokning med Boknings ID: ${bookingId} togs bort`);
       setShow(true);
 
+    } catch (err: any) {
+      setToastMessage(err.message || "Kunde inte ta bort bokningen");
+      setShow(true);
     }
   };
 
